@@ -1,4 +1,4 @@
-namespace PurchaseOrder.Domain.CoreContext;
+namespace PurchaseOrder.Domain.Core;
 
 /// <summary>
 /// Base type for domain entities with lifecycle metadata and domain events.

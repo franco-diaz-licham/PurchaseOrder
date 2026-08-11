@@ -1,4 +1,4 @@
-namespace PurchaseOrder.Domain.CoreContext;
+namespace PurchaseOrder.Domain.Core;
 
 /// <summary>
 /// Represents an expected business rule failure inside the domain.

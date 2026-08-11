@@ -1,4 +1,4 @@
-namespace PurchaseOrder.Domain.CoreContext;
+namespace PurchaseOrder.Domain.Core;
 
 /// <summary>
 /// Marker interface for in-process domain events.
