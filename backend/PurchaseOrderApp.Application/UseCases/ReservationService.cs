@@ -3,12 +3,17 @@ using PurchaseOrderApp.Application.Models;
 using PurchaseOrderApp.Application.Ports;
 using PurchaseOrderApp.Domain.Core;
 using PurchaseOrderApp.Domain.Entities;
+using PurchaseOrderApp.Domain.Enums;
 using PurchaseOrderApp.Domain.ValueObjects;
 
 namespace PurchaseOrderApp.Application.UseCases;
 
 public interface IReservationService
 {
+    Task<Result<ReservationResponse>> GetAsync(StockReservationId stockReservationId, CancellationToken cancellationToken);
+
+    Task<Result<List<ReservationResponse>>> ListAsync(WarehouseId? warehouseId, ReservationStatus? status, CancellationToken cancellationToken);
+
     Task<Result<ReservationResponse>> ReserveAsync(CreateReservationCommand command, CancellationToken cancellationToken);
 
     Task<Result<ReservationResponse>> ReleaseAsync(ReleaseReservationCommand command, CancellationToken cancellationToken);
@@ -22,6 +27,24 @@ public sealed class ReservationService(
     IAuditLogRepository auditLogRepository,
     IUnitOfWork unitOfWork) : IReservationService
 {
+    public async Task<Result<ReservationResponse>> GetAsync(StockReservationId stockReservationId, CancellationToken cancellationToken)
+    {
+        if (stockReservationId.Value == Guid.Empty) return Result.Fail<ReservationResponse>("Stock reservation id is required.", ResultStatus.Invalid);
+
+        var reservation = await stockReservationRepository.GetResponseAsync(stockReservationId, cancellationToken);
+        if (reservation is null) return Result.Fail<ReservationResponse>("Stock reservation was not found.", ResultStatus.NotFound);
+
+        return Result.Success(reservation);
+    }
+
+    public async Task<Result<List<ReservationResponse>>> ListAsync(WarehouseId? warehouseId, ReservationStatus? status, CancellationToken cancellationToken)
+    {
+        if (warehouseId is not null && warehouseId.Value.Value == Guid.Empty) return Result.Fail<List<ReservationResponse>>("Warehouse id is required.", ResultStatus.Invalid);
+
+        var reservations = await stockReservationRepository.ListResponsesAsync(warehouseId, status, cancellationToken);
+        return Result.Success(reservations);
+    }
+
     public async Task<Result<ReservationResponse>> ReserveAsync(CreateReservationCommand command, CancellationToken cancellationToken)
     {
         if (command.PurchaseOrderLineId.Value == Guid.Empty) return Result.Fail<ReservationResponse>("Purchase order line id is required.", ResultStatus.Invalid);

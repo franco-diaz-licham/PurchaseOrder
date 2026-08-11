@@ -13,9 +13,7 @@ namespace PurchaseOrderApp.Api.Controllers;
 public sealed class PurchaseOrderController(IPurchaseOrderService purchaseOrderService) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<List<PurchaseOrderResponse>>>> GetAll(
-        [FromQuery] Guid? warehouseId,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<List<PurchaseOrderResponse>>>> GetAll([FromQuery] Guid? warehouseId, CancellationToken cancellationToken)
     {
         WarehouseId? parsedWarehouseId = warehouseId.HasValue ? new WarehouseId(warehouseId.Value) : null;
         var result = await purchaseOrderService.ListAsync(parsedWarehouseId, cancellationToken);
@@ -23,27 +21,29 @@ public sealed class PurchaseOrderController(IPurchaseOrderService purchaseOrderS
     }
 
     [HttpGet("{purchaseOrderId:guid}")]
-    public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> Get(
-        Guid purchaseOrderId,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> Get(Guid purchaseOrderId, CancellationToken cancellationToken)
     {
         var result = await purchaseOrderService.GetAsync(new PurchaseOrderId(purchaseOrderId), cancellationToken);
         return result.ToActionResult();
     }
 
     [HttpPost]
-    public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> Submit(
-        [FromBody] SubmitPurchaseOrderRequest request,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> Submit([FromBody] SubmitPurchaseOrderRequest request, CancellationToken cancellationToken)
     {
+        var lines = new List<SubmitPurchaseOrderLineCommand>();
+        if (request.Lines is not null) {
+            foreach (var requestLine in request.Lines) {
+                var inventoryItemId = new InventoryItemId(requestLine.InventoryItemId);
+                var quantityOrdered = new Quantity(requestLine.QuantityOrdered);
+                var line = new SubmitPurchaseOrderLineCommand(inventoryItemId, quantityOrdered);
+                lines.Add(line);
+            }
+        }
+
         var command = new SubmitPurchaseOrderCommand(
             request.PurchaseOrderNumber,
             new WarehouseId(request.WarehouseId),
-            request.Lines?
-                .Select(line => new SubmitPurchaseOrderLineCommand(
-                    new InventoryItemId(line.InventoryItemId),
-                    new Quantity(line.QuantityOrdered)))
-                .ToList() ?? [],
+            lines,
             request.User,
             DateTimeOffset.UtcNow);
 
@@ -52,10 +52,7 @@ public sealed class PurchaseOrderController(IPurchaseOrderService purchaseOrderS
     }
 
     [HttpPost("{purchaseOrderId:guid}/lines")]
-    public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> AddLine(
-        Guid purchaseOrderId,
-        [FromBody] AddPurchaseOrderLineRequest request,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> AddLine(Guid purchaseOrderId, [FromBody] AddPurchaseOrderLineRequest request, CancellationToken cancellationToken)
     {
         var command = new AddPurchaseOrderLineCommand(
             new PurchaseOrderId(purchaseOrderId),
@@ -69,10 +66,7 @@ public sealed class PurchaseOrderController(IPurchaseOrderService purchaseOrderS
     }
 
     [HttpPut("{purchaseOrderId:guid}/approve")]
-    public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> Approve(
-        Guid purchaseOrderId,
-        [FromBody] ChangePurchaseOrderStatusRequest request,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> Approve(Guid purchaseOrderId, [FromBody] ChangePurchaseOrderStatusRequest request, CancellationToken cancellationToken)
     {
         var command = new ChangePurchaseOrderStatusCommand(new PurchaseOrderId(purchaseOrderId), request.User, DateTimeOffset.UtcNow);
         var result = await purchaseOrderService.ApproveAsync(command, cancellationToken);
@@ -80,10 +74,7 @@ public sealed class PurchaseOrderController(IPurchaseOrderService purchaseOrderS
     }
 
     [HttpPut("{purchaseOrderId:guid}/close")]
-    public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> Close(
-        Guid purchaseOrderId,
-        [FromBody] ChangePurchaseOrderStatusRequest request,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> Close(Guid purchaseOrderId, [FromBody] ChangePurchaseOrderStatusRequest request, CancellationToken cancellationToken)
     {
         var command = new ChangePurchaseOrderStatusCommand(new PurchaseOrderId(purchaseOrderId), request.User, DateTimeOffset.UtcNow);
         var result = await purchaseOrderService.CloseAsync(command, cancellationToken);
@@ -91,10 +82,7 @@ public sealed class PurchaseOrderController(IPurchaseOrderService purchaseOrderS
     }
 
     [HttpPut("{purchaseOrderId:guid}/cancel")]
-    public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> Cancel(
-        Guid purchaseOrderId,
-        [FromBody] ChangePurchaseOrderStatusRequest request,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> Cancel(Guid purchaseOrderId, [FromBody] ChangePurchaseOrderStatusRequest request, CancellationToken cancellationToken)
     {
         var command = new ChangePurchaseOrderStatusCommand(new PurchaseOrderId(purchaseOrderId), request.User, DateTimeOffset.UtcNow);
         var result = await purchaseOrderService.CancelAsync(command, cancellationToken);
@@ -102,9 +90,7 @@ public sealed class PurchaseOrderController(IPurchaseOrderService purchaseOrderS
     }
 
     [HttpGet("approved-lines")]
-    public async Task<ActionResult<ApiResponse<List<ApprovedPurchaseOrderLineResponse>>>> GetApprovedLines(
-        [FromQuery] Guid warehouseId,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<List<ApprovedPurchaseOrderLineResponse>>>> GetApprovedLines([FromQuery] Guid warehouseId, CancellationToken cancellationToken)
     {
         var result = await purchaseOrderService.ListApprovedOutstandingLinesAsync(new WarehouseId(warehouseId), cancellationToken);
         return result.ToActionResult();

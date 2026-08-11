@@ -60,7 +60,9 @@ public static class ApiAppServices
 
     private static IServiceCollection AddUseCaseServices(this IServiceCollection services)
     {
+        services.AddScoped<IAuditLogService, AuditLogService>();
         services.AddScoped<IFinanceService, FinanceService>();
+        services.AddScoped<IInventoryItemService, InventoryItemService>();
         services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
         services.AddScoped<IReservationService, ReservationService>();
 

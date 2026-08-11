@@ -4,6 +4,7 @@ using PurchaseOrderApp.Api.Helpers;
 using PurchaseOrderApp.Api.Models;
 using PurchaseOrderApp.Application.Models;
 using PurchaseOrderApp.Application.UseCases;
+using PurchaseOrderApp.Domain.Enums;
 using PurchaseOrderApp.Domain.ValueObjects;
 
 namespace PurchaseOrderApp.Api.Controllers;
@@ -12,6 +13,26 @@ namespace PurchaseOrderApp.Api.Controllers;
 [ApiController]
 public sealed class ReservationController(IReservationService reservationService) : ControllerBase
 {
+    [HttpGet]
+    public async Task<ActionResult<ApiResponse<List<ReservationResponse>>>> GetAll(
+        [FromQuery] Guid? warehouseId,
+        [FromQuery] ReservationStatus? status,
+        CancellationToken cancellationToken)
+    {
+        WarehouseId? parsedWarehouseId = warehouseId.HasValue ? new WarehouseId(warehouseId.Value) : null;
+        var result = await reservationService.ListAsync(parsedWarehouseId, status, cancellationToken);
+        return result.ToActionResult();
+    }
+
+    [HttpGet("{stockReservationId:guid}")]
+    public async Task<ActionResult<ApiResponse<ReservationResponse>>> Get(
+        Guid stockReservationId,
+        CancellationToken cancellationToken)
+    {
+        var result = await reservationService.GetAsync(new StockReservationId(stockReservationId), cancellationToken);
+        return result.ToActionResult();
+    }
+
     [HttpPost]
     public async Task<ActionResult<ApiResponse<ReservationResponse>>> Create([FromBody] CreateReservationRequest request, CancellationToken cancellationToken)
     {
