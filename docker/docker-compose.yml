@@ -1,0 +1,50 @@
+name: purchase-order
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: db
+    hostname: db
+    environment:
+      POSTGRES_DB: "purchase_order"
+      POSTGRES_USER: "local-dev"
+      POSTGRES_PASSWORD: "local-dev"
+    ports:
+      - "55433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U local-dev -d purchase_order"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/api.dockerfile
+    image: api:local
+    container_name: api
+    ports:
+      - "5180:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      Database__PurchaseOrderDb: "Host=db;Port=5432;Database=purchase_order;Username=local-dev;Password=local-dev;Maximum Pool Size=100;Timeout=60"
+
+  db-seeder:
+    build:
+      context: ..
+      dockerfile: docker/db-seeder.dockerfile
+    image: db-seeder:local
+    container_name: db-seeder
+    depends_on:
+      api:
+        condition: service_started
+
+volumes:
+  postgres-data:
+    name: postgres-data
+    driver: local

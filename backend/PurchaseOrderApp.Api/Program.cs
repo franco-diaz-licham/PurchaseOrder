@@ -6,6 +6,8 @@ try {
     builder.Services.AddAppServices(builder.Configuration);
     var app = builder.Build();
 
+    await app.MigrateDatabaseAsync();
+
     if (app.Environment.IsDevelopment()) {
         app.UseSwagger();
         app.UseSwaggerUI();

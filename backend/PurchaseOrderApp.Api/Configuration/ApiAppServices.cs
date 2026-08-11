@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using PurchaseOrderApp.Application.Ports;
 using PurchaseOrderApp.Application.UseCases;
 using PurchaseOrderApp.Infrastructure.Persistence;
@@ -14,9 +15,8 @@ public static class ApiAppServices
     {
         services
             .AddControllerServices()
-            .AddDatabase(configuration)
             .AddUseCaseServices()
-            .AddPersistenceServices();
+            .AddPersistenceServices(configuration);
 
         return services;
     }
@@ -31,20 +31,19 @@ public static class ApiAppServices
         return services;
     }
 
-    private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("Db");
+        services
+            .AddOptions<DatabaseOptions>()
+            .Bind(configuration.GetSection(DatabaseOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
-        if (string.IsNullOrWhiteSpace(connectionString)) throw new InvalidOperationException("ConnectionStrings:Db is required.");
-        services.AddDbContext<DatabaseContext>(options => {
-            options.UseNpgsql(connectionString);
+        services.AddDbContext<DatabaseContext>((sp, options) => {
+            var databaseOptions = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
+            options.UseNpgsql(databaseOptions.PurchaseOrderDb);
         });
 
-        return services;
-    }
-
-    private static IServiceCollection AddPersistenceServices(this IServiceCollection services)
-    {
         services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IAuditLogRepository, AuditLogRepository>();

@@ -7,7 +7,7 @@ public sealed class DatabaseContextFactory : IDesignTimeDbContextFactory<Databas
 {
     public DatabaseContext CreateDbContext(string[] args)
     {
-        var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__Db");
+        var connectionString = Environment.GetEnvironmentVariable("Database__PurchaseOrderDb");
 
         if (string.IsNullOrWhiteSpace(connectionString))
         {

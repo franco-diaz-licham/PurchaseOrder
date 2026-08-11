@@ -21,19 +21,21 @@ More detailed implementation notes are in `docs/development.md`.
 
 ## Local Docker Setup
 
-Start PostgreSQL and the API:
+Start PostgreSQL, run API migrations, seed the database, and start the API:
 
 ```powershell
 ./scripts/compose.ps1
 ```
 
-Apply EF Core migrations to the Docker PostgreSQL database:
+The API runs EF Core migrations during startup. The seeder container runs automatically during compose startup and then runs `scripts/Seeder.sql`.
+
+To apply EF Core migrations manually:
 
 ```powershell
 ./scripts/migrate-database.ps1
 ```
 
-Seed warehouse, inventory, stock, and sample approved purchase order data:
+To reseed manually:
 
 ```powershell
 ./scripts/initialize-database.ps1
@@ -47,8 +49,4 @@ The Docker database is available from the host at:
 Host=localhost;Port=55433;Database=purchase_order;Username=local-dev;Password=local-dev
 ```
 
-If the PostgreSQL client tools are not installed locally, run the seed script through Docker Compose instead:
-
-```powershell
-docker compose -f docker/docker-compose.yml --profile seed run --rm db-seeder
-```
+The seed script uses Docker Compose, so it does not require PostgreSQL client tools on your machine.
