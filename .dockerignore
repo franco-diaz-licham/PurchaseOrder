@@ -1,0 +1,17 @@
+# Git and editor state
+.git/
+.github/
+.vs/
+.vscode/
+
+# .NET build output is OS-specific and must not be copied into Linux images
+**/bin/
+**/obj/
+
+# Frontend dependencies/build output
+**/node_modules/
+frontend/dist/
+
+# Local settings and transient files
+**/local.settings.json
+.tmp/

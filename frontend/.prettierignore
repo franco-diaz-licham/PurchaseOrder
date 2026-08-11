@@ -1,0 +1,34 @@
+# artifacts and editor files
+
+**/.git
+**/.github
+**/.artifacts
+**/.idea
+**/.vs
+**/.vscode
+**/.nuget
+**/dist
+templates.js
+.editorconfig
+.auto-imports.d.ts
+.components.d.ts
+
+# metadata and solution files
+
+.sln
+.node-version
+.npmrc
+.gitignore
+.gitattributes
+.gitconfig
+.prettierignore
+CODEOWNERS
+
+# dependencies and ignored projects
+
+**/node_modules
+**/logs
+
+# test mocking files (order of imports matters and should not be affected)
+
+vitest.setup.ts
