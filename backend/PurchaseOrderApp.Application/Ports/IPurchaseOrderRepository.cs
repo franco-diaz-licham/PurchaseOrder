@@ -10,9 +10,24 @@ namespace PurchaseOrderApp.Application.Ports;
 public interface IPurchaseOrderRepository
 {
     /// <summary>
+    /// Gets a purchase order aggregate by id for mutation workflows.
+    /// </summary>
+    Task<PurchaseOrder?> GetAsync(PurchaseOrderId purchaseOrderId, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Gets the purchase order that owns the requested line.
     /// </summary>
     Task<PurchaseOrder?> GetByLineIdAsync(PurchaseOrderLineId purchaseOrderLineId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets a purchase order read model by id.
+    /// </summary>
+    Task<PurchaseOrderResponse?> GetResponseAsync(PurchaseOrderId purchaseOrderId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Lists purchase order read models.
+    /// </summary>
+    Task<List<PurchaseOrderResponse>> ListResponsesAsync(WarehouseId? warehouseId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Adds a purchase order to the current unit of work.

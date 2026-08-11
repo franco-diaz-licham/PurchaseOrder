@@ -1,7 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using PurchaseOrderApp.Application.Ports;
+using PurchaseOrderApp.Application.UseCases;
 using PurchaseOrderApp.Infrastructure.Persistence;
 using PurchaseOrderApp.Infrastructure.Persistence.Repositories;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace PurchaseOrderApp.Api.Configuration;
 
@@ -10,8 +13,20 @@ public static class ApiAppServices
     public static IServiceCollection AddAppServices(this IServiceCollection services, IConfiguration configuration)
     {
         services
+            .AddControllerServices()
             .AddDatabase(configuration)
+            .AddUseCaseServices()
             .AddPersistenceServices();
+
+        return services;
+    }
+
+    private static IServiceCollection AddControllerServices(this IServiceCollection services)
+    {
+        services.AddControllers()
+            .AddJsonOptions(options => {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false));
+            });
 
         return services;
     }
@@ -39,6 +54,15 @@ public static class ApiAppServices
         services.AddScoped<IStockReservationRepository, StockReservationRepository>();
         services.AddScoped<IWarehouseRepository, WarehouseRepository>();
         services.AddScoped<IWarehouseStockRepository, WarehouseStockRepository>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddUseCaseServices(this IServiceCollection services)
+    {
+        services.AddScoped<IFinanceService, FinanceService>();
+        services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
+        services.AddScoped<IReservationService, ReservationService>();
 
         return services;
     }

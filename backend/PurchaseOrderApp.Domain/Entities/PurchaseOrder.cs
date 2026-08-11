@@ -79,6 +79,9 @@ public sealed class PurchaseOrder : Entity<PurchaseOrderId>
         string user,
         DateTimeOffset occurredAt)
     {
+        if (Status == PurchaseOrderStatus.Cancelled) throw new DomainException("Cancelled purchase orders cannot be changed.");
+        if (Status == PurchaseOrderStatus.Closed) throw new DomainException("Closed purchase orders cannot be changed.");
+
         quantityOrdered.EnsureValidFor(item.TrackingMode);
         if (quantityOrdered.IsZero) throw new DomainException("Purchase order line quantity must be greater than zero.");
 
@@ -120,6 +123,8 @@ public sealed class PurchaseOrder : Entity<PurchaseOrderId>
 
     public void Cancel(string user, DateTimeOffset occurredAt)
     {
+        if (_lines.Any(line => !line.QuantityReserved.IsZero)) throw new DomainException("Purchase orders with active reservations cannot be cancelled.");
+
         Status = PurchaseOrderStatus.Cancelled;
         SetUpdated(user, occurredAt);
     }

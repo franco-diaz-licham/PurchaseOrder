@@ -9,11 +9,38 @@ namespace PurchaseOrderApp.Infrastructure.Persistence.Repositories;
 
 public sealed class PurchaseOrderRepository(DatabaseContext db) : IPurchaseOrderRepository
 {
+    public Task<PurchaseOrder?> GetAsync(PurchaseOrderId purchaseOrderId, CancellationToken cancellationToken)
+    {
+        return db.PurchaseOrders
+            .Include(order => order.Lines)
+            .SingleOrDefaultAsync(order => order.Id == purchaseOrderId, cancellationToken);
+    }
+
     public Task<PurchaseOrder?> GetByLineIdAsync(PurchaseOrderLineId purchaseOrderLineId, CancellationToken cancellationToken)
     {
         return db.PurchaseOrders
             .Include(order => order.Lines)
             .SingleOrDefaultAsync(order => order.Lines.Any(line => line.Id == purchaseOrderLineId), cancellationToken);
+    }
+
+    public Task<PurchaseOrderResponse?> GetResponseAsync(PurchaseOrderId purchaseOrderId, CancellationToken cancellationToken)
+    {
+        return ProjectPurchaseOrders(db.PurchaseOrders.AsNoTracking())
+            .SingleOrDefaultAsync(order => order.PurchaseOrderId == purchaseOrderId.Value, cancellationToken);
+    }
+
+    public Task<List<PurchaseOrderResponse>> ListResponsesAsync(WarehouseId? warehouseId, CancellationToken cancellationToken)
+    {
+        var query = db.PurchaseOrders.AsNoTracking();
+
+        if (warehouseId is not null)
+        {
+            query = query.Where(order => order.WarehouseId == warehouseId.Value);
+        }
+
+        return ProjectPurchaseOrders(query)
+            .OrderBy(order => order.PurchaseOrderNumber)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task AddAsync(PurchaseOrder purchaseOrder, CancellationToken cancellationToken)
@@ -47,5 +74,22 @@ public sealed class PurchaseOrderRepository(DatabaseContext db) : IPurchaseOrder
             .OrderBy(line => line.PurchaseOrderNumber)
             .ThenBy(line => line.Sku)
             .ToListAsync(cancellationToken);
+    }
+
+    private static IQueryable<PurchaseOrderResponse> ProjectPurchaseOrders(IQueryable<PurchaseOrder> query)
+    {
+        return query.Select(order => new PurchaseOrderResponse(
+            order.Id.Value,
+            order.PurchaseOrderNumber,
+            order.WarehouseId.Value,
+            order.Status.ToString(),
+            order.Lines
+                .Select(line => new PurchaseOrderLineResponse(
+                    line.Id.Value,
+                    line.InventoryItemId.Value,
+                    line.QuantityOrdered.Value,
+                    line.QuantityReserved.Value,
+                    line.QuantityOrdered.Value - line.QuantityReserved.Value))
+                .ToList()));
     }
 }

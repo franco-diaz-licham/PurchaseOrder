@@ -8,6 +8,7 @@ This document captures implementation decisions, assumptions, and tradeoffs made
 - Warehouses are reference data, not compile-time enum values. They will be modeled as entities and seeded for local/demo use.
 - Inventory item categories are stable enough for this exercise and will be modeled as an enum.
 - Purchase orders belong to a single warehouse. Warehouse operators view approved purchase orders for that warehouse.
+- Purchase order submission is implied by the workflow even though the brief focuses on reservations. The API supports submitting an approved purchase order with its lines so there is data to reserve against.
 - Reservations are made against a specific purchase order line.
 - Releases are made against a specific stock reservation, not directly against a purchase order line.
 - Over-requested reservations are rejected rather than silently partially fulfilled.
