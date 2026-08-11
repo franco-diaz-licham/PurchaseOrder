@@ -21,7 +21,6 @@ $ErrorActionPreference = "Stop"
 
 $connection = "host=$PostgresHost port=$PostgresPort dbname=$PostgresDatabase user=$PostgresUser"
 $seedScript = Join-Path $PSScriptRoot "Seeder.sql"
-
 $env:PGPASSWORD = $PostgresPassword
 $env:PGCLIENTENCODING = "UTF8"
 
