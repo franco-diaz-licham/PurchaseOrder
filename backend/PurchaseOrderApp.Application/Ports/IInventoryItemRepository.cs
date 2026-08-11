@@ -9,6 +9,11 @@ namespace PurchaseOrderApp.Application.Ports;
 public interface IInventoryItemRepository
 {
     /// <summary>
+    /// Lists all inventory items.
+    /// </summary>
+    Task<List<InventoryItem>> ListAsync(CancellationToken cancellationToken);
+
+    /// <summary>
     /// Gets an inventory item by id.
     /// </summary>
     Task<InventoryItem?> GetAsync(InventoryItemId inventoryItemId, CancellationToken cancellationToken);

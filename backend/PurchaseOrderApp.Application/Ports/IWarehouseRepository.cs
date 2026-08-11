@@ -9,6 +9,11 @@ namespace PurchaseOrderApp.Application.Ports;
 public interface IWarehouseRepository
 {
     /// <summary>
+    /// Lists all warehouses.
+    /// </summary>
+    Task<List<Warehouse>> ListAsync(CancellationToken cancellationToken);
+
+    /// <summary>
     /// Gets a warehouse by id.
     /// </summary>
     Task<Warehouse?> GetAsync(WarehouseId warehouseId, CancellationToken cancellationToken);

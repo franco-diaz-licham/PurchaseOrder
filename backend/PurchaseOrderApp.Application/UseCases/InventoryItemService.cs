@@ -6,6 +6,8 @@ namespace PurchaseOrderApp.Application.UseCases;
 
 public interface IInventoryItemService
 {
+    Task<Result<List<InventoryItemResponse>>> ListAsync(CancellationToken cancellationToken);
+
     Task<Result> ChangeStandardCostAsync(ChangeInventoryItemStandardCostCommand command, CancellationToken cancellationToken);
 }
 
@@ -13,6 +15,16 @@ public sealed class InventoryItemService(
     IInventoryItemRepository inventoryItemRepository,
     IUnitOfWork unitOfWork) : IInventoryItemService
 {
+    public async Task<Result<List<InventoryItemResponse>>> ListAsync(CancellationToken cancellationToken)
+    {
+        var inventoryItems = await inventoryItemRepository.ListAsync(cancellationToken);
+        var response = inventoryItems
+            .Select(item => new InventoryItemResponse(item.Id.Value, item.Sku, item.Name, item.Category.ToString(), item.TrackingMode.ToString(), item.StandardCost.Value))
+            .ToList();
+
+        return Result.Success(response);
+    }
+
     public async Task<Result> ChangeStandardCostAsync(ChangeInventoryItemStandardCostCommand command, CancellationToken cancellationToken)
     {
         if (command.InventoryItemId.Value == Guid.Empty) return Result.Fail("Inventory item id is required.", ResultStatus.Invalid);

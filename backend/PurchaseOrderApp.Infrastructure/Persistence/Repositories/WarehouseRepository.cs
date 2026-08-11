@@ -7,6 +7,14 @@ namespace PurchaseOrderApp.Infrastructure.Persistence.Repositories;
 
 public sealed class WarehouseRepository(DatabaseContext db) : IWarehouseRepository
 {
+    public Task<List<Warehouse>> ListAsync(CancellationToken cancellationToken)
+    {
+        return db.Warehouses
+            .AsNoTracking()
+            .OrderBy(warehouse => warehouse.Code)
+            .ToListAsync(cancellationToken);
+    }
+
     public Task<Warehouse?> GetAsync(WarehouseId warehouseId, CancellationToken cancellationToken)
     {
         return db.Warehouses.SingleOrDefaultAsync(warehouse => warehouse.Id == warehouseId, cancellationToken);

@@ -64,6 +64,7 @@ public static class ApiAppServices
         services.AddScoped<IInventoryItemService, InventoryItemService>();
         services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
         services.AddScoped<IReservationService, ReservationService>();
+        services.AddScoped<IWarehouseService, WarehouseService>();
 
         return services;
     }

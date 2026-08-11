@@ -12,6 +12,13 @@ namespace PurchaseOrderApp.Api.Controllers;
 [ApiController]
 public sealed class InventoryItemController(IInventoryItemService inventoryItemService) : ControllerBase
 {
+    [HttpGet]
+    public async Task<ActionResult<ApiResponse<List<InventoryItemResponse>>>> GetAll(CancellationToken cancellationToken)
+    {
+        var result = await inventoryItemService.ListAsync(cancellationToken);
+        return result.ToActionResult();
+    }
+
     [HttpPut("{inventoryItemId:guid}/standard-cost")]
     public async Task<ActionResult<ApiResponse>> ChangeStandardCost(Guid inventoryItemId, [FromBody] ChangeInventoryItemStandardCostRequest request, CancellationToken cancellationToken)
     {
