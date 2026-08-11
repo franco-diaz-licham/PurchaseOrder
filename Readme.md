@@ -18,3 +18,37 @@ Internal purchase order stock reservation module built with .NET 8, ASP.NET Core
 - Cancelling a purchase order is used instead of hard delete so reservation and audit history remain intact.
 
 More detailed implementation notes are in `docs/development.md`.
+
+## Local Docker Setup
+
+Start PostgreSQL and the API:
+
+```powershell
+./scripts/compose.ps1
+```
+
+Apply EF Core migrations to the Docker PostgreSQL database:
+
+```powershell
+./scripts/migrate-database.ps1
+```
+
+Seed warehouse, inventory, stock, and sample approved purchase order data:
+
+```powershell
+./scripts/initialize-database.ps1
+```
+
+The API runs at `http://localhost:5180` and Swagger is available at `http://localhost:5180/swagger`.
+
+The Docker database is available from the host at:
+
+```text
+Host=localhost;Port=55433;Database=purchase_order;Username=local-dev;Password=local-dev
+```
+
+If the PostgreSQL client tools are not installed locally, run the seed script through Docker Compose instead:
+
+```powershell
+docker compose -f docker/docker-compose.yml --profile seed run --rm db-seeder
+```
