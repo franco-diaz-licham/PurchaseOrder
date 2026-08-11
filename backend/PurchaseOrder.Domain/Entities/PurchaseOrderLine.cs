@@ -37,6 +37,11 @@ public sealed class PurchaseOrderLine : Entity<PurchaseOrderLineId>
     public InventoryItemId InventoryItemId { get; private set; }
 
     /// <summary>
+    /// Inventory item requested by this line.
+    /// </summary>
+    public InventoryItem InventoryItem { get; private set; } = null!;
+
+    /// <summary>
     /// Total quantity ordered for the item.
     /// </summary>
     public Quantity QuantityOrdered { get; private set; }

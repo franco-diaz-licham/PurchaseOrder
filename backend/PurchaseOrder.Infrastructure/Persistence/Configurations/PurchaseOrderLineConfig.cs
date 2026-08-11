@@ -40,7 +40,7 @@ public sealed class PurchaseOrderLineConfig : IEntityTypeConfiguration<PurchaseO
         builder.Property(line => line.UpdatedAt).IsRequired(false);
         builder.Property(line => line.UpdatedBy).HasMaxLength(100);
 
-        builder.HasOne<InventoryItem>()
+        builder.HasOne(line => line.InventoryItem)
             .WithMany()
             .HasForeignKey(line => line.InventoryItemId);
 

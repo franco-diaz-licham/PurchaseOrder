@@ -34,6 +34,10 @@ public sealed class PurchaseOrderHeaderConfig : IEntityTypeConfiguration<Purchas
             .WithOne()
             .HasForeignKey(line => line.PurchaseOrderId);
 
+        builder.HasOne(order => order.Warehouse)
+            .WithMany()
+            .HasForeignKey(order => order.WarehouseId);
+
         builder.Navigation(order => order.Lines)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
 

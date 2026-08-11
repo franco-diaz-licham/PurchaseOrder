@@ -39,6 +39,11 @@ public sealed class PurchaseOrderHeader : Entity<PurchaseOrderId>
     public WarehouseId WarehouseId { get; private set; }
 
     /// <summary>
+    /// Warehouse responsible for fulfilling the purchase order.
+    /// </summary>
+    public Warehouse Warehouse { get; private set; } = null!;
+
+    /// <summary>
     /// Current lifecycle state of the purchase order.
     /// </summary>
     public PurchaseOrderStatus Status { get; private set; }

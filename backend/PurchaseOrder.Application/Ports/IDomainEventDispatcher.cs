@@ -7,5 +7,8 @@ namespace PurchaseOrder.Application.Ports;
 /// </summary>
 public interface IDomainEventDispatcher
 {
+    /// <summary>
+    /// Dispatches domain events collected from changed aggregates.
+    /// </summary>
     Task DispatchAsync(IReadOnlyCollection<IDomainEvent> domainEvents, CancellationToken cancellationToken);
 }

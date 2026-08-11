@@ -36,7 +36,7 @@ This document captures implementation decisions, assumptions, and tradeoffs made
 
 The critical invariant is that active reservations for a warehouse/item must never exceed on-hand stock.
 
-The intended implementation is to enforce this in the database-backed application workflow, not by a simple application-level check. The preferred approach is:
+The intended implementation is to enforce this in the database-backed application workflow, not by a simple application-level check. The chosen approach is pessimistic row-level locking:
 
 1. Start a transaction.
 2. Lock the relevant warehouse stock row.
@@ -45,6 +45,10 @@ The intended implementation is to enforce this in the database-backed applicatio
 5. Persist the reservation, update the purchase order line, append the audit entry, and commit atomically.
 
 For PostgreSQL, this can be implemented with a targeted `SELECT ... FOR UPDATE` lock on the warehouse stock row.
+
+Optimistic concurrency was considered but not chosen for the first implementation. It would require every reservation attempt to update a concurrency-controlled stock row, which usually means adding a denormalized value such as `ReservedQuantity` or touching a version column only to detect conflicts. That adds retry handling and extra state that must stay consistent with `StockReservation` records.
+
+Pessimistic locking is easier to explain and test for this module: competing reservations for the same warehouse/item are serialized at the database row level, availability is recalculated while the lock is held, and only then is the reservation written.
 
 ## Things To Revisit With More Time
 

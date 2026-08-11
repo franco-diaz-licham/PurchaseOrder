@@ -6,7 +6,7 @@ namespace PurchaseOrder.Infrastructure.Persistence;
 
 public sealed class UnitOfWork(DatabaseContext db, IDomainEventDispatcher domainEventDispatcher) : IUnitOfWork
 {
-    private IDbContextTransaction? transaction;
+    private IDbContextTransaction? _transaction;
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
     {
@@ -28,24 +28,23 @@ public sealed class UnitOfWork(DatabaseContext db, IDomainEventDispatcher domain
 
     public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
-        transaction ??= await db.Database.BeginTransactionAsync(cancellationToken);
+        _transaction ??= await db.Database.BeginTransactionAsync(cancellationToken);
     }
 
     public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
     {
-        if (transaction is null) return;
-
-        await transaction.CommitAsync(cancellationToken);
-        await transaction.DisposeAsync();
-        transaction = null;
+        if (_transaction is null) return;
+        await _transaction.CommitAsync(cancellationToken);
+        await _transaction.DisposeAsync();
+        _transaction = null;
     }
 
     public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
     {
-        if (transaction is null) return;
+        if (_transaction is null) return;
 
-        await transaction.RollbackAsync(cancellationToken);
-        await transaction.DisposeAsync();
-        transaction = null;
+        await _transaction.RollbackAsync(cancellationToken);
+        await _transaction.DisposeAsync();
+        _transaction = null;
     }
 }

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PurchaseOrder.Application.Ports;
 using PurchaseOrder.Infrastructure.Persistence;
+using PurchaseOrder.Infrastructure.Persistence.Repositories;
 
 namespace PurchaseOrder.Api.Configuration;
 
@@ -19,10 +20,7 @@ public static class ApiAppServices
     {
         var connectionString = configuration.GetConnectionString("Db");
 
-        if (string.IsNullOrWhiteSpace(connectionString)) {
-            throw new InvalidOperationException("ConnectionStrings:Db is required.");
-        }
-
+        if (string.IsNullOrWhiteSpace(connectionString)) throw new InvalidOperationException("ConnectionStrings:Db is required.");
         services.AddDbContext<DatabaseContext>(options => {
             options.UseNpgsql(connectionString);
         });
@@ -34,6 +32,13 @@ public static class ApiAppServices
     {
         services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+        services.AddScoped<IFinanceQueryRepository, FinanceRepository>();
+        services.AddScoped<IInventoryItemRepository, InventoryItemRepository>();
+        services.AddScoped<IPurchaseOrderRepository, PurchaseOrderRepository>();
+        services.AddScoped<IStockReservationRepository, StockReservationRepository>();
+        services.AddScoped<IWarehouseRepository, WarehouseRepository>();
+        services.AddScoped<IWarehouseStockRepository, WarehouseStockRepository>();
 
         return services;
     }
