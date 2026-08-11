@@ -14,6 +14,7 @@ try {
     }
 
     app.UseHttpsRedirection();
+    app.UseCors(CorsOptions.PolicyName);
     app.MapControllers();
 
     await app.RunAsync();

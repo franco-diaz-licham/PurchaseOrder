@@ -3,7 +3,7 @@ import http from '@/lib/api/http';
 import type { CreateReservationRequestDto, ReleaseReservationRequestDto, ReservationDto } from '../types/reservation.api.types';
 
 export const listReservations = async (warehouseId?: string, status?: string) => {
-  const response = await http.get<ApiResponse<ReservationDto[]>>('/Reservation', {
+  const response = await http.get<ApiResponse<ReservationDto[]>>('/reservation', {
     params: {
       warehouseId: warehouseId || undefined,
       status: status || undefined
@@ -13,11 +13,11 @@ export const listReservations = async (warehouseId?: string, status?: string) =>
 };
 
 export const createReservation = async (request: CreateReservationRequestDto) => {
-  const response = await http.post<ApiResponse<ReservationDto>>('/Reservation', request);
+  const response = await http.post<ApiResponse<ReservationDto>>('/reservation', request);
   return response.data.data;
 };
 
 export const releaseReservation = async (stockReservationId: string, request: ReleaseReservationRequestDto) => {
-  const response = await http.post<ApiResponse<ReservationDto>>(`/Reservation/${stockReservationId}/release`, request);
+  const response = await http.post<ApiResponse<ReservationDto>>(`/reservation/${stockReservationId}/release`, request);
   return response.data.data;
 };

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.Extensions.Options;
 using PurchaseOrderApp.Application.Ports;
 using PurchaseOrderApp.Application.UseCases;
@@ -15,6 +16,7 @@ public static class ApiAppServices
     {
         services
             .AddControllerServices()
+            .AddCorsServices(configuration)
             .AddUseCaseServices()
             .AddPersistenceServices(configuration);
 
@@ -23,10 +25,34 @@ public static class ApiAppServices
 
     private static IServiceCollection AddControllerServices(this IServiceCollection services)
     {
-        services.AddControllers()
+        services.AddControllers(options => {
+            options.Conventions.Add(new RouteTokenTransformerConvention(new RouteTransformer()));
+        })
             .AddJsonOptions(options => {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false));
             });
+
+        return services;
+    }
+
+    private static IServiceCollection AddCorsServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        services
+            .AddOptions<CorsOptions>()
+            .Bind(configuration.GetSection(CorsOptions.SectionName))
+            .Validate(options => options.AllowedOrigins.All(origin => !string.IsNullOrWhiteSpace(origin)), "Cors origins cannot be empty.")
+            .ValidateOnStart();
+
+        var corsOptions = configuration.GetSection(CorsOptions.SectionName).Get<CorsOptions>() ?? new CorsOptions();
+
+        services.AddCors(options => {
+            options.AddPolicy(CorsOptions.PolicyName, policy => {
+                policy
+                    .WithOrigins(corsOptions.AllowedOrigins)
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+        });
 
         return services;
     }

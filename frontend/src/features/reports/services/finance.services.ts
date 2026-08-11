@@ -3,6 +3,6 @@ import http from '@/lib/api/http';
 import type { WarehouseCommittedValueDto } from '../types/finance.api.types';
 
 export const listWarehouseCommittedValues = async () => {
-  const response = await http.get<ApiResponse<WarehouseCommittedValueDto[]>>('/Finance/warehouse-committed-values');
+  const response = await http.get<ApiResponse<WarehouseCommittedValueDto[]>>('/finance/warehouse-committed-values');
   return response.data.data;
 };
