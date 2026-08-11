@@ -22,6 +22,8 @@ This document captures implementation decisions, assumptions, and tradeoffs made
 
 ## Domain Decisions
 
+- Backend projects and namespaces use the `PurchaseOrderApp` prefix so the domain entity can be named `PurchaseOrder` without clashing with the root namespace.
+- The purchase order aggregate is named `PurchaseOrder`, matching the language in the spec. `PurchaseOrderHeader` was considered but rejected because it adds terminology that the brief does not use.
 - The domain is implemented in an EF Core-friendly style rather than a purely isolated DDD model.
 - Entities have private parameterless constructors for EF hydration.
 - Entity state uses private setters and is mutated through aggregate methods.
