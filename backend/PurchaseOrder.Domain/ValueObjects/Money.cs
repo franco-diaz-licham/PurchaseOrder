@@ -16,6 +16,4 @@ public readonly record struct Money
     public decimal Value { get; }
 
     public static Money Zero => new(0);
-
-    public static Money operator *(Money money, Quantity quantity) => new(money.Value * quantity.Value);
 }

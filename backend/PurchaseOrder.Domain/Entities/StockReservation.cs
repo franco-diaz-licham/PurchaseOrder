@@ -66,7 +66,7 @@ public sealed class StockReservation : Entity<StockReservationId>
     /// <summary>
     /// Current committed value based on active quantity and the cost snapshot.
     /// </summary>
-    public Money CommittedValue => UnitCostSnapshot * QuantityReserved;
+    public Money CommittedValue => new(UnitCostSnapshot.Value * QuantityReserved.Value);
 
     public static StockReservation Create(
         PurchaseOrderLineId purchaseOrderLineId,

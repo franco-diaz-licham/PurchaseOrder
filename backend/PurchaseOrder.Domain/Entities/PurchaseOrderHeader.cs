@@ -5,15 +5,15 @@ using PurchaseOrder.Domain.ValueObjects;
 namespace PurchaseOrder.Domain.Entities;
 
 /// <summary>
-/// Aggregate root for a warehouse purchase order and its reservable lines.
+/// Aggregate root for the header of a warehouse purchase order and its reservable lines.
 /// </summary>
-public sealed class PurchaseOrder : Entity<PurchaseOrderId>
+public sealed class PurchaseOrderHeader : Entity<PurchaseOrderId>
 {
     private readonly List<PurchaseOrderLine> _lines = [];
 
-    private PurchaseOrder() { }
+    private PurchaseOrderHeader() { }
 
-    private PurchaseOrder(
+    private PurchaseOrderHeader(
         PurchaseOrderId id,
         string purchaseOrderNumber,
         WarehouseId warehouseId,
@@ -53,13 +53,13 @@ public sealed class PurchaseOrder : Entity<PurchaseOrderId>
     /// </summary>
     public bool HasOutstandingLines => _lines.Any(line => line.HasOutstandingQuantity);
 
-    public static PurchaseOrder CreateApproved(
+    public static PurchaseOrderHeader CreateApproved(
         string purchaseOrderNumber,
         WarehouseId warehouseId,
         string user,
         DateTimeOffset occurredAt)
     {
-        return new PurchaseOrder(
+        return new PurchaseOrderHeader(
             new PurchaseOrderId(Guid.NewGuid()),
             purchaseOrderNumber,
             warehouseId,
