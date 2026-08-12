@@ -18,38 +18,40 @@ export const AuditLogTable = ({ entries, inventoryItems, isError, isLoading, war
     <div className="rounded-md border bg-card">
       {isError && <ErrorMessage message="Audit log could not be loaded." />}
       {entries.length === 0 && !isLoading && <EmptyState title="No audit entries found." />}
-      <AppTableContainer maxHeight="calc(100vh - 10.5rem)">
-        <AppTable minWidth="56.25rem">
-          <AppTableHead sticky>
-            <AppTableHeaderRow>
-              <AppTableHeaderCell>Time</AppTableHeaderCell>
-              <AppTableHeaderCell>Action</AppTableHeaderCell>
-              <AppTableHeaderCell>Warehouse</AppTableHeaderCell>
-              <AppTableHeaderCell>Item</AppTableHeaderCell>
-              <AppTableHeaderCell align="right">Quantity</AppTableHeaderCell>
-              <AppTableHeaderCell align="right">Available after</AppTableHeaderCell>
-              <AppTableHeaderCell>User</AppTableHeaderCell>
-            </AppTableHeaderRow>
-          </AppTableHead>
-          <AppTableBody>
-            {entries.map((entry) => {
-              const warehouse = findWarehouse(warehouses, entry.warehouseId);
-              const item = findInventoryItem(inventoryItems, entry.inventoryItemId);
-              return (
-                <AppTableRow key={entry.id}>
-                  <AppTableCell>{entry.timestamp.toLocaleString()}</AppTableCell>
-                  <AppTableCell>{entry.action}</AppTableCell>
-                  <AppTableCell>{warehouse?.code ?? entry.warehouseId}</AppTableCell>
-                  <AppTableCell>{item?.displayName ?? entry.inventoryItemId}</AppTableCell>
-                  <AppTableCell align="right">{entry.quantity}</AppTableCell>
-                  <AppTableCell align="right">{entry.resultingAvailableQuantity}</AppTableCell>
-                  <AppTableCell>{entry.user}</AppTableCell>
-                </AppTableRow>
-              );
-            })}
-          </AppTableBody>
-        </AppTable>
-      </AppTableContainer>
+      {entries.length > 0 && (
+        <AppTableContainer maxHeight="calc(100vh - 10.5rem)">
+          <AppTable minWidth="56.25rem">
+            <AppTableHead sticky>
+              <AppTableHeaderRow>
+                <AppTableHeaderCell>Time</AppTableHeaderCell>
+                <AppTableHeaderCell>Action</AppTableHeaderCell>
+                <AppTableHeaderCell>Warehouse</AppTableHeaderCell>
+                <AppTableHeaderCell>Item</AppTableHeaderCell>
+                <AppTableHeaderCell align="right">Quantity</AppTableHeaderCell>
+                <AppTableHeaderCell align="right">Available after</AppTableHeaderCell>
+                <AppTableHeaderCell>User</AppTableHeaderCell>
+              </AppTableHeaderRow>
+            </AppTableHead>
+            <AppTableBody>
+              {entries.map((entry) => {
+                const warehouse = findWarehouse(warehouses, entry.warehouseId);
+                const item = findInventoryItem(inventoryItems, entry.inventoryItemId);
+                return (
+                  <AppTableRow key={entry.id}>
+                    <AppTableCell>{entry.timestamp.toLocaleString()}</AppTableCell>
+                    <AppTableCell>{entry.action}</AppTableCell>
+                    <AppTableCell>{warehouse?.code ?? entry.warehouseId}</AppTableCell>
+                    <AppTableCell>{item?.displayName ?? entry.inventoryItemId}</AppTableCell>
+                    <AppTableCell align="right">{entry.quantity}</AppTableCell>
+                    <AppTableCell align="right">{entry.resultingAvailableQuantity}</AppTableCell>
+                    <AppTableCell>{entry.user}</AppTableCell>
+                  </AppTableRow>
+                );
+              })}
+            </AppTableBody>
+          </AppTable>
+        </AppTableContainer>
+      )}
     </div>
   </div>
 );

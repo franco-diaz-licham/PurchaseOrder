@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorSummary } from '@/components/common/ErrorSummary';
+import { PageLoadingIndicator } from '@/components/common/PageLoadingIndicator';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useInventoryItemsQuery, useWarehousesQuery, useWarehouseStockQuery } from '@/features/catalog/queries/catalog.queries';
 import { findInventoryItem, findWarehouse } from '@/features/catalog/utils/catalogLookup';
@@ -62,6 +63,12 @@ export const PurchaseOrderDetailPage = () => {
     createReservationMutation,
     releaseReservationMutation
   });
+  const isPageLoading =
+    purchaseOrderQuery.isLoading ||
+    warehousesQuery.isLoading ||
+    itemsQuery.isLoading ||
+    warehouseStockQuery.isLoading ||
+    reservationsQuery.isLoading;
 
   const openAddLineDialog = () => {
     setIsAddLineOpen(true);
@@ -113,6 +120,8 @@ export const PurchaseOrderDetailPage = () => {
       user
     });
   };
+
+  if (isPageLoading) return <PageLoadingIndicator />;
 
   return (
     <section>

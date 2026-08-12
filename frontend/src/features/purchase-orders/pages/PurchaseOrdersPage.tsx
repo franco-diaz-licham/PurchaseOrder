@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { PageLoadingIndicator } from '@/components/common/PageLoadingIndicator';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useWarehousesQuery } from '@/features/catalog/queries/catalog.queries';
 import { CreatePurchaseOrderDialog, type CreatePurchaseOrderFormValues } from '../components/CreatePurchaseOrderDialog';
@@ -26,6 +27,7 @@ export const PurchaseOrdersPage = () => {
       return true;
     });
   }, [purchaseOrdersQuery.data, showReadyToReserveOnly, warehouseFilter]);
+  const isLoading = purchaseOrdersQuery.isLoading || warehousesQuery.isLoading;
 
   const closeCreateDialog = () => {
     setIsCreateOpen(false);
@@ -41,6 +43,8 @@ export const PurchaseOrdersPage = () => {
     closeCreateDialog();
     navigate(`/purchase-orders/${created.id}`);
   };
+
+  if (isLoading) return <PageLoadingIndicator />;
 
   return (
     <section>

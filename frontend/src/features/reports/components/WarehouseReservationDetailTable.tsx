@@ -20,7 +20,7 @@ export const WarehouseReservationDetailTable = ({ warehouse, onClose, onOpenPurc
         Close
       </AppButton>
     </div>
-    <AppTableContainer maxHeight="18rem">
+    <AppTableContainer className="min-h-[20rem]" maxHeight="calc(100vh - 31rem)">
       <AppTable minWidth="51.25rem">
         <AppTableHead sticky>
           <AppTableHeaderRow>

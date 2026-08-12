@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { PageLoadingIndicator } from '@/components/common/PageLoadingIndicator';
 import { PageHeader } from '@/components/common/PageHeader';
 import { FinanceStatsHeader } from '../components/FinanceStatsHeader';
 import { WarehouseCommittedValueTable } from '../components/WarehouseCommittedValueTable';
@@ -23,6 +24,8 @@ export const FinancePage = () => {
     openPurchaseOrder(purchaseOrderId, warehouseId);
     navigate(`/purchase-orders/${purchaseOrderId}`);
   };
+
+  if (financeQuery.isLoading) return <PageLoadingIndicator />;
 
   return (
     <section>

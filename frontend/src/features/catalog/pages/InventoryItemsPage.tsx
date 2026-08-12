@@ -2,6 +2,7 @@ import { useInventoryItemsQuery } from '../queries/catalog.queries';
 import { useChangeInventoryItemStandardCostMutation } from '../queries/inventoryItem.mutations';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
+import { PageLoadingIndicator } from '@/components/common/PageLoadingIndicator';
 import { PageHeader } from '@/components/common/PageHeader';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppInput } from '@/components/ui/AppInput';
@@ -24,6 +25,8 @@ export const InventoryItemsPage = () => {
       user: 'Franco Diaz'
     });
   };
+
+  if (itemsQuery.isLoading) return <PageLoadingIndicator />;
 
   return (
     <section>

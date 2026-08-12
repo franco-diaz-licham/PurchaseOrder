@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { PageLoadingIndicator } from '@/components/common/PageLoadingIndicator';
 import { PageHeader } from '@/components/common/PageHeader';
 import { AppSelect } from '@/components/ui/AppSelect';
 import { useInventoryItemsQuery, useWarehousesQuery } from '@/features/catalog/queries/catalog.queries';
@@ -17,6 +18,9 @@ export const AuditLogPage = () => {
     if (!warehouseId) return entries;
     return entries.filter((entry) => entry.warehouseId === warehouseId);
   }, [auditQuery.data, warehouseId]);
+  const isLoading = auditQuery.isLoading || warehousesQuery.isLoading || itemsQuery.isLoading;
+
+  if (isLoading) return <PageLoadingIndicator />;
 
   return (
     <section>
