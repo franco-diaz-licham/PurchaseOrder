@@ -1,6 +1,7 @@
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { StatusBadge } from '@/components/common/StatusBadge';
+import { AppTable, AppTableBody, AppTableCell, AppTableContainer, AppTableHead, AppTableHeaderCell, AppTableRow } from '@/components/ui/AppTable';
 import type { WarehouseModel } from '@/features/catalog/types/catalog.types';
 import { findWarehouse } from '@/features/catalog/utils/catalogLookup';
 import { formatMoney } from '@/lib/formatMoney';
@@ -21,26 +22,26 @@ export const PurchaseOrderSummaryTable = ({ isError, isLoading, purchaseOrders, 
       {purchaseOrders.length === 0 && !isLoading && <EmptyState title="No purchase orders found." />}
 
       {purchaseOrders.length > 0 && (
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-225 text-left text-sm">
-            <thead className="bg-muted text-xs uppercase text-muted-foreground">
+        <AppTableContainer>
+          <AppTable minWidth="56.25rem">
+            <AppTableHead>
               <tr>
-                <th className="px-4 py-3">PO number</th>
-                <th className="px-4 py-3">Warehouse</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-right">Lines</th>
-                <th className="px-4 py-3 text-right">Ordered</th>
-                <th className="px-4 py-3 text-right">Reserved</th>
-                <th className="px-4 py-3 text-right">Remaining</th>
-                <th className="px-4 py-3 text-right">Total</th>
+                <AppTableHeaderCell>PO number</AppTableHeaderCell>
+                <AppTableHeaderCell>Warehouse</AppTableHeaderCell>
+                <AppTableHeaderCell>Status</AppTableHeaderCell>
+                <AppTableHeaderCell align="right">Lines</AppTableHeaderCell>
+                <AppTableHeaderCell align="right">Ordered</AppTableHeaderCell>
+                <AppTableHeaderCell align="right">Reserved</AppTableHeaderCell>
+                <AppTableHeaderCell align="right">Remaining</AppTableHeaderCell>
+                <AppTableHeaderCell align="right">Total</AppTableHeaderCell>
               </tr>
-            </thead>
-            <tbody>
+            </AppTableHead>
+            <AppTableBody>
               {purchaseOrders.map((order) => {
                 const warehouse = findWarehouse(warehouses, order.warehouseId);
                 return (
-                  <tr
-                    className="cursor-pointer border-t hover:bg-muted/60"
+                  <AppTableRow
+                    interactive
                     key={order.id}
                     onClick={() => onOpenPurchaseOrder(order.id)}
                     onKeyDown={(event) => {
@@ -48,22 +49,24 @@ export const PurchaseOrderSummaryTable = ({ isError, isLoading, purchaseOrders, 
                     }}
                     tabIndex={0}
                   >
-                    <td className="px-4 py-3 font-semibold">{order.number}</td>
-                    <td className="px-4 py-3">{warehouse?.displayName ?? order.warehouseId}</td>
-                    <td className="px-4 py-3">
+                    <AppTableCell className="font-semibold">{order.number}</AppTableCell>
+                    <AppTableCell>{warehouse?.displayName ?? order.warehouseId}</AppTableCell>
+                    <AppTableCell>
                       <StatusBadge status={order.status} />
-                    </td>
-                    <td className="px-4 py-3 text-right">{order.lineCount}</td>
-                    <td className="px-4 py-3 text-right">{order.quantityOrdered}</td>
-                    <td className="px-4 py-3 text-right">{order.quantityReserved}</td>
-                    <td className="px-4 py-3 text-right">{order.quantityRemaining}</td>
-                    <td className="px-4 py-3 text-right font-semibold">{formatMoney(order.totalAmount)}</td>
-                  </tr>
+                    </AppTableCell>
+                    <AppTableCell align="right">{order.lineCount}</AppTableCell>
+                    <AppTableCell align="right">{order.quantityOrdered}</AppTableCell>
+                    <AppTableCell align="right">{order.quantityReserved}</AppTableCell>
+                    <AppTableCell align="right">{order.quantityRemaining}</AppTableCell>
+                    <AppTableCell align="right" className="font-semibold">
+                      {formatMoney(order.totalAmount)}
+                    </AppTableCell>
+                  </AppTableRow>
                 );
               })}
-            </tbody>
-          </table>
-        </div>
+            </AppTableBody>
+          </AppTable>
+        </AppTableContainer>
       )}
     </div>
   </div>

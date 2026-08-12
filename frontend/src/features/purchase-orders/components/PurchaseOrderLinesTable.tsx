@@ -1,5 +1,6 @@
 import { UilPen, UilPlus, UilTrash } from '@iconscout/react-unicons';
 import { AppButton } from '@/components/ui/AppButton';
+import { AppTable, AppTableBody, AppTableCell, AppTableContainer, AppTableHeaderCell, AppTableRow } from '@/components/ui/AppTable';
 import type { InventoryItemModel, WarehouseStockModel } from '@/features/catalog/types/catalog.types';
 import { findInventoryItem } from '@/features/catalog/utils/catalogLookup';
 import type { ReservationModel } from '@/features/reservations/types/reservation.types';
@@ -42,11 +43,11 @@ export const PurchaseOrderLinesTable = ({
   <article className="rounded-md border bg-card">
     <div className="grid gap-3 p-4">
       {!canReserveStock && <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">Reservations are available after the purchase order is approved.</div>}
-      <div className="overflow-x-auto rounded-md border">
-        <table className="w-full min-w-295 text-left text-sm">
+      <AppTableContainer bordered>
+        <AppTable minWidth="73.75rem">
           <thead>
             <tr className="border-b bg-card text-sm">
-              <th className="px-4 py-3 font-semibold" colSpan={canChangeLines ? 7 : 6}>
+              <AppTableHeaderCell className="font-semibold" colSpan={canChangeLines ? 7 : 6}>
                 <div className="flex items-center justify-between gap-3">
                   <span>Purchase order lines</span>
                   {canChangeLines && (
@@ -56,39 +57,41 @@ export const PurchaseOrderLinesTable = ({
                     </AppButton>
                   )}
                 </div>
-              </th>
-              <th className="border-l px-4 py-3 font-semibold" colSpan={3}>
+              </AppTableHeaderCell>
+              <AppTableHeaderCell className="border-l font-semibold" colSpan={3}>
                 Reservations
-              </th>
+              </AppTableHeaderCell>
             </tr>
             <tr className="bg-muted text-xs uppercase text-muted-foreground">
-              <th className="px-4 py-3">Item</th>
-              <th className="px-4 py-3 text-right">Ordered</th>
-              <th className="px-4 py-3 text-right">Reserved</th>
-              <th className="px-4 py-3 text-right">Remaining</th>
-              <th className="px-4 py-3 text-right">Unit cost</th>
-              <th className="px-4 py-3 text-right">Total Amount</th>
-              {canChangeLines && <th className="px-4 py-3 text-right" aria-label="Line actions" />}
-              <th className="border-l px-4 py-3 text-right">Available</th>
-              <th className="px-4 py-3 text-right">Active</th>
-              <th className="px-4 py-3 text-right" aria-label="Reservation actions" />
+              <AppTableHeaderCell>Item</AppTableHeaderCell>
+              <AppTableHeaderCell align="right">Ordered</AppTableHeaderCell>
+              <AppTableHeaderCell align="right">Reserved</AppTableHeaderCell>
+              <AppTableHeaderCell align="right">Remaining</AppTableHeaderCell>
+              <AppTableHeaderCell align="right">Unit cost</AppTableHeaderCell>
+              <AppTableHeaderCell align="right">Total Amount</AppTableHeaderCell>
+              {canChangeLines && <AppTableHeaderCell align="right" ariaLabel="Line actions" />}
+              <AppTableHeaderCell align="right" className="border-l">
+                Available
+              </AppTableHeaderCell>
+              <AppTableHeaderCell align="right">Active</AppTableHeaderCell>
+              <AppTableHeaderCell align="right" ariaLabel="Reservation actions" />
             </tr>
           </thead>
-          <tbody>
+          <AppTableBody>
             {purchaseOrder.lines.map((line) => {
               const item = findInventoryItem(inventoryItems, line.inventoryItemId);
               const stock = stockByItemId.get(line.inventoryItemId);
               const lineReservations = activeReservations.filter((reservation) => reservation.purchaseOrderLineId === line.id);
               return (
-                <tr className="border-t" key={line.id}>
-                  <td className="px-4 py-3 font-medium">{item?.displayName ?? line.inventoryItemId}</td>
-                  <td className="px-4 py-3 text-right">{line.quantityOrdered}</td>
-                  <td className="px-4 py-3 text-right">{line.quantityReserved}</td>
-                  <td className="px-4 py-3 text-right">{line.quantityRemaining}</td>
-                  <td className="px-4 py-3 text-right">{formatMoney(line.unitCost)}</td>
-                  <td className="px-4 py-3 text-right">{formatMoney(line.lineAmount)}</td>
+                <AppTableRow key={line.id}>
+                  <AppTableCell className="font-medium">{item?.displayName ?? line.inventoryItemId}</AppTableCell>
+                  <AppTableCell align="right">{line.quantityOrdered}</AppTableCell>
+                  <AppTableCell align="right">{line.quantityReserved}</AppTableCell>
+                  <AppTableCell align="right">{line.quantityRemaining}</AppTableCell>
+                  <AppTableCell align="right">{formatMoney(line.unitCost)}</AppTableCell>
+                  <AppTableCell align="right">{formatMoney(line.lineAmount)}</AppTableCell>
                   {canChangeLines && (
-                    <td className="px-4 py-3 text-right">
+                    <AppTableCell align="right">
                       <div className="flex items-center justify-end gap-2">
                         <AppButton aria-label="Edit line" appearance="secondary" className="h-8 w-8 px-0" onClick={() => onEditLine(line.id)} title="Edit line">
                           <UilPen className="h-4 w-4 text-blue-700" />
@@ -97,24 +100,26 @@ export const PurchaseOrderLinesTable = ({
                           <UilTrash className="h-4 w-4 text-red-700" />
                         </AppButton>
                       </div>
-                    </td>
+                    </AppTableCell>
                   )}
-                  <td className="border-l px-4 py-3 text-right">{stock ? stock.availableQuantity : 'Not stocked'}</td>
-                  <td className="px-4 py-3 text-right">
+                  <AppTableCell align="right" className="border-l">
+                    {stock ? stock.availableQuantity : 'Not stocked'}
+                  </AppTableCell>
+                  <AppTableCell align="right">
                     {lineReservations.length === 0 && <span className="text-muted-foreground">None</span>}
                     {lineReservations.length > 0 && <span>{lineReservations.length}</span>}
-                  </td>
-                  <td className="px-4 py-3 text-right">
+                  </AppTableCell>
+                  <AppTableCell align="right">
                     <AppButton aria-label="Manage reservations" appearance="secondary" className="h-8 w-8 px-0" disabled={!canReserveStock} onClick={() => onManageReservations(line.id)} title="Manage reservations">
                       <UilPen className="h-4 w-4 text-blue-700" />
                     </AppButton>
-                  </td>
-                </tr>
+                  </AppTableCell>
+                </AppTableRow>
               );
             })}
-          </tbody>
-        </table>
-      </div>
+          </AppTableBody>
+        </AppTable>
+      </AppTableContainer>
     </div>
   </article>
 );

@@ -1,4 +1,5 @@
 import { AppButton } from '@/components/ui/AppButton';
+import { AppTable, AppTableBody, AppTableCell, AppTableContainer, AppTableHead, AppTableHeaderCell, AppTableRow } from '@/components/ui/AppTable';
 import { formatMoney } from '@/lib/formatMoney';
 import type { WarehouseCommittedValueModel } from '../types/finance.types';
 
@@ -19,33 +20,35 @@ export const WarehouseReservationDetailTable = ({ warehouse, onClose, onOpenPurc
         Close
       </AppButton>
     </div>
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-205 text-left text-sm">
-        <thead className="bg-muted text-xs uppercase text-muted-foreground">
+    <AppTableContainer>
+      <AppTable minWidth="51.25rem">
+        <AppTableHead>
           <tr>
-            <th className="px-4 py-3">PO number</th>
-            <th className="px-4 py-3">Item</th>
-            <th className="px-4 py-3 text-right">Qty reserved</th>
-            <th className="px-4 py-3 text-right">Unit cost at reservation</th>
-            <th className="px-4 py-3 text-right">Committed value</th>
+            <AppTableHeaderCell>PO number</AppTableHeaderCell>
+            <AppTableHeaderCell>Item</AppTableHeaderCell>
+            <AppTableHeaderCell align="right">Qty reserved</AppTableHeaderCell>
+            <AppTableHeaderCell align="right">Unit cost at reservation</AppTableHeaderCell>
+            <AppTableHeaderCell align="right">Committed value</AppTableHeaderCell>
           </tr>
-        </thead>
-        <tbody>
+        </AppTableHead>
+        <AppTableBody>
           {warehouse.reservations.map((reservation) => (
-            <tr className="border-t" key={reservation.stockReservationId}>
-              <td className="px-4 py-3">
+            <AppTableRow key={reservation.stockReservationId}>
+              <AppTableCell>
                 <button className="font-semibold text-primary underline-offset-4 hover:underline" type="button" onClick={() => onOpenPurchaseOrder(reservation.purchaseOrderId, warehouse.warehouseId)}>
                   {reservation.purchaseOrderNumber}
                 </button>
-              </td>
-              <td className="px-4 py-3 font-medium">{reservation.itemDisplayName}</td>
-              <td className="px-4 py-3 text-right">{reservation.quantityReserved}</td>
-              <td className="px-4 py-3 text-right">{formatMoney(reservation.unitCostSnapshot)}</td>
-              <td className="px-4 py-3 text-right font-semibold">{formatMoney(reservation.committedValue)}</td>
-            </tr>
+              </AppTableCell>
+              <AppTableCell className="font-medium">{reservation.itemDisplayName}</AppTableCell>
+              <AppTableCell align="right">{reservation.quantityReserved}</AppTableCell>
+              <AppTableCell align="right">{formatMoney(reservation.unitCostSnapshot)}</AppTableCell>
+              <AppTableCell align="right" className="font-semibold">
+                {formatMoney(reservation.committedValue)}
+              </AppTableCell>
+            </AppTableRow>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </AppTableBody>
+      </AppTable>
+    </AppTableContainer>
   </div>
 );
