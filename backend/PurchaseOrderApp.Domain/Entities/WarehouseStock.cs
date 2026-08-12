@@ -10,21 +10,6 @@ public sealed class WarehouseStock : Entity<WarehouseStockId>
 {
     private WarehouseStock() { }
 
-    private WarehouseStock(
-        WarehouseStockId id,
-        WarehouseId warehouseId,
-        InventoryItemId inventoryItemId,
-        Quantity onHandQuantity,
-        string user,
-        DateTimeOffset occurredAt)
-    {
-        Id = id;
-        WarehouseId = warehouseId;
-        InventoryItemId = inventoryItemId;
-        OnHandQuantity = onHandQuantity;
-        SetCreated(user, occurredAt);
-    }
-
     /// <summary>
     /// Warehouse that holds this stock balance.
     /// </summary>
@@ -39,33 +24,6 @@ public sealed class WarehouseStock : Entity<WarehouseStockId>
     /// Physical on-hand quantity before active reservations are subtracted.
     /// </summary>
     public Quantity OnHandQuantity { get; private set; }
-
-    public static WarehouseStock Create(
-        WarehouseId warehouseId,
-        InventoryItem item,
-        Quantity onHandQuantity,
-        string user,
-        DateTimeOffset occurredAt)
-    {
-        onHandQuantity.EnsureValidFor(item.TrackingMode);
-
-        return new WarehouseStock(
-            new WarehouseStockId(Guid.NewGuid()),
-            warehouseId,
-            item.Id,
-            onHandQuantity,
-            user,
-            occurredAt);
-    }
-
-    public void AdjustOnHandQuantity(InventoryItem item, Quantity onHandQuantity, string user, DateTimeOffset occurredAt)
-    {
-        if (item.Id != InventoryItemId) throw new DomainException("Inventory item does not match this warehouse stock.");
-
-        onHandQuantity.EnsureValidFor(item.TrackingMode);
-        OnHandQuantity = onHandQuantity;
-        SetUpdated(user, occurredAt);
-    }
 
     public void EnsureCanReserve(Quantity activeReservedQuantity, Quantity requestedQuantity)
     {

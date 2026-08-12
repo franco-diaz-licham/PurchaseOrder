@@ -35,9 +35,4 @@ public sealed class WarehouseStockRepository(DatabaseContext db) : IWarehouseSto
                 """)
             .SingleOrDefaultAsync(cancellationToken);
     }
-
-    public async Task AddAsync(WarehouseStock warehouseStock, CancellationToken cancellationToken)
-    {
-        await db.WarehouseStock.AddAsync(warehouseStock, cancellationToken);
-    }
 }

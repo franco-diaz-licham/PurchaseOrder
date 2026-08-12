@@ -4,7 +4,7 @@ using PurchaseOrderApp.Domain.ValueObjects;
 namespace PurchaseOrderApp.Application.Ports;
 
 /// <summary>
-/// Loads and persists warehouse stock aggregate roots.
+/// Loads warehouse stock aggregate roots.
 /// </summary>
 public interface IWarehouseStockRepository
 {
@@ -23,8 +23,4 @@ public interface IWarehouseStockRepository
     /// </summary>
     Task<WarehouseStock?> GetForUpdateAsync(WarehouseId warehouseId, InventoryItemId inventoryItemId, CancellationToken cancellationToken);
 
-    /// <summary>
-    /// Adds warehouse stock to the current unit of work.
-    /// </summary>
-    Task AddAsync(WarehouseStock warehouseStock, CancellationToken cancellationToken);
 }
