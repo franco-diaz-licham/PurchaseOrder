@@ -3,8 +3,14 @@ using PurchaseOrderApp.Application.Ports;
 
 namespace PurchaseOrderApp.Application.UseCases;
 
+/// <summary>
+/// Coordinates warehouse read operations.
+/// </summary>
 public interface IWarehouseService
 {
+    /// <summary>
+    /// Lists warehouses for selection and filtering.
+    /// </summary>
     Task<Result<List<WarehouseResponse>>> ListAsync(CancellationToken cancellationToken);
 }
 

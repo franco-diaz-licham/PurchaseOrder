@@ -4,8 +4,14 @@ using PurchaseOrderApp.Domain.ValueObjects;
 
 namespace PurchaseOrderApp.Application.UseCases;
 
+/// <summary>
+/// Coordinates audit log read operations.
+/// </summary>
 public interface IAuditLogService
 {
+    /// <summary>
+    /// Lists audit log entries, optionally filtered by warehouse.
+    /// </summary>
     Task<Result<List<AuditLogResponse>>> ListAsync(WarehouseId? warehouseId, CancellationToken cancellationToken);
 }
 

@@ -4,6 +4,9 @@ using PurchaseOrderApp.Domain.ValueObjects;
 
 namespace PurchaseOrderApp.Application.UseCases;
 
+/// <summary>
+/// Coordinates warehouse stock balance reads.
+/// </summary>
 public interface IWarehouseStockService
 {
     /// <summary>

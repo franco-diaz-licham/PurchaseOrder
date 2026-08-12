@@ -4,10 +4,19 @@ using PurchaseOrderApp.Domain.Core;
 
 namespace PurchaseOrderApp.Application.UseCases;
 
+/// <summary>
+/// Coordinates inventory item reads and standard cost changes.
+/// </summary>
 public interface IInventoryItemService
 {
+    /// <summary>
+    /// Lists inventory items for catalog screens.
+    /// </summary>
     Task<Result<List<InventoryItemResponse>>> ListAsync(CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Changes the current standard cost for an inventory item.
+    /// </summary>
     Task<Result> ChangeStandardCostAsync(ChangeInventoryItemStandardCostCommand command, CancellationToken cancellationToken);
 }
 

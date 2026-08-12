@@ -3,8 +3,14 @@ using PurchaseOrderApp.Application.Ports;
 
 namespace PurchaseOrderApp.Application.UseCases;
 
+/// <summary>
+/// Coordinates finance reporting reads.
+/// </summary>
 public interface IFinanceService
 {
+    /// <summary>
+    /// Lists committed reserved stock value grouped by warehouse.
+    /// </summary>
     Task<Result<List<WarehouseCommittedStockValueResponse>>> ListWarehouseCommittedStockValuesAsync(CancellationToken cancellationToken);
 }
 

@@ -8,24 +8,50 @@ using PurchaseOrderApp.Domain.ValueObjects;
 
 namespace PurchaseOrderApp.Application.UseCases;
 
+/// <summary>
+/// Coordinates purchase order creation, reads, line changes, and lifecycle changes.
+/// </summary>
 public interface IPurchaseOrderService
 {
+    /// <summary>
+    /// Creates a pending purchase order with its initial lines.
+    /// </summary>
     Task<Result<PurchaseOrderResponse>> SubmitAsync(SubmitPurchaseOrderCommand command, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Gets the full purchase order aggregate read model.
+    /// </summary>
     Task<Result<PurchaseOrderResponse>> GetAsync(PurchaseOrderId purchaseOrderId, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Lists lightweight purchase order summaries for the list page.
+    /// </summary>
     Task<Result<List<PurchaseOrderSummaryResponse>>> ListSummariesAsync(CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Adds a line to an editable purchase order.
+    /// </summary>
     Task<Result<PurchaseOrderResponse>> AddLineAsync(AddPurchaseOrderLineCommand command, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Removes a line from an editable purchase order and releases any active reservations for that line.
+    /// </summary>
     Task<Result<PurchaseOrderResponse>> RemoveLineAsync(RemovePurchaseOrderLineCommand command, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Approves a purchase order so stock can be reserved against its lines.
+    /// </summary>
     Task<Result<PurchaseOrderResponse>> ApproveAsync(ChangePurchaseOrderStatusCommand command, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Closes a purchase order after its lifecycle is complete.
+    /// </summary>
     Task<Result<PurchaseOrderResponse>> CloseAsync(ChangePurchaseOrderStatusCommand command, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Cancels a purchase order.
+    /// </summary>
     Task<Result<PurchaseOrderResponse>> CancelAsync(ChangePurchaseOrderStatusCommand command, CancellationToken cancellationToken);
-
 }
 
 public sealed class PurchaseOrderService(

@@ -8,12 +8,24 @@ using PurchaseOrderApp.Domain.ValueObjects;
 
 namespace PurchaseOrderApp.Application.UseCases;
 
+/// <summary>
+/// Coordinates stock reservation reads, reserve operations, and release operations.
+/// </summary>
 public interface IReservationService
 {
+    /// <summary>
+    /// Lists reservations, optionally filtered by warehouse and status.
+    /// </summary>
     Task<Result<List<ReservationResponse>>> ListAsync(WarehouseId? warehouseId, ReservationStatus? status, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Reserves stock against an approved purchase order line.
+    /// </summary>
     Task<Result<ReservationResponse>> ReserveAsync(CreateReservationCommand command, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Releases part or all of an active stock reservation.
+    /// </summary>
     Task<Result<ReservationResponse>> ReleaseAsync(ReleaseReservationCommand command, CancellationToken cancellationToken);
 }
 

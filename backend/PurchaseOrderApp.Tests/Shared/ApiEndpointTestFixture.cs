@@ -18,8 +18,14 @@ public abstract class ApiEndpointTestFixture : DatabaseFixture, IDisposable
     private ApiTestApplicationFactory? _factory;
     private HttpClient? _client;
 
+    /// <summary>
+    /// Gets the HTTP client used to call the in-memory API host.
+    /// </summary>
     protected HttpClient Client => _client ?? throw new InvalidOperationException("The API client has not been created.");
 
+    /// <summary>
+    /// Creates a fresh API host and HTTP client before each endpoint test.
+    /// </summary>
     [SetUp]
     public void CreateApiClient()
     {
@@ -27,6 +33,9 @@ public abstract class ApiEndpointTestFixture : DatabaseFixture, IDisposable
         _client = _factory.CreateClient();
     }
 
+    /// <summary>
+    /// Disposes the API host and HTTP client after each endpoint test.
+    /// </summary>
     [TearDown]
     public void DisposeApiClient()
     {
@@ -36,6 +45,9 @@ public abstract class ApiEndpointTestFixture : DatabaseFixture, IDisposable
         _factory = null;
     }
 
+    /// <summary>
+    /// Reads the standard API response wrapper and returns its data payload.
+    /// </summary>
     protected static async Task<T> ReadDataAsync<T>(HttpResponseMessage response)
     {
         var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<T>>(JsonOptions);
@@ -43,6 +55,9 @@ public abstract class ApiEndpointTestFixture : DatabaseFixture, IDisposable
         return apiResponse.Data;
     }
 
+    /// <summary>
+    /// Disposes the API host and HTTP client owned by the fixture.
+    /// </summary>
     public void Dispose()
     {
         _client?.Dispose();
