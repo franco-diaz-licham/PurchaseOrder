@@ -20,6 +20,11 @@ type AddPurchaseOrderLineDialogProps = {
 };
 
 export const AddPurchaseOrderLineDialog = ({ inventoryItems, isSaving, onCancel, onSubmit }: AddPurchaseOrderLineDialogProps) => {
+  const inventoryItemOptions = inventoryItems.map((item) => ({
+    label: item.displayName,
+    value: item.id
+  }));
+
   const form = useForm<AddPurchaseOrderLineFormValues>({
     defaultValues: {
       inventoryItemId: '',
@@ -47,14 +52,7 @@ export const AddPurchaseOrderLineDialog = ({ inventoryItems, isSaving, onCancel,
 
         <div className="grid gap-3 p-4">
           <AppField label="Inventory item">
-            <AppSelect autoFocus required {...form.register('inventoryItemId')}>
-              <option value="">Select item</option>
-              {inventoryItems.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.displayName}
-                </option>
-              ))}
-            </AppSelect>
+            <AppSelect autoFocus options={inventoryItemOptions} placeholder="Select item" required {...form.register('inventoryItemId')} />
           </AppField>
 
           <AppField label="Quantity">

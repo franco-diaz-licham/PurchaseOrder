@@ -76,6 +76,20 @@ public sealed class PurchaseOrderController(IPurchaseOrderService purchaseOrderS
         return result.ToActionResult();
     }
 
+    [HttpPut("{purchaseOrderId:guid}/lines/{purchaseOrderLineId:guid}")]
+    public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> UpdateLine(Guid purchaseOrderId, Guid purchaseOrderLineId, [FromBody] UpdatePurchaseOrderLineRequest request, CancellationToken cancellationToken)
+    {
+        var command = new UpdatePurchaseOrderLineCommand(
+            new PurchaseOrderId(purchaseOrderId),
+            new PurchaseOrderLineId(purchaseOrderLineId),
+            new Quantity(request.QuantityOrdered),
+            request.User,
+            DateTimeOffset.UtcNow);
+
+        var result = await purchaseOrderService.UpdateLineAsync(command, cancellationToken);
+        return result.ToActionResult();
+    }
+
     [HttpPut("{purchaseOrderId:guid}/approve")]
     public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> Approve(Guid purchaseOrderId, [FromBody] ChangePurchaseOrderStatusRequest request, CancellationToken cancellationToken)
     {

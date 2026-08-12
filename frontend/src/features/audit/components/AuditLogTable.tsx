@@ -25,8 +25,8 @@ export const AuditLogTable = ({ entries, inventoryItems, isError, isLoading, war
               <th className="px-4 py-3">Action</th>
               <th className="px-4 py-3">Warehouse</th>
               <th className="px-4 py-3">Item</th>
-              <th className="px-4 py-3">Quantity</th>
-              <th className="px-4 py-3">Available after</th>
+              <th className="px-4 py-3 text-right">Quantity</th>
+              <th className="px-4 py-3 text-right">Available after</th>
               <th className="px-4 py-3">User</th>
             </tr>
           </thead>
@@ -40,8 +40,8 @@ export const AuditLogTable = ({ entries, inventoryItems, isError, isLoading, war
                   <td className="px-4 py-3">{entry.action}</td>
                   <td className="px-4 py-3">{warehouse?.code ?? entry.warehouseId}</td>
                   <td className="px-4 py-3">{item?.displayName ?? entry.inventoryItemId}</td>
-                  <td className="px-4 py-3">{entry.quantity}</td>
-                  <td className="px-4 py-3">{entry.resultingAvailableQuantity}</td>
+                  <td className="px-4 py-3 text-right">{entry.quantity}</td>
+                  <td className="px-4 py-3 text-right">{entry.resultingAvailableQuantity}</td>
                   <td className="px-4 py-3">{entry.user}</td>
                 </tr>
               );

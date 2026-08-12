@@ -84,4 +84,14 @@ public sealed class PurchaseOrderLine : Entity<PurchaseOrderLineId>
         QuantityReserved = QuantityReserved.Subtract(quantity);
         SetUpdated(user, occurredAt);
     }
+
+    internal void UpdateQuantity(Quantity quantityOrdered, string user, DateTimeOffset occurredAt)
+    {
+        if (quantityOrdered.IsZero) throw new DomainException("Purchase order line quantity must be greater than zero.");
+        if (quantityOrdered.Value < QuantityReserved.Value) throw new DomainException("Purchase order line quantity cannot be less than the reserved quantity.");
+
+        quantityOrdered.EnsureValidFor(InventoryItem.TrackingMode);
+        QuantityOrdered = quantityOrdered;
+        SetUpdated(user, occurredAt);
+    }
 }

@@ -52,6 +52,11 @@ export type RemovePurchaseOrderLineRequestDto = {
   user: string;
 };
 
+export type UpdatePurchaseOrderLineRequestDto = {
+  quantityOrdered: number;
+  user: string;
+};
+
 export type ChangePurchaseOrderStatusRequestDto = {
   user: string;
 };

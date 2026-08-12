@@ -43,8 +43,8 @@ export const InventoryItemsPage = () => {
                     <th className="px-4 py-3">Item</th>
                     <th className="px-4 py-3">Category</th>
                     <th className="px-4 py-3">Tracking</th>
-                    <th className="px-4 py-3">Current cost</th>
-                    <th className="px-4 py-3">New cost</th>
+                    <th className="px-4 py-3 text-right">Current cost</th>
+                    <th className="px-4 py-3 text-right">New cost</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -54,10 +54,10 @@ export const InventoryItemsPage = () => {
                       <td className="px-4 py-3">{item.name}</td>
                       <td className="px-4 py-3">{item.category}</td>
                       <td className="px-4 py-3">{item.trackingMode}</td>
-                      <td className="px-4 py-3">{formatMoney(item.standardCost)}</td>
+                      <td className="px-4 py-3 text-right">{formatMoney(item.standardCost)}</td>
                       <td className="px-4 py-3">
-                        <form className="flex items-center gap-2" onSubmit={(event) => changeStandardCost(event, item.id)}>
-                          <AppInput className="w-28" defaultValue={item.standardCost} min="0" name="standardCost" step="0.01" type="number" />
+                        <form className="flex items-center justify-end gap-2" onSubmit={(event) => changeStandardCost(event, item.id)}>
+                          <AppInput className="w-28 text-right" defaultValue={item.standardCost} min="0" name="standardCost" step="0.01" type="number" />
                           <AppButton disabled={changeStandardCostMutation.isPending} type="submit">
                             Save
                           </AppButton>

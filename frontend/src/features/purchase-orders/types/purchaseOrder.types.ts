@@ -55,6 +55,13 @@ export type RemovePurchaseOrderLineModel = {
   user: string;
 };
 
+export type UpdatePurchaseOrderLineModel = {
+  purchaseOrderId: string;
+  purchaseOrderLineId: string;
+  quantityOrdered: number;
+  user: string;
+};
+
 export type ChangePurchaseOrderStatusModel = {
   purchaseOrderId: string;
   status: 'approve' | 'close' | 'cancel';

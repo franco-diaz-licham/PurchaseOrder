@@ -34,6 +34,11 @@ public interface IPurchaseOrderService
     Task<Result<PurchaseOrderResponse>> AddLineAsync(AddPurchaseOrderLineCommand command, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Updates the ordered quantity for an editable purchase order line.
+    /// </summary>
+    Task<Result<PurchaseOrderResponse>> UpdateLineAsync(UpdatePurchaseOrderLineCommand command, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Removes a line from an editable purchase order and releases any active reservations for that line.
     /// </summary>
     Task<Result<PurchaseOrderResponse>> RemoveLineAsync(RemovePurchaseOrderLineCommand command, CancellationToken cancellationToken);
@@ -187,6 +192,34 @@ public sealed class PurchaseOrderService(
             }
 
             purchaseOrder.RemoveLine(command.PurchaseOrderLineId, command.User, command.OccurredAt);
+
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            return Result.Success(PurchaseOrderMapper.ToResponse(purchaseOrder));
+        } catch (DomainException ex) {
+            await unitOfWork.RollbackTransactionAsync(cancellationToken);
+            return Result.Fail<PurchaseOrderResponse>(ex.Message, ResultStatus.Invalid);
+        } catch {
+            await unitOfWork.RollbackTransactionAsync(cancellationToken);
+            throw;
+        }
+    }
+
+    public async Task<Result<PurchaseOrderResponse>> UpdateLineAsync(UpdatePurchaseOrderLineCommand command, CancellationToken cancellationToken)
+    {
+        if (command.PurchaseOrderId.Value == Guid.Empty) return Result.Fail<PurchaseOrderResponse>("Purchase order id is required.", ResultStatus.Invalid);
+        if (command.PurchaseOrderLineId.Value == Guid.Empty) return Result.Fail<PurchaseOrderResponse>("Purchase order line id is required.", ResultStatus.Invalid);
+        if (command.QuantityOrdered.IsZero) return Result.Fail<PurchaseOrderResponse>("Line quantity must be greater than zero.", ResultStatus.Invalid);
+        if (string.IsNullOrWhiteSpace(command.User)) return Result.Fail<PurchaseOrderResponse>("User is required.", ResultStatus.Invalid);
+
+        await unitOfWork.BeginTransactionAsync(cancellationToken);
+
+        try {
+            var purchaseOrder = await purchaseOrderRepository.GetAsync(command.PurchaseOrderId, cancellationToken);
+            if (purchaseOrder is null) return await TransactionResult.RollBackNotFoundAsync<PurchaseOrderResponse>(unitOfWork, "Purchase order was not found.", cancellationToken);
+
+            purchaseOrder.UpdateLineQuantity(command.PurchaseOrderLineId, command.QuantityOrdered, command.User, command.OccurredAt);
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
             await unitOfWork.CommitTransactionAsync(cancellationToken);

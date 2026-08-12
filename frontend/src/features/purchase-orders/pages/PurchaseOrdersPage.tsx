@@ -54,9 +54,7 @@ export const PurchaseOrdersPage = () => {
           warehouses={warehousesQuery.data ?? []}
         />
       </PageHeader>
-
       <PurchaseOrderSummaryTable isError={purchaseOrdersQuery.isError} isLoading={purchaseOrdersQuery.isLoading} onOpenPurchaseOrder={(id) => navigate(`/purchase-orders/${id}`)} purchaseOrders={purchaseOrders} warehouses={warehousesQuery.data} />
-
       {isCreateOpen && <CreatePurchaseOrderDialog isError={submitMutation.isError} isSaving={submitMutation.isPending} onCancel={closeCreateDialog} onSubmit={createPurchaseOrder} warehouses={warehousesQuery.data ?? []} />}
     </section>
   );

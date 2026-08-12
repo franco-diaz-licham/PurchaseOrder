@@ -18,14 +18,15 @@ export const PurchaseOrderListActions = ({ showReadyToReserveOnly, warehouseFilt
       <input checked={showReadyToReserveOnly} className="h-4 w-4 accent-primary" onChange={(event) => onShowReadyToReserveOnlyChange(event.target.checked)} type="checkbox" />
       Ready to reserve
     </label>
-    <AppSelect value={warehouseFilter} onChange={(event) => onWarehouseFilterChange(event.target.value)}>
-      <option value="">All warehouses</option>
-      {warehouses.map((warehouse) => (
-        <option key={warehouse.id} value={warehouse.id}>
-          {warehouse.displayName}
-        </option>
-      ))}
-    </AppSelect>
+    <AppSelect
+      options={warehouses.map((warehouse) => ({
+        label: warehouse.displayName,
+        value: warehouse.id
+      }))}
+      placeholder="All warehouses"
+      value={warehouseFilter}
+      onChange={(event) => onWarehouseFilterChange(event.target.value)}
+    />
     <AppButton onClick={onAdd}>
       <UilPlus className="h-4 w-4" />
       Add

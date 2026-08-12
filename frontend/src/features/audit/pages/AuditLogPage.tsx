@@ -21,14 +21,15 @@ export const AuditLogPage = () => {
   return (
     <section>
       <PageHeader description="Every successful reserve and release action is recorded here with resulting available quantity." title="Audit Log">
-        <AppSelect value={warehouseId} onChange={(event) => setWarehouseId(event.target.value)}>
-          <option value="">All warehouses</option>
-          {(warehousesQuery.data ?? []).map((warehouse) => (
-            <option key={warehouse.id} value={warehouse.id}>
-              {warehouse.displayName}
-            </option>
-          ))}
-        </AppSelect>
+        <AppSelect
+          options={(warehousesQuery.data ?? []).map((warehouse) => ({
+            label: warehouse.displayName,
+            value: warehouse.id
+          }))}
+          placeholder="All warehouses"
+          value={warehouseId}
+          onChange={(event) => setWarehouseId(event.target.value)}
+        />
       </PageHeader>
       <AuditLogTable entries={auditEntries} inventoryItems={itemsQuery.data} isError={auditQuery.isError} isLoading={auditQuery.isLoading} warehouses={warehousesQuery.data} />
     </section>

@@ -108,6 +108,16 @@ public sealed class PurchaseOrder : Entity<PurchaseOrderId>
         SetUpdated(user, occurredAt);
     }
 
+    public void UpdateLineQuantity(PurchaseOrderLineId lineId, Quantity quantityOrdered, string user, DateTimeOffset occurredAt)
+    {
+        if (Status == PurchaseOrderStatus.Cancelled) throw new DomainException("Cancelled purchase orders cannot be changed.");
+        if (Status == PurchaseOrderStatus.Closed) throw new DomainException("Closed purchase orders cannot be changed.");
+
+        var line = GetLine(lineId);
+        line.UpdateQuantity(quantityOrdered, user, occurredAt);
+        SetUpdated(user, occurredAt);
+    }
+
     public void Approve(string user, DateTimeOffset occurredAt)
     {
         if (Status == PurchaseOrderStatus.Cancelled) throw new DomainException("Cancelled purchase orders cannot be approved.");

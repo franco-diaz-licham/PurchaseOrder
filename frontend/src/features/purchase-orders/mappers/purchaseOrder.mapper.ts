@@ -5,9 +5,19 @@ import type {
   PurchaseOrderLineResponseDto,
   PurchaseOrderSummaryResponseDto,
   RemovePurchaseOrderLineRequestDto,
-  SubmitPurchaseOrderRequestDto
+  SubmitPurchaseOrderRequestDto,
+  UpdatePurchaseOrderLineRequestDto
 } from '../types/purchaseOrder.api.types';
-import type { AddPurchaseOrderLineModel, ChangePurchaseOrderStatusModel, PurchaseOrderModel, PurchaseOrderLineModel, PurchaseOrderSummaryModel, RemovePurchaseOrderLineModel, SubmitPurchaseOrderModel } from '../types/purchaseOrder.types';
+import type {
+  AddPurchaseOrderLineModel,
+  ChangePurchaseOrderStatusModel,
+  PurchaseOrderModel,
+  PurchaseOrderLineModel,
+  PurchaseOrderSummaryModel,
+  RemovePurchaseOrderLineModel,
+  SubmitPurchaseOrderModel,
+  UpdatePurchaseOrderLineModel
+} from '../types/purchaseOrder.types';
 
 export const toPurchaseOrderLine = (dto: PurchaseOrderLineResponseDto): PurchaseOrderLineModel => ({
   id: dto.purchaseOrderLineId,
@@ -62,6 +72,11 @@ export const toAddPurchaseOrderLineRequestDto = (command: AddPurchaseOrderLineMo
 });
 
 export const toRemovePurchaseOrderLineRequestDto = (command: RemovePurchaseOrderLineModel): RemovePurchaseOrderLineRequestDto => ({
+  user: command.user
+});
+
+export const toUpdatePurchaseOrderLineRequestDto = (command: UpdatePurchaseOrderLineModel): UpdatePurchaseOrderLineRequestDto => ({
+  quantityOrdered: command.quantityOrdered,
   user: command.user
 });
 

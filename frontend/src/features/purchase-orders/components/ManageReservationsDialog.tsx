@@ -92,11 +92,11 @@ export const ManageReservationsDialog = ({ availableQuantity, isReleasing, isRes
             <table className="w-full text-left text-sm">
               <thead className="bg-muted text-xs uppercase text-muted-foreground">
                 <tr>
-                  <th className="px-4 py-3">Active reservation</th>
-                  <th className="px-4 py-3">Unit cost</th>
+                  <th className="px-4 py-3 text-right">Active reservation</th>
+                  <th className="px-4 py-3 text-right">Unit cost</th>
                   <th className="px-4 py-3">Reserved by</th>
                   <th className="px-4 py-3">Reserved at</th>
-                  <th className="px-4 py-3">{releaseLabel}</th>
+                  <th className="px-4 py-3 text-right">{releaseLabel}</th>
                   <th className="px-4 py-3">Action</th>
                 </tr>
               </thead>
@@ -110,15 +110,15 @@ export const ManageReservationsDialog = ({ availableQuantity, isReleasing, isRes
                 )}
                 {reservations.map((reservation) => (
                   <tr className="border-t" key={reservation.id}>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-right">
                       {reservation.quantityReserved} {quantityUnit}
                     </td>
-                    <td className="px-4 py-3">{formatMoney(reservation.unitCostSnapshot)}</td>
+                    <td className="px-4 py-3 text-right">{formatMoney(reservation.unitCostSnapshot)}</td>
                     <td className="px-4 py-3">{reservation.reservedBy}</td>
                     <td className="px-4 py-3">{dateTime.format(reservation.reservedAt)}</td>
                     <td className="px-4 py-3">
                       <AppInput
-                        className="w-32"
+                        className="w-32 text-right"
                         max={reservation.quantityReserved}
                         min={minimumQuantity}
                         onChange={(event) =>

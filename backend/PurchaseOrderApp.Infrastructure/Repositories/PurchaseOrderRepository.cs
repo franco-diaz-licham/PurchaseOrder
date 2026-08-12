@@ -90,7 +90,7 @@ public sealed class PurchaseOrderRepository(DatabaseContext db) : IPurchaseOrder
     {
         var headers = await db.PurchaseOrders
             .AsNoTracking()
-            .OrderBy(order => order.PurchaseOrderNumber)
+            .OrderByDescending(order => order.CreatedAt)
             .Select(order => new PurchaseOrderHeaderProjection(
                 order.Id,
                 order.PurchaseOrderNumber,

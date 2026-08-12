@@ -12,4 +12,7 @@ declare module '@iconscout/react-unicons' {
   export const UilCheck: Unicon;
   export const UilTimes: Unicon;
   export const UilArchive: Unicon;
+  export const UilPen: Unicon;
+  export const UilTrash: Unicon;
+  export const UilEye: Unicon;
 }

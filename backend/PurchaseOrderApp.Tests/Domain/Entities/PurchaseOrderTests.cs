@@ -185,6 +185,41 @@ public sealed class PurchaseOrderTests
     }
 
     [Test]
+    public void UpdateLineQuantity_ShouldChangeOrderedAndRemainingQuantity()
+    {
+        // Arrange
+        var purchaseOrder = TestData.CreatePendingPurchaseOrder();
+        var item = TestData.CreateUnitItem();
+        var line = purchaseOrder.AddLine(item, new Quantity(5), TestData.User, TestData.OccurredAt);
+
+        // Act
+        purchaseOrder.UpdateLineQuantity(line.Id, new Quantity(8), TestData.User, TestData.OccurredAt);
+
+        // Assert
+        line.QuantityOrdered.Value.ShouldBe(8);
+        line.QuantityRemaining.Value.ShouldBe(8);
+        purchaseOrder.UpdatedBy.ShouldBe(TestData.User);
+    }
+
+    [Test]
+    public void UpdateLineQuantity_ShouldThrow_WhenQuantityIsLessThanReservedQuantity()
+    {
+        // Arrange
+        var purchaseOrder = TestData.CreatePendingPurchaseOrder();
+        var item = TestData.CreateUnitItem();
+        var line = purchaseOrder.AddLine(item, new Quantity(5), TestData.User, TestData.OccurredAt);
+        purchaseOrder.Approve(TestData.User, TestData.OccurredAt);
+        purchaseOrder.ReserveLine(line.Id, new Quantity(3), TestData.User, TestData.OccurredAt);
+
+        // Act
+        var exception = Should.Throw<DomainException>(() =>
+            purchaseOrder.UpdateLineQuantity(line.Id, new Quantity(2), TestData.User, TestData.OccurredAt));
+
+        // Assert
+        exception.Message.ShouldBe("Purchase order line quantity cannot be less than the reserved quantity.");
+    }
+
+    [Test]
     public void ReserveLine_ShouldThrow_WhenReservationExceedsRemainingQuantity()
     {
         // Arrange

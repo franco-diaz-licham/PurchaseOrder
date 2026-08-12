@@ -1,28 +1,26 @@
 import { useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { PageHeader } from '@/components/common/PageHeader';
-import { AppButton } from '@/components/ui/AppButton';
 import { useInventoryItemsQuery, useWarehousesQuery, useWarehouseStockQuery } from '@/features/catalog/queries/catalog.queries';
 import { findInventoryItem, findWarehouse } from '@/features/catalog/utils/catalogLookup';
 import { useCreateReservationMutation, useReleaseReservationMutation, useReservationsQuery } from '@/features/reservations/queries/reservation.queries';
-import { useFinanceNavigationStore } from '@/features/reports/stores/financeNavigation.store';
 import { AddPurchaseOrderLineDialog, type AddPurchaseOrderLineFormValues } from '../components/AddPurchaseOrderLineDialog';
+import { EditPurchaseOrderLineDialog, type EditPurchaseOrderLineFormValues } from '../components/EditPurchaseOrderLineDialog';
 import { ManageReservationsDialog } from '../components/ManageReservationsDialog';
 import { PurchaseOrderHeaderCard } from '../components/PurchaseOrderHeaderCard';
 import { PurchaseOrderLinesTable } from '../components/PurchaseOrderLinesTable';
-import { useAddPurchaseOrderLineMutation, usePurchaseOrderQuery, usePurchaseOrderStatusMutation, useRemovePurchaseOrderLineMutation } from '../queries/purchaseOrder.queries';
+import { PurchaseOrderTotalsBar } from '../components/PurchaseOrderTotalsBar';
+import { useAddPurchaseOrderLineMutation, usePurchaseOrderQuery, usePurchaseOrderStatusMutation, useRemovePurchaseOrderLineMutation, useUpdatePurchaseOrderLineMutation } from '../queries/purchaseOrder.queries';
 
 export const PurchaseOrderDetailPage = () => {
   const { purchaseOrderId } = useParams();
-  const navigate = useNavigate();
-  const openedFinancePurchaseOrderId = useFinanceNavigationStore((state) => state.openedPurchaseOrderId);
-  const clearOpenedFinancePurchaseOrder = useFinanceNavigationStore((state) => state.clearOpenedPurchaseOrder);
   const purchaseOrderQuery = usePurchaseOrderQuery(purchaseOrderId);
   const statusMutation = usePurchaseOrderStatusMutation();
   const addLineMutation = useAddPurchaseOrderLineMutation();
   const removeLineMutation = useRemovePurchaseOrderLineMutation();
+  const updateLineMutation = useUpdatePurchaseOrderLineMutation();
   const createReservationMutation = useCreateReservationMutation();
   const releaseReservationMutation = useReleaseReservationMutation();
   const warehousesQuery = useWarehousesQuery();
@@ -42,11 +40,13 @@ export const PurchaseOrderDetailPage = () => {
   const existingLineItemIds = useMemo(() => new Set((purchaseOrder?.lines ?? []).map((line) => line.inventoryItemId)), [purchaseOrder?.lines]);
   const availableItemsToAdd = useMemo(() => (itemsQuery.data ?? []).filter((item) => !existingLineItemIds.has(item.id)), [existingLineItemIds, itemsQuery.data]);
   const [isAddLineOpen, setIsAddLineOpen] = useState(false);
+  const [editLineId, setEditLineId] = useState<string | null>(null);
   const [manageReservationsLineId, setManageReservationsLineId] = useState<string | null>(null);
   const [reservationUser, setReservationUser] = useState('Franco Diaz');
-  const cameFromFinance = openedFinancePurchaseOrderId === purchaseOrderId;
 
   const manageReservationsLine = purchaseOrder?.lines.find((line) => line.id === manageReservationsLineId);
+  const editLine = purchaseOrder?.lines.find((line) => line.id === editLineId);
+  const editLineItem = editLine ? findInventoryItem(itemsQuery.data, editLine.inventoryItemId) : undefined;
   const manageReservationsItem = manageReservationsLine ? findInventoryItem(itemsQuery.data, manageReservationsLine.inventoryItemId) : undefined;
   const manageReservationsStock = manageReservationsLine ? stockByItemId.get(manageReservationsLine.inventoryItemId) : undefined;
   const manageReservationsAvailableQuantity = manageReservationsStock?.availableQuantity ?? 0;
@@ -74,6 +74,20 @@ export const PurchaseOrderDetailPage = () => {
     setIsAddLineOpen(false);
   };
 
+  const updateLine = async (values: EditPurchaseOrderLineFormValues) => {
+    if (!purchaseOrder) return;
+    if (!editLine) return;
+
+    await updateLineMutation.mutateAsync({
+      purchaseOrderId: purchaseOrder.id,
+      purchaseOrderLineId: editLine.id,
+      quantityOrdered: Number(values.quantityOrdered),
+      user: values.user
+    });
+
+    setEditLineId(null);
+  };
+
   const closeManageReservationsDialog = () => {
     setManageReservationsLineId(null);
   };
@@ -90,40 +104,23 @@ export const PurchaseOrderDetailPage = () => {
     });
   };
 
-  const goBack = () => {
-    if (cameFromFinance) {
-      clearOpenedFinancePurchaseOrder();
-      navigate('/finance');
-      return;
-    }
-
-    navigate('/purchase-orders');
-  };
-
   return (
     <section>
-      <PageHeader description="Review the full purchase order aggregate and manage its lifecycle." title={purchaseOrder?.number ?? 'Purchase Order'}>
-        <AppButton appearance="secondary" onClick={goBack}>
-          Back
-        </AppButton>
-      </PageHeader>
+      <PageHeader description="Review the full purchase order aggregate and manage its lifecycle." title={purchaseOrder?.number ?? 'Purchase Order'} />
 
       <div className="grid gap-4 p-6">
         {purchaseOrderQuery.isError && <ErrorMessage message="Purchase order could not be loaded." />}
         {statusMutation.isError && <ErrorMessage message="Purchase order status could not be changed." />}
         {addLineMutation.isError && <ErrorMessage message="Purchase order line could not be added." />}
         {removeLineMutation.isError && <ErrorMessage message="Purchase order line could not be removed." />}
+        {updateLineMutation.isError && <ErrorMessage message="Purchase order line could not be updated." />}
         {createReservationMutation.isError && <ErrorMessage message="Stock could not be reserved for this line." />}
         {releaseReservationMutation.isError && <ErrorMessage message="Reservation could not be released." />}
         {!purchaseOrder && !purchaseOrderQuery.isLoading && !purchaseOrderQuery.isError && <EmptyState title="Purchase order was not found." />}
 
         {purchaseOrder && (
           <PurchaseOrderHeaderCard
-            availableItemCount={availableItemsToAdd.length}
-            canChangeLines={canChangeLines}
-            isAddingLine={addLineMutation.isPending}
             isChangingStatus={statusMutation.isPending}
-            onAddLine={openAddLineDialog}
             onApprove={() => statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'approve', user: 'Franco Diaz' })}
             onCancel={() => statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'cancel', user: 'Franco Diaz' })}
             onClose={() => statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'close', user: 'Franco Diaz' })}
@@ -132,13 +129,19 @@ export const PurchaseOrderDetailPage = () => {
           />
         )}
 
+        {purchaseOrder && <PurchaseOrderTotalsBar gstAmount={purchaseOrder.gstAmount} subtotalAmount={purchaseOrder.subtotalAmount} totalAmount={purchaseOrder.totalAmount} />}
+
         {purchaseOrder && (
           <PurchaseOrderLinesTable
             activeReservations={activeReservations}
+            availableItemCount={availableItemsToAdd.length}
             canChangeLines={canChangeLines}
             canReserveStock={canReserveStock}
             inventoryItems={itemsQuery.data}
+            isAddingLine={addLineMutation.isPending}
             isRemovingLine={removeLineMutation.isPending}
+            onAddLine={openAddLineDialog}
+            onEditLine={setEditLineId}
             onManageReservations={setManageReservationsLineId}
             onRemoveLine={(purchaseOrderLineId, user) =>
               removeLineMutation.mutate({
@@ -155,6 +158,17 @@ export const PurchaseOrderDetailPage = () => {
       </div>
 
       {isAddLineOpen && <AddPurchaseOrderLineDialog inventoryItems={availableItemsToAdd} isSaving={addLineMutation.isPending} onCancel={closeAddLineDialog} onSubmit={addLine} />}
+
+      {editLine && (
+        <EditPurchaseOrderLineDialog
+          isSaving={updateLineMutation.isPending}
+          itemName={editLineItem?.displayName ?? editLine.inventoryItemId}
+          onCancel={() => setEditLineId(null)}
+          onSubmit={updateLine}
+          quantityOrdered={editLine.quantityOrdered}
+          quantityReserved={editLine.quantityReserved}
+        />
+      )}
 
       {manageReservationsLine && (
         <ManageReservationsDialog

@@ -21,6 +21,11 @@ type CreatePurchaseOrderDialogProps = {
 };
 
 export const CreatePurchaseOrderDialog = ({ isError, isSaving, warehouses, onCancel, onSubmit }: CreatePurchaseOrderDialogProps) => {
+  const warehouseOptions = warehouses.map((warehouse) => ({
+    label: warehouse.displayName,
+    value: warehouse.id
+  }));
+
   const form = useForm<CreatePurchaseOrderFormValues>({
     defaultValues: {
       warehouseId: '',
@@ -49,14 +54,7 @@ export const CreatePurchaseOrderDialog = ({ isError, isSaving, warehouses, onCan
           {isError && <ErrorMessage message="Purchase order could not be created." />}
 
           <AppField label="Warehouse">
-            <AppSelect autoFocus required {...form.register('warehouseId')}>
-              <option value="">Select warehouse</option>
-              {warehouses.map((warehouse) => (
-                <option key={warehouse.id} value={warehouse.id}>
-                  {warehouse.displayName}
-                </option>
-              ))}
-            </AppSelect>
+            <AppSelect autoFocus options={warehouseOptions} placeholder="Select warehouse" required {...form.register('warehouseId')} />
           </AppField>
 
           <AppField label="User">

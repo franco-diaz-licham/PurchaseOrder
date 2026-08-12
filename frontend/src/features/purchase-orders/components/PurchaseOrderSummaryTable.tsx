@@ -28,11 +28,11 @@ export const PurchaseOrderSummaryTable = ({ isError, isLoading, purchaseOrders, 
                 <th className="px-4 py-3">PO number</th>
                 <th className="px-4 py-3">Warehouse</th>
                 <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Lines</th>
-                <th className="px-4 py-3">Ordered</th>
-                <th className="px-4 py-3">Reserved</th>
-                <th className="px-4 py-3">Remaining</th>
-                <th className="px-4 py-3">Total</th>
+                <th className="px-4 py-3 text-right">Lines</th>
+                <th className="px-4 py-3 text-right">Ordered</th>
+                <th className="px-4 py-3 text-right">Reserved</th>
+                <th className="px-4 py-3 text-right">Remaining</th>
+                <th className="px-4 py-3 text-right">Total</th>
               </tr>
             </thead>
             <tbody>
@@ -53,11 +53,11 @@ export const PurchaseOrderSummaryTable = ({ isError, isLoading, purchaseOrders, 
                     <td className="px-4 py-3">
                       <StatusBadge status={order.status} />
                     </td>
-                    <td className="px-4 py-3">{order.lineCount}</td>
-                    <td className="px-4 py-3">{order.quantityOrdered}</td>
-                    <td className="px-4 py-3">{order.quantityReserved}</td>
-                    <td className="px-4 py-3">{order.quantityRemaining}</td>
-                    <td className="px-4 py-3 font-semibold">{formatMoney(order.totalAmount)}</td>
+                    <td className="px-4 py-3 text-right">{order.lineCount}</td>
+                    <td className="px-4 py-3 text-right">{order.quantityOrdered}</td>
+                    <td className="px-4 py-3 text-right">{order.quantityReserved}</td>
+                    <td className="px-4 py-3 text-right">{order.quantityRemaining}</td>
+                    <td className="px-4 py-3 text-right font-semibold">{formatMoney(order.totalAmount)}</td>
                   </tr>
                 );
               })}
