@@ -3,7 +3,7 @@ using PurchaseOrderApp.Domain.Enums;
 using PurchaseOrderApp.Domain.ValueObjects;
 using Shouldly;
 
-namespace PurchaseOrderApp.Tests.ValueObjects;
+namespace PurchaseOrderApp.Tests.Domain.ValueObjects;
 
 [TestFixture]
 public sealed class QuantityTests

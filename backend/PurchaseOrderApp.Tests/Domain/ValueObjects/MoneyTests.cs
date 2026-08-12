@@ -2,7 +2,7 @@ using PurchaseOrderApp.Domain.Core;
 using PurchaseOrderApp.Domain.ValueObjects;
 using Shouldly;
 
-namespace PurchaseOrderApp.Tests.ValueObjects;
+namespace PurchaseOrderApp.Tests.Domain.ValueObjects;
 
 [TestFixture]
 public sealed class MoneyTests

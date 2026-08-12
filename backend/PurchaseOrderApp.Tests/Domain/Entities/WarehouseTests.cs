@@ -2,7 +2,7 @@ using PurchaseOrderApp.Domain.Core;
 using PurchaseOrderApp.Tests.Shared;
 using Shouldly;
 
-namespace PurchaseOrderApp.Tests.Domain;
+namespace PurchaseOrderApp.Tests.Domain.Entities;
 
 [TestFixture]
 public sealed class WarehouseTests
