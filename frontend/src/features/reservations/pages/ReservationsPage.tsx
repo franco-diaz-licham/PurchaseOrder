@@ -36,7 +36,7 @@ export const ReservationsPage = () => {
     defaultValues: {
       purchaseOrderLineId: '',
       quantity: 1,
-      user: 'demo-user'
+      user: 'Franco Diaz'
     }
   });
 
@@ -81,7 +81,7 @@ export const ReservationsPage = () => {
                 value={selectedWarehouseId}
                 onChange={(event) => {
                   setWarehouseId(event.target.value);
-                  reset({ purchaseOrderLineId: '', quantity: 1, user: 'demo-user' });
+                  reset({ purchaseOrderLineId: '', quantity: 1, user: 'Franco Diaz' });
                 }}
               >
                 {(warehousesQuery.data ?? []).map((warehouse) => (
@@ -135,7 +135,9 @@ export const ReservationsPage = () => {
                   const item = findInventoryItem(itemsQuery.data, reservation.inventoryItemId);
                   return (
                     <tr className="border-t" key={reservation.id}>
-                      <td className="px-4 py-3"><StatusBadge status={reservation.status} /></td>
+                      <td className="px-4 py-3">
+                        <StatusBadge status={reservation.status} />
+                      </td>
                       <td className="px-4 py-3">{warehouse?.code ?? reservation.warehouseId}</td>
                       <td className="px-4 py-3">{item?.displayName ?? reservation.inventoryItemId}</td>
                       <td className="px-4 py-3">{reservation.quantityReserved}</td>
@@ -144,7 +146,7 @@ export const ReservationsPage = () => {
                         <AppButton
                           appearance="secondary"
                           disabled={reservation.status !== 'Active' || releaseMutation.isPending}
-                          onClick={() => releaseMutation.mutate({ stockReservationId: reservation.id, quantity: reservation.quantityReserved, user: 'demo-user' })}
+                          onClick={() => releaseMutation.mutate({ stockReservationId: reservation.id, quantity: reservation.quantityReserved, user: 'Franco Diaz' })}
                         >
                           <UilArchive className="h-4 w-4" />
                           Release

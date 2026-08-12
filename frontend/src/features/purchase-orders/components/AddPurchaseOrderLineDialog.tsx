@@ -24,7 +24,7 @@ export const AddPurchaseOrderLineDialog = ({ inventoryItems, isSaving, onCancel,
     defaultValues: {
       inventoryItemId: '',
       quantityOrdered: 1,
-      user: 'demo-user'
+      user: 'Franco Diaz'
     }
   });
 

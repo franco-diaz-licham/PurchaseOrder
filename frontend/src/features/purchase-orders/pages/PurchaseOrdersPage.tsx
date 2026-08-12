@@ -117,9 +117,7 @@ export const PurchaseOrdersPage = () => {
         </div>
       </div>
 
-      {isCreateOpen && (
-        <CreatePurchaseOrderDialog isError={submitMutation.isError} isSaving={submitMutation.isPending} onCancel={closeCreateDialog} onSubmit={createPurchaseOrder} warehouses={warehousesQuery.data ?? []} />
-      )}
+      {isCreateOpen && <CreatePurchaseOrderDialog isError={submitMutation.isError} isSaving={submitMutation.isPending} onCancel={closeCreateDialog} onSubmit={createPurchaseOrder} warehouses={warehousesQuery.data ?? []} />}
     </section>
   );
 };

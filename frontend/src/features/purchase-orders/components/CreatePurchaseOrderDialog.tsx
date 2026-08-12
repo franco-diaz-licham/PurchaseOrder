@@ -24,13 +24,13 @@ export const CreatePurchaseOrderDialog = ({ isError, isSaving, warehouses, onCan
   const form = useForm<CreatePurchaseOrderFormValues>({
     defaultValues: {
       warehouseId: '',
-      user: 'demo-user'
+      user: 'Franco Diaz'
     }
   });
 
   const submit = form.handleSubmit(async (values) => {
     await onSubmit(values);
-    form.reset({ warehouseId: '', user: 'demo-user' });
+    form.reset({ warehouseId: '', user: 'Franco Diaz' });
   });
 
   return (

@@ -14,6 +14,7 @@ public sealed class PurchaseOrderRepository(DatabaseContext db) : IPurchaseOrder
     public Task<PurchaseOrder?> GetAsync(PurchaseOrderId purchaseOrderId, CancellationToken cancellationToken)
     {
         return db.PurchaseOrders
+            .AsSplitQuery()
             .Include(order => order.Lines)
                 .ThenInclude(line => line.InventoryItem)
             .SingleOrDefaultAsync(order => order.Id == purchaseOrderId, cancellationToken);
@@ -27,6 +28,7 @@ public sealed class PurchaseOrderRepository(DatabaseContext db) : IPurchaseOrder
     public Task<PurchaseOrder?> GetByLineIdAsync(PurchaseOrderLineId purchaseOrderLineId, CancellationToken cancellationToken)
     {
         return db.PurchaseOrders
+            .AsSplitQuery()
             .Include(order => order.Lines)
                 .ThenInclude(line => line.InventoryItem)
             .SingleOrDefaultAsync(order => order.Lines.Any(line => line.Id == purchaseOrderLineId), cancellationToken);
@@ -36,6 +38,7 @@ public sealed class PurchaseOrderRepository(DatabaseContext db) : IPurchaseOrder
     {
         var purchaseOrder = await db.PurchaseOrders
             .AsNoTracking()
+            .AsSplitQuery()
             .Include(order => order.Lines)
                 .ThenInclude(line => line.InventoryItem)
             .SingleOrDefaultAsync(order => order.Id == purchaseOrderId, cancellationToken);
@@ -47,6 +50,7 @@ public sealed class PurchaseOrderRepository(DatabaseContext db) : IPurchaseOrder
     {
         var purchaseOrders = await db.PurchaseOrders
             .AsNoTracking()
+            .AsSplitQuery()
             .Include(order => order.Lines)
                 .ThenInclude(line => line.InventoryItem)
             .OrderBy(order => order.PurchaseOrderNumber)
@@ -61,6 +65,7 @@ public sealed class PurchaseOrderRepository(DatabaseContext db) : IPurchaseOrder
     {
         var purchaseOrders = await db.PurchaseOrders
             .AsNoTracking()
+            .AsSplitQuery()
             .Include(order => order.Lines)
                 .ThenInclude(line => line.InventoryItem)
             .OrderBy(order => order.PurchaseOrderNumber)
@@ -80,6 +85,7 @@ public sealed class PurchaseOrderRepository(DatabaseContext db) : IPurchaseOrder
     {
         var approvedOrders = await db.PurchaseOrders
             .AsNoTracking()
+            .AsSplitQuery()
             .Include(order => order.Warehouse)
             .Include(order => order.Lines)
                 .ThenInclude(line => line.InventoryItem)
