@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using PurchaseOrderApp.Domain.Entities;
+using PurchaseOrderApp.Infrastructure;
 using PurchaseOrderApp.Infrastructure.Repositories;
 using PurchaseOrderApp.Tests.Shared;
 using Shouldly;
@@ -51,5 +53,52 @@ public sealed class WarehouseStockRepositoryTests : DatabaseFixture
         result.WarehouseId.ShouldBe(warehouse.Id);
         result.InventoryItemId.ShouldBe(item.Id);
         result.OnHandQuantity.Value.ShouldBe(42);
+    }
+
+    [Test]
+    public async Task GetForUpdateAsync_ShouldHoldRowLockUntilTransactionCommits()
+    {
+        // Arrange
+        var seed = await PurchaseOrderScenarioSeeder.SeedApprovedLineAsync(Db, onHandQuantity: 10m);
+        await using var firstContext = CreateContext();
+        await using var firstTransaction = await firstContext.Database.BeginTransactionAsync();
+        var firstRepository = new WarehouseStockRepository(firstContext);
+
+        var firstLock = await firstRepository.GetForUpdateAsync(seed.WarehouseId, seed.InventoryItemId, CancellationToken.None);
+        firstLock.ShouldNotBeNull();
+
+        var secondLockStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var secondLockTask = Task.Run(async () => {
+            await using var secondContext = CreateContext();
+            await using var secondTransaction = await secondContext.Database.BeginTransactionAsync();
+            var secondRepository = new WarehouseStockRepository(secondContext);
+
+            secondLockStarted.SetResult();
+            var secondLock = await secondRepository.GetForUpdateAsync(seed.WarehouseId, seed.InventoryItemId, CancellationToken.None);
+            await secondTransaction.CommitAsync();
+            return secondLock;
+        });
+
+        await secondLockStarted.Task;
+        await Task.Delay(250);
+
+        // Assert
+        secondLockTask.IsCompleted.ShouldBeFalse();
+
+        await firstTransaction.CommitAsync();
+        var result = await secondLockTask.WaitAsync(TimeSpan.FromSeconds(5));
+
+        result.ShouldNotBeNull();
+        result.Id.ShouldBe(seed.WarehouseStockId);
+    }
+
+    private DatabaseContext CreateContext()
+    {
+        var options = new DbContextOptionsBuilder<DatabaseContext>()
+            .UseNpgsql(ConnectionString)
+            .UseSnakeCaseNamingConvention()
+            .Options;
+
+        return new DatabaseContext(options);
     }
 }

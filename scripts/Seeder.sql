@@ -8,7 +8,7 @@ DELETE FROM warehouse_stock;
 DELETE FROM inventory_items;
 DELETE FROM warehouses;
 
-INSERT INTO warehouses ("Id", "Code", "Name", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy")
+INSERT INTO warehouses (id, code, name, created_at, created_by, updated_at, updated_by)
 VALUES
     ('00000000-0000-0000-0000-000000000001', 'SYD', 'Sydney Fulfilment Centre', '2026-01-01T00:00:00+00:00', 'System Seeder', NULL, NULL),
     ('00000000-0000-0000-0000-000000000002', 'MEL', 'Melbourne Distribution Hub', '2026-01-01T00:00:00+00:00', 'System Seeder', NULL, NULL),
@@ -16,7 +16,7 @@ VALUES
     ('00000000-0000-0000-0000-000000000004', 'PER', 'Perth Regional Depot', '2026-01-01T00:00:00+00:00', 'System Seeder', NULL, NULL),
     ('00000000-0000-0000-0000-000000000005', 'ADL', 'Adelaide Overflow Warehouse', '2026-01-01T00:00:00+00:00', 'System Seeder', NULL, NULL);
 
-INSERT INTO inventory_items ("Id", "Sku", "Name", "Category", "TrackingMode", "StandardCost", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy")
+INSERT INTO inventory_items (id, sku, name, category, tracking_mode, standard_cost, created_at, created_by, updated_at, updated_by)
 VALUES
     ('10000000-0000-0000-0000-000000000001', 'BOLT-10', '10mm Bolt', 'Hardware', 'Unit', 2.5000, '2026-01-01T00:00:00+00:00', 'System Seeder', NULL, NULL),
     ('10000000-0000-0000-0000-000000000002', 'NUT-10', '10mm Nut', 'Hardware', 'Unit', 1.2500, '2026-01-01T00:00:00+00:00', 'System Seeder', NULL, NULL),
@@ -70,7 +70,7 @@ item_stock_seed ("ItemNumber", "InventoryItemId", "BaseQuantity") AS (
         (19, '10000000-0000-0000-0000-000000000019'::uuid, 115.000),
         (20, '10000000-0000-0000-0000-000000000020'::uuid, 35.000)
 )
-INSERT INTO warehouse_stock ("Id", "WarehouseId", "InventoryItemId", "OnHandQuantity", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy")
+INSERT INTO warehouse_stock (id, warehouse_id, inventory_item_id, on_hand_quantity, created_at, created_by, updated_at, updated_by)
 SELECT
     ('20000000-0000-0000-0000-' || lpad(((warehouse_seed."WarehouseNumber" * 100) + item_stock_seed."ItemNumber")::text, 12, '0'))::uuid,
     warehouse_seed."WarehouseId",
@@ -83,7 +83,7 @@ SELECT
 FROM warehouse_seed
 CROSS JOIN item_stock_seed;
 
-INSERT INTO purchase_orders ("Id", "PurchaseOrderNumber", "WarehouseId", "Status", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy")
+INSERT INTO purchase_orders (id, purchase_order_number, warehouse_id, status, created_at, created_by, updated_at, updated_by)
 VALUES
     ('30000000-0000-0000-0000-000000000001', 'PO-1001', '00000000-0000-0000-0000-000000000001', 'Pending', '2026-02-01T09:00:00+00:00', 'Alice Nguyen', NULL, NULL),
     ('30000000-0000-0000-0000-000000000002', 'PO-1002', '00000000-0000-0000-0000-000000000001', 'Approved', '2026-02-02T09:00:00+00:00', 'Ben Carter', '2026-02-02T10:00:00+00:00', 'Ben Carter'),
@@ -106,7 +106,7 @@ VALUES
     ('30000000-0000-0000-0000-000000000019', 'PO-1019', '00000000-0000-0000-0000-000000000005', 'Closed', '2026-02-19T09:00:00+00:00', 'Sam Walker', '2026-02-20T16:00:00+00:00', 'Sam Walker'),
     ('30000000-0000-0000-0000-000000000020', 'PO-1020', '00000000-0000-0000-0000-000000000005', 'Approved', '2026-02-20T09:00:00+00:00', 'Tara Smith', '2026-02-20T11:15:00+00:00', 'Tara Smith');
 
-INSERT INTO purchase_order_lines ("Id", "PurchaseOrderId", "InventoryItemId", "QuantityOrdered", "QuantityReserved", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy")
+INSERT INTO purchase_order_lines (id, purchase_order_id, inventory_item_id, quantity_ordered, quantity_reserved, created_at, created_by, updated_at, updated_by)
 VALUES
     ('40000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 50.000, 0.000, '2026-02-01T09:05:00+00:00', 'Alice Nguyen', NULL, NULL),
     ('40000000-0000-0000-0000-000000000002', '30000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000002', 30.000, 0.000, '2026-02-01T09:06:00+00:00', 'Alice Nguyen', NULL, NULL),
@@ -134,7 +134,7 @@ VALUES
     ('40000000-0000-0000-0000-000000000024', '30000000-0000-0000-0000-000000000019', '10000000-0000-0000-0000-000000000015', 30.000, 0.000, '2026-02-19T09:05:00+00:00', 'Sam Walker', NULL, NULL),
     ('40000000-0000-0000-0000-000000000025', '30000000-0000-0000-0000-000000000020', '10000000-0000-0000-0000-000000000018', 55.000, 22.000, '2026-02-20T09:05:00+00:00', 'Tara Smith', '2026-02-20T13:00:00+00:00', 'Tara Smith');
 
-INSERT INTO stock_reservations ("Id", "PurchaseOrderLineId", "WarehouseId", "InventoryItemId", "QuantityReserved", "UnitCostSnapshot", "Status", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy")
+INSERT INTO stock_reservations (id, purchase_order_line_id, warehouse_id, inventory_item_id, quantity_reserved, unit_cost_snapshot, status, created_at, created_by, updated_at, updated_by)
 VALUES
     ('50000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000003', 15.000, 0.3500, 'Active', '2026-02-02T11:00:00+00:00', 'Ben Carter', NULL, NULL),
     ('50000000-0000-0000-0000-000000000002', '40000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000005', 20.000, 6.4000, 'Active', '2026-02-03T11:30:00+00:00', 'Carla Mendes', NULL, NULL),
@@ -145,7 +145,7 @@ VALUES
     ('50000000-0000-0000-0000-000000000007', '40000000-0000-0000-0000-000000000023', '00000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000008', 12.000, 1.1000, 'Active', '2026-02-18T12:30:00+00:00', 'Rosa Garcia', NULL, NULL),
     ('50000000-0000-0000-0000-000000000008', '40000000-0000-0000-0000-000000000025', '00000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000018', 22.000, 11.2000, 'Active', '2026-02-20T13:00:00+00:00', 'Tara Smith', NULL, NULL);
 
-INSERT INTO audit_log_entries ("Id", "Action", "InventoryItemId", "WarehouseId", "PurchaseOrderLineId", "StockReservationId", "Quantity", "ResultingAvailableQuantity", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy")
+INSERT INTO audit_log_entries (id, action, inventory_item_id, warehouse_id, purchase_order_line_id, stock_reservation_id, quantity, resulting_available_quantity, created_at, created_by, updated_at, updated_by)
 VALUES
     ('60000000-0000-0000-0000-000000000001', 'Reserve', '10000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000003', '50000000-0000-0000-0000-000000000001', 15.000, 72.000, '2026-02-02T11:00:00+00:00', 'Ben Carter', NULL, NULL),
     ('60000000-0000-0000-0000-000000000002', 'Reserve', '10000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000005', '50000000-0000-0000-0000-000000000002', 20.000, 78.000, '2026-02-03T11:30:00+00:00', 'Carla Mendes', NULL, NULL),

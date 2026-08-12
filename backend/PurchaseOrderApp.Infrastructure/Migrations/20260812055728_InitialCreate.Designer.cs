@@ -12,8 +12,8 @@ using PurchaseOrderApp.Infrastructure;
 namespace PurchaseOrderApp.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20260812054129_UseSnakeCaseColumnNames")]
-    partial class UseSnakeCaseColumnNames
+    [Migration("20260812055728_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
