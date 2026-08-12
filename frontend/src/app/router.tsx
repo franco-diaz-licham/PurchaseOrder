@@ -1,8 +1,8 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AuditLogPage } from '@/features/audit/pages/AuditLogPage';
+import { PurchaseOrderDetailPage } from '@/features/purchase-orders/pages/PurchaseOrderDetailPage';
 import { PurchaseOrdersPage } from '@/features/purchase-orders/pages/PurchaseOrdersPage';
 import { FinancePage } from '@/features/reports/pages/FinancePage';
-import { ReservationsPage } from '@/features/reservations/pages/ReservationsPage';
 import { WorkspaceLayout } from '@/layouts/WorkspaceLayout';
 
 export const router = createBrowserRouter([
@@ -11,7 +11,8 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate replace to="/purchase-orders" /> },
       { path: '/purchase-orders', element: <PurchaseOrdersPage /> },
-      { path: '/reservations', element: <ReservationsPage /> },
+      { path: '/purchase-orders/new', element: <PurchaseOrderDetailPage /> },
+      { path: '/purchase-orders/:purchaseOrderId', element: <PurchaseOrderDetailPage /> },
       { path: '/finance', element: <FinancePage /> },
       { path: '/audit-log', element: <AuditLogPage /> }
     ]

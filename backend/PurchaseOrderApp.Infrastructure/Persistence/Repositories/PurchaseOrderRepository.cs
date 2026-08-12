@@ -23,24 +23,58 @@ public sealed class PurchaseOrderRepository(DatabaseContext db) : IPurchaseOrder
             .SingleOrDefaultAsync(order => order.Lines.Any(line => line.Id == purchaseOrderLineId), cancellationToken);
     }
 
-    public Task<PurchaseOrderResponse?> GetResponseAsync(PurchaseOrderId purchaseOrderId, CancellationToken cancellationToken)
+    public async Task<PurchaseOrderResponse?> GetResponseAsync(PurchaseOrderId purchaseOrderId, CancellationToken cancellationToken)
     {
-        return ProjectPurchaseOrders(db.PurchaseOrders.AsNoTracking())
-            .SingleOrDefaultAsync(order => order.PurchaseOrderId == purchaseOrderId.Value, cancellationToken);
+        var purchaseOrder = await db.PurchaseOrders
+            .AsNoTracking()
+            .Include(order => order.Lines)
+            .SingleOrDefaultAsync(order => order.Id == purchaseOrderId, cancellationToken);
+
+        return purchaseOrder is null ? null : ToResponse(purchaseOrder);
     }
 
-    public Task<List<PurchaseOrderResponse>> ListResponsesAsync(WarehouseId? warehouseId, CancellationToken cancellationToken)
+    public async Task<List<PurchaseOrderResponse>> ListResponsesAsync(WarehouseId? warehouseId, CancellationToken cancellationToken)
     {
-        var query = db.PurchaseOrders.AsNoTracking();
+        var query = db.PurchaseOrders
+            .AsNoTracking()
+            .Include(order => order.Lines)
+            .AsQueryable();
 
-        if (warehouseId is not null)
-        {
-            query = query.Where(order => order.WarehouseId == warehouseId.Value);
-        }
+        if (warehouseId is not null) query = query.Where(order => order.WarehouseId == warehouseId.Value);
 
-        return ProjectPurchaseOrders(query)
+        var purchaseOrders = await query
             .OrderBy(order => order.PurchaseOrderNumber)
             .ToListAsync(cancellationToken);
+
+        return purchaseOrders
+            .Select(ToResponse)
+            .ToList();
+    }
+
+    public async Task<List<PurchaseOrderSummaryResponse>> ListSummariesAsync(WarehouseId? warehouseId, CancellationToken cancellationToken)
+    {
+        var query = db.PurchaseOrders
+            .AsNoTracking()
+            .Include(order => order.Lines)
+            .AsQueryable();
+
+        if (warehouseId is not null) query = query.Where(order => order.WarehouseId == warehouseId.Value);
+
+        var purchaseOrders = await query
+            .OrderBy(order => order.PurchaseOrderNumber)
+            .ToListAsync(cancellationToken);
+
+        return purchaseOrders
+            .Select(order => new PurchaseOrderSummaryResponse(
+                order.Id.Value,
+                order.PurchaseOrderNumber,
+                order.WarehouseId.Value,
+                order.Status.ToString(),
+                order.Lines.Count,
+                order.Lines.Sum(line => line.QuantityOrdered.Value),
+                order.Lines.Sum(line => line.QuantityReserved.Value),
+                order.Lines.Sum(line => line.QuantityRemaining.Value)))
+            .ToList();
     }
 
     public async Task AddAsync(PurchaseOrder purchaseOrder, CancellationToken cancellationToken)
@@ -50,14 +84,19 @@ public sealed class PurchaseOrderRepository(DatabaseContext db) : IPurchaseOrder
 
     public async Task<List<ApprovedPurchaseOrderLineResponse>> ListApprovedOutstandingLinesAsync(WarehouseId warehouseId, CancellationToken cancellationToken)
     {
-        var approvedOrders = db.PurchaseOrders
+        var approvedOrders = await db.PurchaseOrders
             .AsNoTracking()
+            .Include(order => order.Warehouse)
+            .Include(order => order.Lines)
+                .ThenInclude(line => line.InventoryItem)
             .Where(order => order.WarehouseId == warehouseId)
-            .Where(order => order.Status == PurchaseOrderStatus.Approved);
+            .Where(order => order.Status == PurchaseOrderStatus.Approved)
+            .OrderBy(line => line.PurchaseOrderNumber)
+            .ToListAsync(cancellationToken);
 
-        return await approvedOrders
+        return approvedOrders
             .SelectMany(order => order.Lines
-                .Where(line => line.QuantityReserved.Value < line.QuantityOrdered.Value)
+                .Where(line => !line.QuantityRemaining.IsZero)
                 .Select(line => new ApprovedPurchaseOrderLineResponse(
                     order.Id.Value,
                     order.PurchaseOrderNumber,
@@ -70,15 +109,15 @@ public sealed class PurchaseOrderRepository(DatabaseContext db) : IPurchaseOrder
                     line.InventoryItem.Name,
                     line.QuantityOrdered.Value,
                     line.QuantityReserved.Value,
-                    line.QuantityOrdered.Value - line.QuantityReserved.Value)))
+                    line.QuantityRemaining.Value)))
             .OrderBy(line => line.PurchaseOrderNumber)
             .ThenBy(line => line.Sku)
-            .ToListAsync(cancellationToken);
+            .ToList();
     }
 
-    private static IQueryable<PurchaseOrderResponse> ProjectPurchaseOrders(IQueryable<PurchaseOrder> query)
+    private static PurchaseOrderResponse ToResponse(PurchaseOrder order)
     {
-        return query.Select(order => new PurchaseOrderResponse(
+        return new PurchaseOrderResponse(
             order.Id.Value,
             order.PurchaseOrderNumber,
             order.WarehouseId.Value,
@@ -89,7 +128,7 @@ public sealed class PurchaseOrderRepository(DatabaseContext db) : IPurchaseOrder
                     line.InventoryItemId.Value,
                     line.QuantityOrdered.Value,
                     line.QuantityReserved.Value,
-                    line.QuantityOrdered.Value - line.QuantityReserved.Value))
-                .ToList()));
+                    line.QuantityRemaining.Value))
+                .ToList());
     }
 }

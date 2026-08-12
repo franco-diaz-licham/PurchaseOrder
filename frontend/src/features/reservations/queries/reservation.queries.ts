@@ -9,10 +9,11 @@ export const reservationKeys = {
   list: (warehouseId?: string, status?: string) => ['reservations', warehouseId ?? 'all', status ?? 'all'] as const
 };
 
-export const useReservationsQuery = (warehouseId?: string, status?: string) =>
+export const useReservationsQuery = (warehouseId?: string, status?: string, enabled = true) =>
   useQuery({
     queryKey: reservationKeys.list(warehouseId, status),
-    queryFn: async () => toReservations(await listReservations(warehouseId, status))
+    queryFn: async () => toReservations(await listReservations(warehouseId, status)),
+    enabled
   });
 
 export const useCreateReservationMutation = () => {

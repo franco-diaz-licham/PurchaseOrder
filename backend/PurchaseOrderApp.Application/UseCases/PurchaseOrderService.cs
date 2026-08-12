@@ -13,6 +13,8 @@ public interface IPurchaseOrderService
 
     Task<Result<PurchaseOrderResponse>> GetAsync(PurchaseOrderId purchaseOrderId, CancellationToken cancellationToken);
 
+    Task<Result<List<PurchaseOrderSummaryResponse>>> ListSummariesAsync(WarehouseId? warehouseId, CancellationToken cancellationToken);
+
     Task<Result<List<PurchaseOrderResponse>>> ListAsync(WarehouseId? warehouseId, CancellationToken cancellationToken);
 
     Task<Result<PurchaseOrderResponse>> AddLineAsync(AddPurchaseOrderLineCommand command, CancellationToken cancellationToken);
@@ -36,7 +38,6 @@ public sealed class PurchaseOrderService(
     {
         if (string.IsNullOrWhiteSpace(command.PurchaseOrderNumber)) return Result.Fail<PurchaseOrderResponse>("Purchase order number is required.", ResultStatus.Invalid);
         if (command.WarehouseId.Value == Guid.Empty) return Result.Fail<PurchaseOrderResponse>("Warehouse id is required.", ResultStatus.Invalid);
-        if (command.Lines is null || command.Lines.Count == 0) return Result.Fail<PurchaseOrderResponse>("At least one purchase order line is required.", ResultStatus.Invalid);
         if (string.IsNullOrWhiteSpace(command.User)) return Result.Fail<PurchaseOrderResponse>("User is required.", ResultStatus.Invalid);
 
         foreach (var line in command.Lines) {
@@ -50,7 +51,7 @@ public sealed class PurchaseOrderService(
             var warehouse = await warehouseRepository.GetAsync(command.WarehouseId, cancellationToken);
             if (warehouse is null) return await TransactionResult.RollBackNotFoundAsync<PurchaseOrderResponse>(unitOfWork, "Warehouse was not found.", cancellationToken);
 
-            var purchaseOrder = PurchaseOrder.CreateApproved(command.PurchaseOrderNumber, warehouse.Id, command.User, command.OccurredAt);
+            var purchaseOrder = PurchaseOrder.CreateDraft(command.PurchaseOrderNumber, warehouse.Id, command.User, command.OccurredAt);
 
             foreach (var line in command.Lines) {
                 var item = await inventoryItemRepository.GetAsync(line.InventoryItemId, cancellationToken);
@@ -87,6 +88,14 @@ public sealed class PurchaseOrderService(
         if (warehouseId is not null && warehouseId.Value.Value == Guid.Empty) return Result.Fail<List<PurchaseOrderResponse>>("Warehouse id is required.", ResultStatus.Invalid);
 
         var purchaseOrders = await purchaseOrderRepository.ListResponsesAsync(warehouseId, cancellationToken);
+        return Result.Success(purchaseOrders);
+    }
+
+    public async Task<Result<List<PurchaseOrderSummaryResponse>>> ListSummariesAsync(WarehouseId? warehouseId, CancellationToken cancellationToken)
+    {
+        if (warehouseId is not null && warehouseId.Value.Value == Guid.Empty) return Result.Fail<List<PurchaseOrderSummaryResponse>>("Warehouse id is required.", ResultStatus.Invalid);
+
+        var purchaseOrders = await purchaseOrderRepository.ListSummariesAsync(warehouseId, cancellationToken);
         return Result.Success(purchaseOrders);
     }
 

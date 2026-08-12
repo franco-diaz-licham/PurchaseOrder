@@ -3,7 +3,7 @@ namespace PurchaseOrderApp.Api.Controllers.Models;
 public sealed record SubmitPurchaseOrderRequest(
     string PurchaseOrderNumber,
     Guid WarehouseId,
-    List<SubmitPurchaseOrderLineRequest> Lines,
+    List<SubmitPurchaseOrderLineRequest>? Lines,
     string User);
 
 public sealed record SubmitPurchaseOrderLineRequest(

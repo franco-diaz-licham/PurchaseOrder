@@ -1,10 +1,9 @@
-import { UilBox, UilChartPie, UilClipboardNotes, UilHistory, UilLayerGroup } from '@iconscout/react-unicons';
+import { UilChartPie, UilClipboardNotes, UilHistory, UilLayerGroup } from '@iconscout/react-unicons';
 import { NavLink, Outlet } from 'react-router-dom';
 import { cn } from '@/lib/cn';
 
 const navItems = [
   { label: 'Purchase Orders', to: '/purchase-orders', icon: UilClipboardNotes },
-  { label: 'Reservations', to: '/reservations', icon: UilBox },
   { label: 'Finance', to: '/finance', icon: UilChartPie },
   { label: 'Audit Log', to: '/audit-log', icon: UilHistory }
 ];
@@ -23,13 +22,7 @@ export const WorkspaceLayout = () => (
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
-            <NavLink
-              className={({ isActive }) =>
-                cn('flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white', isActive && 'bg-white/10 text-white')
-              }
-              key={item.to}
-              to={item.to}
-            >
+            <NavLink className={({ isActive }) => cn('flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white', isActive && 'bg-white/10 text-white')} key={item.to} to={item.to}>
               <Icon className="h-5 w-5" />
               {item.label}
             </NavLink>

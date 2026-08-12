@@ -20,6 +20,14 @@ public sealed class PurchaseOrderController(IPurchaseOrderService purchaseOrderS
         return result.ToActionResult();
     }
 
+    [HttpGet("summary")]
+    public async Task<ActionResult<ApiResponse<List<PurchaseOrderSummaryResponse>>>> GetSummary([FromQuery] Guid? warehouseId, CancellationToken cancellationToken)
+    {
+        WarehouseId? parsedWarehouseId = warehouseId.HasValue ? new WarehouseId(warehouseId.Value) : null;
+        var result = await purchaseOrderService.ListSummariesAsync(parsedWarehouseId, cancellationToken);
+        return result.ToActionResult();
+    }
+
     [HttpGet("{purchaseOrderId:guid}")]
     public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> Get(Guid purchaseOrderId, CancellationToken cancellationToken)
     {
@@ -48,7 +56,7 @@ public sealed class PurchaseOrderController(IPurchaseOrderService purchaseOrderS
             DateTimeOffset.UtcNow);
 
         var result = await purchaseOrderService.SubmitAsync(command, cancellationToken);
-        return result.ToActionResult($"/api/PurchaseOrder/{result.Value?.PurchaseOrderId}");
+        return result.ToActionResult($"/api/purchase-order/{result.Value?.PurchaseOrderId}");
     }
 
     [HttpPost("{purchaseOrderId:guid}/lines")]

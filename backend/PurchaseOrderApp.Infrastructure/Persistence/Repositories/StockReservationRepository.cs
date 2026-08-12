@@ -14,13 +14,16 @@ public sealed class StockReservationRepository(DatabaseContext db) : IStockReser
         return db.StockReservations.SingleOrDefaultAsync(reservation => reservation.Id == stockReservationId, cancellationToken);
     }
 
-    public Task<ReservationResponse?> GetResponseAsync(StockReservationId stockReservationId, CancellationToken cancellationToken)
+    public async Task<ReservationResponse?> GetResponseAsync(StockReservationId stockReservationId, CancellationToken cancellationToken)
     {
-        return ProjectReservations(db.StockReservations.AsNoTracking())
-            .SingleOrDefaultAsync(reservation => reservation.StockReservationId == stockReservationId.Value, cancellationToken);
+        var reservation = await db.StockReservations
+            .AsNoTracking()
+            .SingleOrDefaultAsync(reservation => reservation.Id == stockReservationId, cancellationToken);
+
+        return reservation is null ? null : ToResponse(reservation);
     }
 
-    public Task<List<ReservationResponse>> ListResponsesAsync(WarehouseId? warehouseId, ReservationStatus? status, CancellationToken cancellationToken)
+    public async Task<List<ReservationResponse>> ListResponsesAsync(WarehouseId? warehouseId, ReservationStatus? status, CancellationToken cancellationToken)
     {
         var query = db.StockReservations.AsNoTracking();
 
@@ -34,22 +37,27 @@ public sealed class StockReservationRepository(DatabaseContext db) : IStockReser
             query = query.Where(reservation => reservation.Status == status.Value);
         }
 
-        return ProjectReservations(query)
+        var reservations = await query
             .OrderBy(reservation => reservation.Status)
-            .ThenBy(reservation => reservation.StockReservationId)
+            .ThenBy(reservation => reservation.Id)
             .ToListAsync(cancellationToken);
+
+        return reservations
+            .Select(ToResponse)
+            .ToList();
     }
 
     public async Task<Quantity> GetActiveReservedQuantityAsync(WarehouseId warehouseId, InventoryItemId inventoryItemId, CancellationToken cancellationToken)
     {
-        var quantity = await db.StockReservations
+        var reservations = await db.StockReservations
+            .AsNoTracking()
             .Where(reservation =>
                 reservation.WarehouseId == warehouseId &&
                 reservation.InventoryItemId == inventoryItemId &&
                 reservation.Status == ReservationStatus.Active)
-            .SumAsync(reservation => reservation.QuantityReserved.Value, cancellationToken);
+            .ToListAsync(cancellationToken);
 
-        return new Quantity(quantity);
+        return new Quantity(reservations.Sum(reservation => reservation.QuantityReserved.Value));
     }
 
     public async Task AddAsync(StockReservation stockReservation, CancellationToken cancellationToken)
@@ -57,15 +65,15 @@ public sealed class StockReservationRepository(DatabaseContext db) : IStockReser
         await db.StockReservations.AddAsync(stockReservation, cancellationToken);
     }
 
-    private static IQueryable<ReservationResponse> ProjectReservations(IQueryable<StockReservation> query)
+    private static ReservationResponse ToResponse(StockReservation reservation)
     {
-        return query.Select(reservation => new ReservationResponse(
+        return new ReservationResponse(
             reservation.Id.Value,
             reservation.PurchaseOrderLineId.Value,
             reservation.WarehouseId.Value,
             reservation.InventoryItemId.Value,
             reservation.QuantityReserved.Value,
             reservation.UnitCostSnapshot.Value,
-            reservation.Status.ToString()));
+            reservation.Status.ToString());
     }
 }

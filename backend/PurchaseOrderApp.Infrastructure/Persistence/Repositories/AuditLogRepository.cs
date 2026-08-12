@@ -8,7 +8,7 @@ namespace PurchaseOrderApp.Infrastructure.Persistence.Repositories;
 
 public sealed class AuditLogRepository(DatabaseContext db) : IAuditLogRepository
 {
-    public Task<List<AuditLogResponse>> ListAsync(WarehouseId? warehouseId, CancellationToken cancellationToken)
+    public async Task<List<AuditLogResponse>> ListAsync(WarehouseId? warehouseId, CancellationToken cancellationToken)
     {
         var query = db.AuditLogEntries.AsNoTracking();
 
@@ -17,8 +17,11 @@ public sealed class AuditLogRepository(DatabaseContext db) : IAuditLogRepository
             query = query.Where(entry => entry.WarehouseId == warehouseId.Value);
         }
 
-        return query
+        var entries = await query
             .OrderByDescending(entry => entry.CreatedAt)
+            .ToListAsync(cancellationToken);
+
+        return entries
             .Select(entry => new AuditLogResponse(
                 entry.Id.Value,
                 entry.Action.ToString(),
@@ -30,7 +33,7 @@ public sealed class AuditLogRepository(DatabaseContext db) : IAuditLogRepository
                 entry.ResultingAvailableQuantity.Value,
                 entry.CreatedBy,
                 entry.CreatedAt))
-            .ToListAsync(cancellationToken);
+            .ToList();
     }
 
     public async Task AddAsync(AuditLogEntry auditLogEntry, CancellationToken cancellationToken)

@@ -9,27 +9,28 @@ public sealed class FinanceRepository(DatabaseContext db) : IFinanceQueryReposit
 {
     public async Task<List<WarehouseCommittedStockValueResponse>> ListWarehouseCommittedStockValuesAsync(CancellationToken cancellationToken)
     {
-        var committedValues = db.StockReservations
+        var activeReservations = await db.StockReservations
             .AsNoTracking()
             .Where(reservation => reservation.Status == ReservationStatus.Active)
-            .GroupBy(reservation => reservation.WarehouseId)
-            .Select(group => new {
-                WarehouseId = group.Key,
-                Value = group.Sum(reservation => reservation.QuantityReserved.Value * reservation.UnitCostSnapshot.Value)
-            });
+            .ToListAsync(cancellationToken);
 
-        var warehouseSummaries = db.Warehouses
+        var committedValues = activeReservations
+            .GroupBy(reservation => reservation.WarehouseId)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Sum(reservation => reservation.QuantityReserved.Value * reservation.UnitCostSnapshot.Value));
+
+        var warehouses = await db.Warehouses
             .AsNoTracking()
+            .OrderBy(warehouse => warehouse.Code)
+            .ToListAsync(cancellationToken);
+
+        return warehouses
             .Select(warehouse => new WarehouseCommittedStockValueResponse(
                 warehouse.Id.Value,
                 warehouse.Code,
                 warehouse.Name,
-                committedValues
-                    .Where(value => value.WarehouseId == warehouse.Id)
-                    .Select(value => value.Value)
-                    .FirstOrDefault()))
-            .OrderBy(summary => summary.WarehouseCode);
-
-        return await warehouseSummaries.ToListAsync(cancellationToken);
+                committedValues.GetValueOrDefault(warehouse.Id)))
+            .ToList();
     }
 }
