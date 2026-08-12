@@ -145,7 +145,6 @@ export const ReservationsPage = () => {
                           appearance="secondary"
                           disabled={reservation.status !== 'Active' || releaseMutation.isPending}
                           onClick={() => releaseMutation.mutate({ stockReservationId: reservation.id, quantity: reservation.quantityReserved, user: 'demo-user' })}
-                          size="sm"
                         >
                           <UilArchive className="h-4 w-4" />
                           Release

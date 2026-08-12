@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toAddPurchaseOrderLineRequestDto, toApprovedPurchaseOrderLines, toChangePurchaseOrderStatusRequestDto, toPurchaseOrder, toPurchaseOrders, toPurchaseOrderSummaries, toSubmitPurchaseOrderRequestDto } from '../mappers/purchaseOrder.mapper';
-import { addPurchaseOrderLine, changePurchaseOrderStatus, getPurchaseOrder, listApprovedPurchaseOrderLines, listPurchaseOrders, listPurchaseOrderSummaries, submitPurchaseOrder } from '../services/purchaseOrder.services';
-import type { AddPurchaseOrderLineCommand, ChangePurchaseOrderStatusCommand, SubmitPurchaseOrderCommand } from '../types/purchaseOrder.types';
+import { catalogKeys } from '@/features/catalog/queries/catalog.queries';
+import { toAddPurchaseOrderLineRequestDto, toApprovedPurchaseOrderLines, toChangePurchaseOrderStatusRequestDto, toPurchaseOrder, toPurchaseOrders, toPurchaseOrderSummaries, toRemovePurchaseOrderLineRequestDto, toSubmitPurchaseOrderRequestDto } from '../mappers/purchaseOrder.mapper';
+import { addPurchaseOrderLine, changePurchaseOrderStatus, getPurchaseOrder, listApprovedPurchaseOrderLines, listPurchaseOrders, listPurchaseOrderSummaries, removePurchaseOrderLine, submitPurchaseOrder } from '../services/purchaseOrder.services';
+import type { AddPurchaseOrderLineCommand, ChangePurchaseOrderStatusCommand, RemovePurchaseOrderLineCommand, SubmitPurchaseOrderCommand } from '../types/purchaseOrder.types';
 
 export const purchaseOrderKeys = {
   all: ['purchase-orders'] as const,
@@ -54,6 +55,21 @@ export const useAddPurchaseOrderLineMutation = () => {
     onSuccess: async (purchaseOrder) => {
       await queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.all });
       await queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.detail(purchaseOrder.id) });
+    }
+  });
+};
+
+export const useRemovePurchaseOrderLineMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (command: RemovePurchaseOrderLineCommand) => toPurchaseOrder(await removePurchaseOrderLine(command.purchaseOrderId, command.purchaseOrderLineId, toRemovePurchaseOrderLineRequestDto(command))),
+    onSuccess: async (purchaseOrder) => {
+      await queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.all });
+      await queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.detail(purchaseOrder.id) });
+      await queryClient.invalidateQueries({ queryKey: ['reservations'] });
+      await queryClient.invalidateQueries({ queryKey: catalogKeys.warehouseStock(purchaseOrder.warehouseId) });
+      await queryClient.invalidateQueries({ queryKey: ['finance'] });
+      await queryClient.invalidateQueries({ queryKey: ['audit-log'] });
     }
   });
 };

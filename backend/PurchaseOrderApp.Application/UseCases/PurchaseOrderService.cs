@@ -19,6 +19,8 @@ public interface IPurchaseOrderService
 
     Task<Result<PurchaseOrderResponse>> AddLineAsync(AddPurchaseOrderLineCommand command, CancellationToken cancellationToken);
 
+    Task<Result<PurchaseOrderResponse>> RemoveLineAsync(RemovePurchaseOrderLineCommand command, CancellationToken cancellationToken);
+
     Task<Result<PurchaseOrderResponse>> ApproveAsync(ChangePurchaseOrderStatusCommand command, CancellationToken cancellationToken);
 
     Task<Result<PurchaseOrderResponse>> CloseAsync(ChangePurchaseOrderStatusCommand command, CancellationToken cancellationToken);
@@ -32,6 +34,9 @@ public sealed class PurchaseOrderService(
     IPurchaseOrderRepository purchaseOrderRepository,
     IWarehouseRepository warehouseRepository,
     IInventoryItemRepository inventoryItemRepository,
+    IWarehouseStockRepository warehouseStockRepository,
+    IStockReservationRepository stockReservationRepository,
+    IAuditLogRepository auditLogRepository,
     IUnitOfWork unitOfWork) : IPurchaseOrderService
 {
     public async Task<Result<PurchaseOrderResponse>> SubmitAsync(SubmitPurchaseOrderCommand command, CancellationToken cancellationToken)
@@ -50,7 +55,7 @@ public sealed class PurchaseOrderService(
             var warehouse = await warehouseRepository.GetAsync(command.WarehouseId, cancellationToken);
             if (warehouse is null) return await TransactionResult.RollBackNotFoundAsync<PurchaseOrderResponse>(unitOfWork, "Warehouse was not found.", cancellationToken);
 
-            var purchaseOrderNumber = CreatePurchaseOrderNumber(command.OccurredAt);
+            var purchaseOrderNumber = await CreatePurchaseOrderNumberAsync(cancellationToken);
             var purchaseOrder = PurchaseOrder.CreatePending(purchaseOrderNumber, warehouse.Id, command.User, command.OccurredAt);
 
             foreach (var line in command.Lines) {
@@ -112,6 +117,59 @@ public sealed class PurchaseOrderService(
             if (item is null) return await TransactionResult.RollBackNotFoundAsync<PurchaseOrderResponse>(unitOfWork, "Inventory item was not found.", cancellationToken);
 
             purchaseOrder.AddLine(item, command.QuantityOrdered, command.User, command.OccurredAt);
+
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            return Result.Success(PurchaseOrderMapper.ToResponse(purchaseOrder));
+        } catch (DomainException ex) {
+            await unitOfWork.RollbackTransactionAsync(cancellationToken);
+            return Result.Fail<PurchaseOrderResponse>(ex.Message, ResultStatus.Invalid);
+        } catch {
+            await unitOfWork.RollbackTransactionAsync(cancellationToken);
+            throw;
+        }
+    }
+
+    public async Task<Result<PurchaseOrderResponse>> RemoveLineAsync(RemovePurchaseOrderLineCommand command, CancellationToken cancellationToken)
+    {
+        if (command.PurchaseOrderId.Value == Guid.Empty) return Result.Fail<PurchaseOrderResponse>("Purchase order id is required.", ResultStatus.Invalid);
+        if (command.PurchaseOrderLineId.Value == Guid.Empty) return Result.Fail<PurchaseOrderResponse>("Purchase order line id is required.", ResultStatus.Invalid);
+        if (string.IsNullOrWhiteSpace(command.User)) return Result.Fail<PurchaseOrderResponse>("User is required.", ResultStatus.Invalid);
+
+        await unitOfWork.BeginTransactionAsync(cancellationToken);
+
+        try {
+            var purchaseOrder = await purchaseOrderRepository.GetAsync(command.PurchaseOrderId, cancellationToken);
+            if (purchaseOrder is null) return await TransactionResult.RollBackNotFoundAsync<PurchaseOrderResponse>(unitOfWork, "Purchase order was not found.", cancellationToken);
+
+            var line = purchaseOrder.Lines.SingleOrDefault(line => line.Id == command.PurchaseOrderLineId);
+            if (line is null) return await TransactionResult.RollBackNotFoundAsync<PurchaseOrderResponse>(unitOfWork, "Purchase order line was not found.", cancellationToken);
+
+            var activeReservations = await stockReservationRepository.ListActiveByLineAsync(command.PurchaseOrderLineId, cancellationToken);
+            var activeReservedByItem = new Dictionary<InventoryItemId, Quantity>();
+
+            foreach (var reservation in activeReservations) {
+                var stock = await warehouseStockRepository.GetForUpdateAsync(reservation.WarehouseId, reservation.InventoryItemId, cancellationToken);
+                if (stock is null) return await TransactionResult.RollBackNotFoundAsync<PurchaseOrderResponse>(unitOfWork, "Warehouse stock was not found.", cancellationToken);
+
+                if (!activeReservedByItem.TryGetValue(reservation.InventoryItemId, out var activeReservedQuantity)) {
+                    activeReservedQuantity = await stockReservationRepository.GetActiveReservedQuantityAsync(reservation.WarehouseId, reservation.InventoryItemId, cancellationToken);
+                }
+
+                var releaseQuantity = reservation.QuantityReserved;
+                reservation.Release(releaseQuantity, command.User, command.OccurredAt);
+                purchaseOrder.ReleaseLine(reservation.PurchaseOrderLineId, releaseQuantity, command.User, command.OccurredAt);
+
+                var resultingActiveReservedQuantity = activeReservedQuantity.Subtract(releaseQuantity);
+                activeReservedByItem[reservation.InventoryItemId] = resultingActiveReservedQuantity;
+
+                var resultingAvailableQuantity = stock.CalculateAvailableQuantity(resultingActiveReservedQuantity);
+                var auditLogEntry = AuditLogEntry.RecordRelease(reservation, releaseQuantity, resultingAvailableQuantity, command.User, command.OccurredAt);
+                await auditLogRepository.AddAsync(auditLogEntry, cancellationToken);
+            }
+
+            purchaseOrder.RemoveLine(command.PurchaseOrderLineId, command.User, command.OccurredAt);
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
             await unitOfWork.CommitTransactionAsync(cancellationToken);
@@ -211,8 +269,13 @@ public sealed class PurchaseOrderService(
         return Result.Success(lines);
     }
 
-    private static string CreatePurchaseOrderNumber(DateTimeOffset occurredAt)
+    private async Task<string> CreatePurchaseOrderNumberAsync(CancellationToken cancellationToken)
     {
-        return $"PO-{occurredAt:yyyyMMddHHmmssfff}";
+        for (var attempt = 0; attempt < 10; attempt++) {
+            var purchaseOrderNumber = $"PO-{Random.Shared.Next(10000, 100000)}";
+            if (!await purchaseOrderRepository.ExistsByNumberAsync(purchaseOrderNumber, cancellationToken)) return purchaseOrderNumber;
+        }
+
+        throw new DomainException("Could not generate a unique purchase order number.");
     }
 }

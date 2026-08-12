@@ -81,11 +81,12 @@ public sealed class PurchaseOrder : Entity<PurchaseOrderId>
     {
         if (Status == PurchaseOrderStatus.Cancelled) throw new DomainException("Cancelled purchase orders cannot be changed.");
         if (Status == PurchaseOrderStatus.Closed) throw new DomainException("Closed purchase orders cannot be changed.");
+        if (_lines.Any(line => line.InventoryItemId == item.Id)) throw new DomainException("Inventory item has already been added to this purchase order.");
 
         quantityOrdered.EnsureValidFor(item.TrackingMode);
         if (quantityOrdered.IsZero) throw new DomainException("Purchase order line quantity must be greater than zero.");
 
-        var line = new PurchaseOrderLine(new PurchaseOrderLineId(Guid.NewGuid()), Id, item.Id, quantityOrdered, user, occurredAt);
+        var line = new PurchaseOrderLine(new PurchaseOrderLineId(Guid.NewGuid()), Id, item, quantityOrdered, user, occurredAt);
         _lines.Add(line);
         SetUpdated(user, occurredAt);
         return line;
@@ -103,6 +104,18 @@ public sealed class PurchaseOrder : Entity<PurchaseOrderId>
     {
         var line = GetLine(lineId);
         line.Release(quantity, user, occurredAt);
+        SetUpdated(user, occurredAt);
+    }
+
+    public void RemoveLine(PurchaseOrderLineId lineId, string user, DateTimeOffset occurredAt)
+    {
+        if (Status == PurchaseOrderStatus.Cancelled) throw new DomainException("Cancelled purchase orders cannot be changed.");
+        if (Status == PurchaseOrderStatus.Closed) throw new DomainException("Closed purchase orders cannot be changed.");
+
+        var line = GetLine(lineId);
+        if (!line.QuantityReserved.IsZero) throw new DomainException("Purchase order line reservations must be released before the line can be removed.");
+
+        _lines.Remove(line);
         SetUpdated(user, occurredAt);
     }
 

@@ -1,12 +1,32 @@
-import type { AddPurchaseOrderLineRequestDto, ApprovedPurchaseOrderLineDto, ChangePurchaseOrderStatusRequestDto, PurchaseOrderDto, PurchaseOrderLineDto, PurchaseOrderSummaryDto, SubmitPurchaseOrderRequestDto } from '../types/purchaseOrder.api.types';
-import type { AddPurchaseOrderLineCommand, ApprovedPurchaseOrderLine, ChangePurchaseOrderStatusCommand, PurchaseOrder, PurchaseOrderLine, PurchaseOrderSummary, SubmitPurchaseOrderCommand } from '../types/purchaseOrder.types';
+import type {
+  AddPurchaseOrderLineRequestDto,
+  ApprovedPurchaseOrderLineDto,
+  ChangePurchaseOrderStatusRequestDto,
+  PurchaseOrderDto,
+  PurchaseOrderLineDto,
+  PurchaseOrderSummaryDto,
+  RemovePurchaseOrderLineRequestDto,
+  SubmitPurchaseOrderRequestDto
+} from '../types/purchaseOrder.api.types';
+import type {
+  AddPurchaseOrderLineCommand,
+  ApprovedPurchaseOrderLine,
+  ChangePurchaseOrderStatusCommand,
+  PurchaseOrder,
+  PurchaseOrderLine,
+  PurchaseOrderSummary,
+  RemovePurchaseOrderLineCommand,
+  SubmitPurchaseOrderCommand
+} from '../types/purchaseOrder.types';
 
 export const toPurchaseOrderLine = (dto: PurchaseOrderLineDto): PurchaseOrderLine => ({
   id: dto.purchaseOrderLineId,
   inventoryItemId: dto.inventoryItemId,
   quantityOrdered: dto.quantityOrdered,
   quantityReserved: dto.quantityReserved,
-  quantityRemaining: dto.quantityRemaining
+  quantityRemaining: dto.quantityRemaining,
+  unitCost: dto.unitCost,
+  lineAmount: dto.lineAmount
 });
 
 export const toPurchaseOrder = (dto: PurchaseOrderDto): PurchaseOrder => ({
@@ -14,6 +34,9 @@ export const toPurchaseOrder = (dto: PurchaseOrderDto): PurchaseOrder => ({
   number: dto.purchaseOrderNumber,
   warehouseId: dto.warehouseId,
   status: dto.status,
+  subtotalAmount: dto.subtotalAmount,
+  gstAmount: dto.gstAmount,
+  totalAmount: dto.totalAmount,
   lines: dto.lines.map(toPurchaseOrderLine)
 });
 
@@ -27,7 +50,10 @@ export const toPurchaseOrderSummary = (dto: PurchaseOrderSummaryDto): PurchaseOr
   lineCount: dto.lineCount,
   quantityOrdered: dto.quantityOrdered,
   quantityReserved: dto.quantityReserved,
-  quantityRemaining: dto.quantityRemaining
+  quantityRemaining: dto.quantityRemaining,
+  subtotalAmount: dto.subtotalAmount,
+  gstAmount: dto.gstAmount,
+  totalAmount: dto.totalAmount
 });
 
 export const toPurchaseOrderSummaries = (dtos: PurchaseOrderSummaryDto[]): PurchaseOrderSummary[] => dtos.map(toPurchaseOrderSummary);
@@ -62,6 +88,10 @@ export const toSubmitPurchaseOrderRequestDto = (command: SubmitPurchaseOrderComm
 export const toAddPurchaseOrderLineRequestDto = (command: AddPurchaseOrderLineCommand): AddPurchaseOrderLineRequestDto => ({
   inventoryItemId: command.inventoryItemId,
   quantityOrdered: command.quantityOrdered,
+  user: command.user
+});
+
+export const toRemovePurchaseOrderLineRequestDto = (command: RemovePurchaseOrderLineCommand): RemovePurchaseOrderLineRequestDto => ({
   user: command.user
 });
 

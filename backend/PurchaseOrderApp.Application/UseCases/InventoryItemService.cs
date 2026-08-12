@@ -11,9 +11,7 @@ public interface IInventoryItemService
     Task<Result> ChangeStandardCostAsync(ChangeInventoryItemStandardCostCommand command, CancellationToken cancellationToken);
 }
 
-public sealed class InventoryItemService(
-    IInventoryItemRepository inventoryItemRepository,
-    IUnitOfWork unitOfWork) : IInventoryItemService
+public sealed class InventoryItemService(IInventoryItemRepository inventoryItemRepository, IUnitOfWork unitOfWork) : IInventoryItemService
 {
     public async Task<Result<List<InventoryItemResponse>>> ListAsync(CancellationToken cancellationToken)
     {
@@ -34,8 +32,7 @@ public sealed class InventoryItemService(
 
         try {
             var inventoryItem = await inventoryItemRepository.GetAsync(command.InventoryItemId, cancellationToken);
-            if (inventoryItem is null)
-            {
+            if (inventoryItem is null) {
                 await unitOfWork.RollbackTransactionAsync(cancellationToken);
                 return Result.Fail("Inventory item was not found.", ResultStatus.NotFound);
             }

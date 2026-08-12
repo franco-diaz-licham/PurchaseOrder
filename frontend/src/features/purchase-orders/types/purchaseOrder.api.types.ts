@@ -4,6 +4,8 @@ export type PurchaseOrderLineDto = {
   quantityOrdered: number;
   quantityReserved: number;
   quantityRemaining: number;
+  unitCost: number;
+  lineAmount: number;
 };
 
 export type PurchaseOrderDto = {
@@ -11,6 +13,9 @@ export type PurchaseOrderDto = {
   purchaseOrderNumber: string;
   warehouseId: string;
   status: string;
+  subtotalAmount: number;
+  gstAmount: number;
+  totalAmount: number;
   lines: PurchaseOrderLineDto[];
 };
 
@@ -23,6 +28,9 @@ export type PurchaseOrderSummaryDto = {
   quantityOrdered: number;
   quantityReserved: number;
   quantityRemaining: number;
+  subtotalAmount: number;
+  gstAmount: number;
+  totalAmount: number;
 };
 
 export type ApprovedPurchaseOrderLineDto = {
@@ -52,6 +60,10 @@ export type SubmitPurchaseOrderRequestDto = {
 export type AddPurchaseOrderLineRequestDto = {
   inventoryItemId: string;
   quantityOrdered: number;
+  user: string;
+};
+
+export type RemovePurchaseOrderLineRequestDto = {
   user: string;
 };
 

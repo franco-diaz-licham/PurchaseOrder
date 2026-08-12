@@ -14,4 +14,6 @@ public sealed record AddPurchaseOrderLineRequest(
     decimal QuantityOrdered,
     string User);
 
+public sealed record RemovePurchaseOrderLineRequest(string User);
+
 public sealed record ChangePurchaseOrderStatusRequest(string User);

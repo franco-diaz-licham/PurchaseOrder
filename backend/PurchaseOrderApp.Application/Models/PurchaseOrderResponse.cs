@@ -5,6 +5,9 @@ public sealed record PurchaseOrderResponse(
     string PurchaseOrderNumber,
     Guid WarehouseId,
     string Status,
+    decimal SubtotalAmount,
+    decimal GstAmount,
+    decimal TotalAmount,
     List<PurchaseOrderLineResponse> Lines);
 
 public sealed record PurchaseOrderLineResponse(
@@ -12,4 +15,6 @@ public sealed record PurchaseOrderLineResponse(
     Guid InventoryItemId,
     decimal QuantityOrdered,
     decimal QuantityReserved,
-    decimal QuantityRemaining);
+    decimal QuantityRemaining,
+    decimal UnitCost,
+    decimal LineAmount);

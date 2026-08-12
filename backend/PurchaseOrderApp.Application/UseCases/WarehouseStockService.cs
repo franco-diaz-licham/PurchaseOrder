@@ -12,9 +12,7 @@ public interface IWarehouseStockService
     Task<Result<List<WarehouseStockResponse>>> ListAsync(WarehouseId warehouseId, CancellationToken cancellationToken);
 }
 
-public sealed class WarehouseStockService(
-    IWarehouseStockRepository warehouseStockRepository,
-    IStockReservationRepository stockReservationRepository) : IWarehouseStockService
+public sealed class WarehouseStockService(IWarehouseStockRepository warehouseStockRepository, IStockReservationRepository stockReservationRepository) : IWarehouseStockService
 {
     public async Task<Result<List<WarehouseStockResponse>>> ListAsync(WarehouseId warehouseId, CancellationToken cancellationToken)
     {

@@ -26,16 +26,8 @@ public sealed class StockReservationRepository(DatabaseContext db) : IStockReser
     public async Task<List<ReservationResponse>> ListResponsesAsync(WarehouseId? warehouseId, ReservationStatus? status, CancellationToken cancellationToken)
     {
         var query = db.StockReservations.AsNoTracking();
-
-        if (warehouseId is not null)
-        {
-            query = query.Where(reservation => reservation.WarehouseId == warehouseId.Value);
-        }
-
-        if (status is not null)
-        {
-            query = query.Where(reservation => reservation.Status == status.Value);
-        }
+        if (warehouseId is not null) query = query.Where(reservation => reservation.WarehouseId == warehouseId.Value);
+        if (status is not null) query = query.Where(reservation => reservation.Status == status.Value);
 
         var reservations = await query
             .OrderBy(reservation => reservation.Status)
@@ -58,6 +50,16 @@ public sealed class StockReservationRepository(DatabaseContext db) : IStockReser
             .ToListAsync(cancellationToken);
 
         return new Quantity(reservations.Sum(reservation => reservation.QuantityReserved.Value));
+    }
+
+    public Task<List<StockReservation>> ListActiveByLineAsync(PurchaseOrderLineId purchaseOrderLineId, CancellationToken cancellationToken)
+    {
+        return db.StockReservations
+            .Where(reservation =>
+                reservation.PurchaseOrderLineId == purchaseOrderLineId &&
+                reservation.Status == ReservationStatus.Active)
+            .OrderBy(reservation => reservation.Id)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task AddAsync(StockReservation stockReservation, CancellationToken cancellationToken)

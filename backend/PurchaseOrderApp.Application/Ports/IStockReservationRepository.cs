@@ -31,6 +31,11 @@ public interface IStockReservationRepository
     Task<Quantity> GetActiveReservedQuantityAsync(WarehouseId warehouseId, InventoryItemId inventoryItemId, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Lists active reservations for one purchase order line.
+    /// </summary>
+    Task<List<StockReservation>> ListActiveByLineAsync(PurchaseOrderLineId purchaseOrderLineId, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Adds a stock reservation to the current unit of work.
     /// </summary>
     Task AddAsync(StockReservation stockReservation, CancellationToken cancellationToken);

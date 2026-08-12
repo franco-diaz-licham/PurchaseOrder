@@ -13,14 +13,15 @@ public sealed class PurchaseOrderLine : Entity<PurchaseOrderLineId>
     internal PurchaseOrderLine(
         PurchaseOrderLineId id,
         PurchaseOrderId purchaseOrderId,
-        InventoryItemId inventoryItemId,
+        InventoryItem inventoryItem,
         Quantity quantityOrdered,
         string user,
         DateTimeOffset occurredAt)
     {
         Id = id;
         PurchaseOrderId = purchaseOrderId;
-        InventoryItemId = inventoryItemId;
+        InventoryItemId = inventoryItem.Id;
+        InventoryItem = inventoryItem;
         QuantityOrdered = quantityOrdered;
         QuantityReserved = Quantity.Zero;
         SetCreated(user, occurredAt);

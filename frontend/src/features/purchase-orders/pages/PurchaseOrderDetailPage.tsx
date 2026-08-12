@@ -1,25 +1,22 @@
 import { UilCheck, UilPlus, UilSync, UilTimes } from '@iconscout/react-unicons';
 import { useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { PageHeader } from '@/components/common/PageHeader';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { AppButton } from '@/components/ui/AppButton';
-import { AppField } from '@/components/ui/AppField';
-import { AppInput } from '@/components/ui/AppInput';
-import { AppSelect } from '@/components/ui/AppSelect';
 import { useInventoryItemsQuery, useWarehousesQuery, useWarehouseStockQuery } from '@/features/catalog/queries/catalog.queries';
 import { findInventoryItem, findWarehouse } from '@/features/catalog/utils/catalogLookup';
 import { useCreateReservationMutation, useReleaseReservationMutation, useReservationsQuery } from '@/features/reservations/queries/reservation.queries';
-import { useAddPurchaseOrderLineMutation, usePurchaseOrderQuery, usePurchaseOrderStatusMutation } from '../queries/purchaseOrder.queries';
+import { AddPurchaseOrderLineDialog, type AddPurchaseOrderLineFormValues } from '../components/AddPurchaseOrderLineDialog';
+import { ReserveStockDialog } from '../components/ReserveStockDialog';
+import { useAddPurchaseOrderLineMutation, usePurchaseOrderQuery, usePurchaseOrderStatusMutation, useRemovePurchaseOrderLineMutation } from '../queries/purchaseOrder.queries';
 
-type AddLineFormValues = {
-  inventoryItemId: string;
-  quantityOrdered: number;
-  user: string;
-};
+const money = new Intl.NumberFormat('en-AU', {
+  style: 'currency',
+  currency: 'AUD'
+});
 
 export const PurchaseOrderDetailPage = () => {
   const { purchaseOrderId } = useParams();
@@ -27,6 +24,7 @@ export const PurchaseOrderDetailPage = () => {
   const purchaseOrderQuery = usePurchaseOrderQuery(purchaseOrderId);
   const statusMutation = usePurchaseOrderStatusMutation();
   const addLineMutation = useAddPurchaseOrderLineMutation();
+  const removeLineMutation = useRemovePurchaseOrderLineMutation();
   const createReservationMutation = useCreateReservationMutation();
   const releaseReservationMutation = useReleaseReservationMutation();
   const warehousesQuery = useWarehousesQuery();
@@ -39,18 +37,27 @@ export const PurchaseOrderDetailPage = () => {
   const reservationsQuery = useReservationsQuery(purchaseOrder?.warehouseId, 'Active', canReserveStock);
   const activeReservations = useMemo(() => reservationsQuery.data ?? [], [reservationsQuery.data]);
   const stockByItemId = useMemo(() => new Map((warehouseStockQuery.data ?? []).map((stock) => [stock.inventoryItemId, stock])), [warehouseStockQuery.data]);
-  const [reserveQuantities, setReserveQuantities] = useState<Record<string, string>>({});
+  const existingLineItemIds = useMemo(() => new Set((purchaseOrder?.lines ?? []).map((line) => line.inventoryItemId)), [purchaseOrder?.lines]);
+  const availableItemsToAdd = useMemo(() => (itemsQuery.data ?? []).filter((item) => !existingLineItemIds.has(item.id)), [existingLineItemIds, itemsQuery.data]);
+  const [isAddLineOpen, setIsAddLineOpen] = useState(false);
+  const [reserveLineId, setReserveLineId] = useState<string | null>(null);
   const [reservationUser, setReservationUser] = useState('demo-user');
 
-  const addLineForm = useForm<AddLineFormValues>({
-    defaultValues: {
-      inventoryItemId: '',
-      quantityOrdered: 1,
-      user: 'demo-user'
-    }
-  });
+  const reserveDialogLine = purchaseOrder?.lines.find((line) => line.id === reserveLineId);
+  const reserveDialogItem = reserveDialogLine ? findInventoryItem(itemsQuery.data, reserveDialogLine.inventoryItemId) : undefined;
+  const reserveDialogStock = reserveDialogLine ? stockByItemId.get(reserveDialogLine.inventoryItemId) : undefined;
+  const reserveDialogAvailableQuantity = reserveDialogStock?.availableQuantity ?? 0;
+  const reserveDialogMaxQuantity = reserveDialogLine ? Math.min(reserveDialogLine.quantityRemaining, reserveDialogAvailableQuantity) : 0;
 
-  const addLine = addLineForm.handleSubmit(async (values) => {
+  const openAddLineDialog = () => {
+    setIsAddLineOpen(true);
+  };
+
+  const closeAddLineDialog = () => {
+    setIsAddLineOpen(false);
+  };
+
+  const addLine = async (values: AddPurchaseOrderLineFormValues) => {
     if (!purchaseOrder) return;
 
     await addLineMutation.mutateAsync({
@@ -60,20 +67,29 @@ export const PurchaseOrderDetailPage = () => {
       user: values.user
     });
 
-    addLineForm.reset({ inventoryItemId: '', quantityOrdered: 1, user: values.user });
-  });
+    setIsAddLineOpen(false);
+  };
 
-  const reserveLine = async (lineId: string) => {
+  const openReserveDialog = (lineId: string) => {
+    setReserveLineId(lineId);
+  };
+
+  const closeReserveDialog = () => {
+    setReserveLineId(null);
+  };
+
+  const reserveLine = async (quantity: number, user: string) => {
     if (!purchaseOrder) return;
+    if (!reserveLineId) return;
 
     await createReservationMutation.mutateAsync({
-      purchaseOrderLineId: lineId,
+      purchaseOrderLineId: reserveLineId,
       warehouseId: purchaseOrder.warehouseId,
-      quantity: Number(reserveQuantities[lineId] || 0),
-      user: reservationUser
+      quantity,
+      user
     });
 
-    setReserveQuantities((current) => ({ ...current, [lineId]: '' }));
+    closeReserveDialog();
   };
 
   return (
@@ -88,6 +104,7 @@ export const PurchaseOrderDetailPage = () => {
         {purchaseOrderQuery.isError && <ErrorMessage message="Purchase order could not be loaded." />}
         {statusMutation.isError && <ErrorMessage message="Purchase order status could not be changed." />}
         {addLineMutation.isError && <ErrorMessage message="Purchase order line could not be added." />}
+        {removeLineMutation.isError && <ErrorMessage message="Purchase order line could not be removed." />}
         {createReservationMutation.isError && <ErrorMessage message="Stock could not be reserved for this line." />}
         {releaseReservationMutation.isError && <ErrorMessage message="Reservation could not be released." />}
         {!purchaseOrder && !purchaseOrderQuery.isLoading && !purchaseOrderQuery.isError && <EmptyState title="Purchase order was not found." />}
@@ -103,7 +120,13 @@ export const PurchaseOrderDetailPage = () => {
                 <p className="mt-1 text-sm text-muted-foreground">{warehouse?.displayName ?? purchaseOrder.warehouseId}</p>
               </div>
               <div className="flex flex-wrap gap-2">
-                <AppButton appearance="secondary" disabled={purchaseOrder.status !== 'Pending' || statusMutation.isPending} onClick={() => statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'approve', user: 'demo-user' })} size="sm">
+                {canChangeLines && (
+                  <AppButton disabled={addLineMutation.isPending || availableItemsToAdd.length === 0} onClick={openAddLineDialog} type="button">
+                    <UilPlus className="h-4 w-4" />
+                    Add line
+                  </AppButton>
+                )}
+                <AppButton appearance="secondary" disabled={purchaseOrder.status !== 'Pending' || statusMutation.isPending} onClick={() => statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'approve', user: 'demo-user' })}>
                   <UilCheck className="h-4 w-4" />
                   Approve
                 </AppButton>
@@ -111,7 +134,6 @@ export const PurchaseOrderDetailPage = () => {
                   appearance="secondary"
                   disabled={purchaseOrder.status === 'Closed' || purchaseOrder.status === 'Cancelled' || statusMutation.isPending}
                   onClick={() => statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'close', user: 'demo-user' })}
-                  size="sm"
                 >
                   <UilSync className="h-4 w-4" />
                   Close
@@ -120,7 +142,6 @@ export const PurchaseOrderDetailPage = () => {
                   appearance="danger"
                   disabled={purchaseOrder.status === 'Closed' || purchaseOrder.status === 'Cancelled' || statusMutation.isPending}
                   onClick={() => statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'cancel', user: 'demo-user' })}
-                  size="sm"
                 >
                   <UilTimes className="h-4 w-4" />
                   Cancel
@@ -128,120 +149,140 @@ export const PurchaseOrderDetailPage = () => {
               </div>
             </div>
 
-            {canChangeLines && (
-              <form className="grid gap-3 border-b p-4 md:grid-cols-[1fr_160px_180px_auto]" onSubmit={addLine}>
-                <AppField label="Inventory item">
-                  <AppSelect required {...addLineForm.register('inventoryItemId')}>
-                    <option value="">Select item</option>
-                    {(itemsQuery.data ?? []).map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.displayName}
-                      </option>
-                    ))}
-                  </AppSelect>
-                </AppField>
-                <AppField label="Quantity">
-                  <AppInput min="0.001" required step="0.001" type="number" {...addLineForm.register('quantityOrdered', { valueAsNumber: true })} />
-                </AppField>
-                <AppField label="User">
-                  <AppInput required {...addLineForm.register('user')} />
-                </AppField>
-                <AppButton className="self-end" disabled={addLineMutation.isPending} type="submit">
-                  <UilPlus className="h-4 w-4" />
-                  Add line
-                </AppButton>
-              </form>
-            )}
+            <div className="grid gap-3 border-b p-4 text-sm md:grid-cols-3">
+              <div>
+                <p className="text-xs uppercase text-muted-foreground">Subtotal</p>
+                <p className="mt-1 font-semibold">{money.format(purchaseOrder.subtotalAmount)}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase text-muted-foreground">GST</p>
+                <p className="mt-1 font-semibold">{money.format(purchaseOrder.gstAmount)}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase text-muted-foreground">Total</p>
+                <p className="mt-1 font-semibold">{money.format(purchaseOrder.totalAmount)}</p>
+              </div>
+            </div>
+          </article>
+        )}
 
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[760px] text-left text-sm">
-                <thead className="bg-muted text-xs uppercase text-muted-foreground">
-                  <tr>
-                    <th className="px-4 py-3">Item</th>
-                    <th className="px-4 py-3">Ordered</th>
-                    <th className="px-4 py-3">Reserved</th>
-                    {canReserveStock && <th className="px-4 py-3">Available</th>}
-                    <th className="px-4 py-3">Remaining</th>
-                    {canReserveStock && <th className="px-4 py-3">Reserve</th>}
-                    {canReserveStock && <th className="px-4 py-3">Active reservations</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {purchaseOrder.lines.map((line) => {
-                    const item = findInventoryItem(itemsQuery.data, line.inventoryItemId);
-                    const stock = stockByItemId.get(line.inventoryItemId);
-                    const lineReservations = activeReservations.filter((reservation) => reservation.purchaseOrderLineId === line.id);
-                    const reserveQuantity = Number(reserveQuantities[line.id] || 0);
-                    const availableQuantity = stock?.availableQuantity ?? 0;
-                    const maxReserveQuantity = Math.min(line.quantityRemaining, availableQuantity);
-                    return (
-                      <tr className="border-t" key={line.id}>
-                        <td className="px-4 py-3">{item?.displayName ?? line.inventoryItemId}</td>
-                        <td className="px-4 py-3">{line.quantityOrdered}</td>
-                        <td className="px-4 py-3">{line.quantityReserved}</td>
-                        {canReserveStock && <td className="px-4 py-3">{stock?.availableQuantity ?? 'Not stocked'}</td>}
-                        <td className="px-4 py-3">{line.quantityRemaining}</td>
-                        {canReserveStock && (
-                          <td className="px-4 py-3">
-                            <div className="flex gap-2">
-                              <AppInput
-                                className="w-28"
-                                disabled={maxReserveQuantity <= 0}
-                                max={maxReserveQuantity}
-                                min="0.001"
-                                onChange={(event) => setReserveQuantities((current) => ({ ...current, [line.id]: event.target.value }))}
-                                step="0.001"
-                                type="number"
-                                value={reserveQuantities[line.id] ?? ''}
-                              />
+        {purchaseOrder && (
+          <article className="rounded-md border bg-card">
+            <div className="p-4">
+              <div className="overflow-x-auto rounded-md border">
+                <table className={`w-full text-left text-sm ${canReserveStock ? 'min-w-[1180px]' : 'min-w-[720px]'}`}>
+                  <thead>
+                    <tr className="border-b bg-card text-sm">
+                      <th className="px-4 py-3 font-semibold" colSpan={canReserveStock ? (canChangeLines ? 5 : 4) : canChangeLines ? 6 : 5}>
+                        Purchase order lines
+                      </th>
+                      {canReserveStock && (
+                        <th className="border-l px-4 py-3 font-semibold" colSpan={4}>
+                          Reservations
+                        </th>
+                      )}
+                    </tr>
+                    <tr className="bg-muted text-xs uppercase text-muted-foreground">
+                      <th className="px-4 py-3">Item</th>
+                      <th className="px-4 py-3">Ordered</th>
+                      {!canReserveStock && <th className="px-4 py-3">Reserved</th>}
+                      <th className="px-4 py-3">Unit cost</th>
+                      <th className="px-4 py-3">Total Amount</th>
+                      {canChangeLines && <th className="px-4 py-3">Remove</th>}
+                      {canReserveStock && <th className="border-l px-4 py-3">Remaining</th>}
+                      {canReserveStock && <th className="px-4 py-3">Available</th>}
+                      {canReserveStock && <th className="px-4 py-3">Reserve</th>}
+                      {canReserveStock && <th className="px-4 py-3">Active reservations</th>}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {purchaseOrder.lines.map((line) => {
+                      const item = findInventoryItem(itemsQuery.data, line.inventoryItemId);
+                      const stock = stockByItemId.get(line.inventoryItemId);
+                      const lineReservations = activeReservations.filter((reservation) => reservation.purchaseOrderLineId === line.id);
+                      const availableQuantity = stock?.availableQuantity ?? 0;
+                      const maxReserveQuantity = Math.min(line.quantityRemaining, availableQuantity);
+                      return (
+                        <tr className="border-t" key={line.id}>
+                          <td className="px-4 py-3">{item?.displayName ?? line.inventoryItemId}</td>
+                          <td className="px-4 py-3">{line.quantityOrdered}</td>
+                          {!canReserveStock && <td className="px-4 py-3">{line.quantityReserved}</td>}
+                          <td className="px-4 py-3">{money.format(line.unitCost)}</td>
+                          <td className="px-4 py-3">{money.format(line.lineAmount)}</td>
+                          {canChangeLines && (
+                            <td className="px-4 py-3">
                               <AppButton
-                                disabled={maxReserveQuantity <= 0 || createReservationMutation.isPending || reserveQuantity <= 0 || reserveQuantity > maxReserveQuantity || reservationUser.trim().length === 0}
-                                onClick={() => void reserveLine(line.id)}
-                                size="sm"
+                                appearance="secondary"
+                                disabled={removeLineMutation.isPending}
+                                onClick={() =>
+                                  removeLineMutation.mutate({
+                                    purchaseOrderId: purchaseOrder.id,
+                                    purchaseOrderLineId: line.id,
+                                    user: reservationUser
+                                  })
+                                }
                               >
+                                <UilTimes className="h-4 w-4" />
+                                Remove
+                              </AppButton>
+                            </td>
+                          )}
+                          {canReserveStock && <td className="border-l px-4 py-3">{line.quantityRemaining}</td>}
+                          {canReserveStock && <td className="px-4 py-3">{stock ? stock.availableQuantity : 'Not stocked'}</td>}
+                          {canReserveStock && (
+                            <td className="px-4 py-3">
+                              <AppButton disabled={maxReserveQuantity <= 0 || createReservationMutation.isPending} onClick={() => openReserveDialog(line.id)}>
                                 Reserve
                               </AppButton>
-                            </div>
-                          </td>
-                        )}
-                        {canReserveStock && (
-                          <td className="px-4 py-3">
-                            <div className="grid gap-2">
-                              {lineReservations.length === 0 && <span className="text-muted-foreground">None</span>}
-                              {lineReservations.map((reservation) => (
-                                <div className="flex items-center justify-between gap-2" key={reservation.id}>
-                                  <span>
-                                    {reservation.quantityReserved} at ${reservation.unitCostSnapshot.toFixed(2)}
-                                  </span>
-                                  <AppButton
-                                    appearance="secondary"
-                                    disabled={releaseReservationMutation.isPending || reservationUser.trim().length === 0}
-                                    onClick={() => releaseReservationMutation.mutate({ stockReservationId: reservation.id, quantity: reservation.quantityReserved, user: reservationUser })}
-                                    size="sm"
-                                  >
-                                    Release
-                                  </AppButton>
-                                </div>
-                              ))}
-                            </div>
-                          </td>
-                        )}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-            {canReserveStock && (
-              <div className="border-t p-4">
-                <AppField label="Reservation user">
-                  <AppInput className="max-w-xs" onChange={(event) => setReservationUser(event.target.value)} value={reservationUser} />
-                </AppField>
+                            </td>
+                          )}
+                          {canReserveStock && (
+                            <td className="px-4 py-3">
+                              <div className="grid gap-2">
+                                {lineReservations.length === 0 && <span className="text-muted-foreground">None</span>}
+                                {lineReservations.map((reservation) => (
+                                  <div className="flex items-center justify-between gap-2" key={reservation.id}>
+                                    <span>
+                                      {reservation.quantityReserved} at {money.format(reservation.unitCostSnapshot)}
+                                    </span>
+                                    <AppButton
+                                      appearance="secondary"
+                                      disabled={releaseReservationMutation.isPending || reservationUser.trim().length === 0}
+                                      onClick={() => releaseReservationMutation.mutate({ stockReservationId: reservation.id, quantity: reservation.quantityReserved, user: reservationUser })}
+                                    >
+                                      Release
+                                    </AppButton>
+                                  </div>
+                                ))}
+                              </div>
+                            </td>
+                          )}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
-            )}
+            </div>
           </article>
         )}
       </div>
+
+      {isAddLineOpen && <AddPurchaseOrderLineDialog inventoryItems={availableItemsToAdd} isSaving={addLineMutation.isPending} onCancel={closeAddLineDialog} onSubmit={addLine} />}
+
+      {reserveDialogLine && (
+        <ReserveStockDialog
+          availableQuantity={reserveDialogStock?.availableQuantity ?? null}
+          itemName={reserveDialogItem?.displayName ?? reserveDialogLine.inventoryItemId}
+          isSaving={createReservationMutation.isPending}
+          line={reserveDialogLine}
+          maxQuantity={reserveDialogMaxQuantity}
+          onCancel={closeReserveDialog}
+          onSubmit={reserveLine}
+          onUserChange={setReservationUser}
+          user={reservationUser}
+        />
+      )}
     </section>
   );
 };

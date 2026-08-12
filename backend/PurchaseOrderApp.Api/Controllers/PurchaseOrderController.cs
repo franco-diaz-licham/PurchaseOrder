@@ -70,6 +70,19 @@ public sealed class PurchaseOrderController(IPurchaseOrderService purchaseOrderS
         return result.ToActionResult();
     }
 
+    [HttpDelete("{purchaseOrderId:guid}/lines/{purchaseOrderLineId:guid}")]
+    public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> RemoveLine(Guid purchaseOrderId, Guid purchaseOrderLineId, [FromBody] RemovePurchaseOrderLineRequest request, CancellationToken cancellationToken)
+    {
+        var command = new RemovePurchaseOrderLineCommand(
+            new PurchaseOrderId(purchaseOrderId),
+            new PurchaseOrderLineId(purchaseOrderLineId),
+            request.User,
+            DateTimeOffset.UtcNow);
+
+        var result = await purchaseOrderService.RemoveLineAsync(command, cancellationToken);
+        return result.ToActionResult();
+    }
+
     [HttpPut("{purchaseOrderId:guid}/approve")]
     public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> Approve(Guid purchaseOrderId, [FromBody] ChangePurchaseOrderStatusRequest request, CancellationToken cancellationToken)
     {

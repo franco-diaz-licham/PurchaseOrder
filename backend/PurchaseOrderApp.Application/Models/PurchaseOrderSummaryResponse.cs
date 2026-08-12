@@ -8,4 +8,7 @@ public sealed record PurchaseOrderSummaryResponse(
     int LineCount,
     decimal QuantityOrdered,
     decimal QuantityReserved,
-    decimal QuantityRemaining);
+    decimal QuantityRemaining,
+    decimal SubtotalAmount,
+    decimal GstAmount,
+    decimal TotalAmount);

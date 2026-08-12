@@ -19,6 +19,12 @@ public sealed record AddPurchaseOrderLineCommand(
     string User,
     DateTimeOffset OccurredAt);
 
+public sealed record RemovePurchaseOrderLineCommand(
+    PurchaseOrderId PurchaseOrderId,
+    PurchaseOrderLineId PurchaseOrderLineId,
+    string User,
+    DateTimeOffset OccurredAt);
+
 public sealed record ChangePurchaseOrderStatusCommand(
     PurchaseOrderId PurchaseOrderId,
     string User,
