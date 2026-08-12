@@ -19,7 +19,7 @@ public static class PurchaseOrderScenarioSeeder
         decimal standardCost = 1.25m,
         CancellationToken cancellationToken = default)
     {
-        var warehouse = Warehouse.Create("SYD", "Sydney Fulfilment Centre", TestData.User, TestData.OccurredAt);
+        var warehouse = Warehouse.Create("NSW", "New South Wales", TestData.User, TestData.OccurredAt);
         var item = CreateItem(trackingMode, standardCost);
         var stock = TestData.CreateWarehouseStock(warehouse.Id, item.Id, onHandQuantity);
         var purchaseOrder = CreateApprovedPurchaseOrder(warehouse.Id, item, quantityOrdered);
@@ -48,7 +48,7 @@ public static class PurchaseOrderScenarioSeeder
         decimal standardCost = 1.25m,
         CancellationToken cancellationToken = default)
     {
-        var warehouse = Warehouse.Create("SYD", "Sydney Fulfilment Centre", TestData.User, TestData.OccurredAt);
+        var warehouse = Warehouse.Create("NSW", "New South Wales", TestData.User, TestData.OccurredAt);
         var item = TestData.CreateUnitItem(standardCost: standardCost);
         var stock = TestData.CreateWarehouseStock(warehouse.Id, item.Id, onHandQuantity);
 
@@ -78,9 +78,9 @@ public static class PurchaseOrderScenarioSeeder
         decimal secondOnHandQuantity = 10m,
         CancellationToken cancellationToken = default)
     {
-        var warehouse = Warehouse.Create("SYD", "Sydney Fulfilment Centre", TestData.User, TestData.OccurredAt);
-        var firstItem = TestData.CreateUnitItem("BOLT-10", "10mm Bolt");
-        var secondItem = TestData.CreateUnitItem("NUT-10", "10mm Nut");
+        var warehouse = Warehouse.Create("NSW", "New South Wales", TestData.User, TestData.OccurredAt);
+        var firstItem = TestData.CreateUnitItem("SHACKLE-12T", "12t Bow Shackle");
+        var secondItem = TestData.CreateUnitItem("SLING-10T", "10t Chain Sling");
         var firstStock = TestData.CreateWarehouseStock(warehouse.Id, firstItem.Id, firstOnHandQuantity);
         var secondStock = TestData.CreateWarehouseStock(warehouse.Id, secondItem.Id, secondOnHandQuantity);
 
@@ -105,8 +105,8 @@ public static class PurchaseOrderScenarioSeeder
         decimal secondOnHandQuantity = 10m,
         CancellationToken cancellationToken = default)
     {
-        var firstWarehouse = Warehouse.Create("SYD", "Sydney Fulfilment Centre", TestData.User, TestData.OccurredAt);
-        var secondWarehouse = Warehouse.Create("MEL", "Melbourne Distribution Hub", TestData.User, TestData.OccurredAt);
+        var firstWarehouse = Warehouse.Create("NSW", "New South Wales", TestData.User, TestData.OccurredAt);
+        var secondWarehouse = Warehouse.Create("VIC", "Victoria", TestData.User, TestData.OccurredAt);
         var item = TestData.CreateUnitItem();
         var firstStock = TestData.CreateWarehouseStock(firstWarehouse.Id, item.Id, firstOnHandQuantity);
         var secondStock = TestData.CreateWarehouseStock(secondWarehouse.Id, item.Id, secondOnHandQuantity);

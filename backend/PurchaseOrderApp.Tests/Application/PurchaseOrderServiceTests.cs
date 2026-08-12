@@ -44,7 +44,7 @@ public sealed class PurchaseOrderServiceTests
     public async Task SubmitAsync_ShouldCreatePendingPurchaseOrderAndCommit()
     {
         // Arrange
-        var warehouse = Warehouse.Create("SYD", "Sydney Fulfilment Centre", TestData.User, TestData.OccurredAt);
+        var warehouse = Warehouse.Create("NSW", "New South Wales", TestData.User, TestData.OccurredAt);
         var item = TestData.CreateUnitItem();
         var command = new SubmitPurchaseOrderCommand(
             warehouse.Id,

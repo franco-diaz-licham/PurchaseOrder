@@ -14,7 +14,7 @@ public sealed class FinanceRepositoryTests : DatabaseFixture
     public async Task ListWarehouseCommittedStockValuesAsync_ShouldUseReservationCostSnapshot()
     {
         // Arrange
-        var warehouse = Warehouse.Create("BNE", "Brisbane", TestData.User, TestData.OccurredAt);
+        var warehouse = Warehouse.Create("QLD", "Queensland", TestData.User, TestData.OccurredAt);
         var item = TestData.CreateWeightItem(standardCost: 1.75m);
         var stock = TestData.CreateWarehouseStock(warehouse.Id, item.Id, onHandQuantity: 35);
         var purchaseOrder = PurchaseOrder.CreatePending(warehouse.Id, TestData.User, TestData.OccurredAt);

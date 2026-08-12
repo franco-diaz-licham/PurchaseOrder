@@ -37,7 +37,7 @@ internal static class TestData
     /// <summary>
     /// Creates a unit-tracked inventory item for tests.
     /// </summary>
-    public static InventoryItem CreateUnitItem(string sku = "BOLT-10", string name = "10mm Bolt", decimal standardCost = 1.25m)
+    public static InventoryItem CreateUnitItem(string sku = "SHACKLE-12T", string name = "12t Bow Shackle", decimal standardCost = 48m)
     {
         return InventoryItem.Create(
             sku,
@@ -52,7 +52,7 @@ internal static class TestData
     /// <summary>
     /// Creates a weight-tracked inventory item for tests.
     /// </summary>
-    public static InventoryItem CreateWeightItem(string sku = "RICE-BULK", string name = "Bulk Rice", decimal standardCost = 1.75m)
+    public static InventoryItem CreateWeightItem(string sku = "WIRE-ROPE", string name = "Hoist Wire Rope", decimal standardCost = 6.80m)
     {
         return InventoryItem.Create(
             sku,

@@ -14,8 +14,8 @@ public sealed class WarehouseStockRepositoryTests : DatabaseFixture
     public async Task ListResponsesAsync_ShouldReturnStockForWarehouseOnly()
     {
         // Arrange
-        var warehouse = Warehouse.Create("SYD", "Sydney", TestData.User, TestData.OccurredAt);
-        var otherWarehouse = Warehouse.Create("MEL", "Melbourne", TestData.User, TestData.OccurredAt);
+        var warehouse = Warehouse.Create("NSW", "New South Wales", TestData.User, TestData.OccurredAt);
+        var otherWarehouse = Warehouse.Create("VIC", "Victoria", TestData.User, TestData.OccurredAt);
         var item = TestData.CreateUnitItem();
         var warehouseStock = TestData.CreateWarehouseStock(warehouse.Id, item.Id, onHandQuantity: 35);
         var otherStock = TestData.CreateWarehouseStock(otherWarehouse.Id, item.Id, onHandQuantity: 50);
@@ -52,7 +52,7 @@ public sealed class WarehouseStockRepositoryTests : DatabaseFixture
     public async Task GetForUpdateAsync_ShouldReturnWarehouseStock()
     {
         // Arrange
-        var warehouse = Warehouse.Create("BNE", "Brisbane", TestData.User, TestData.OccurredAt);
+        var warehouse = Warehouse.Create("QLD", "Queensland", TestData.User, TestData.OccurredAt);
         var item = TestData.CreateUnitItem();
         var warehouseStock = TestData.CreateWarehouseStock(warehouse.Id, item.Id, onHandQuantity: 42);
 

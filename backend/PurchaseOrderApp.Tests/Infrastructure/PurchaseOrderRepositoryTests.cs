@@ -13,7 +13,7 @@ public sealed class PurchaseOrderRepositoryTests : DatabaseFixture
     public async Task AddAsync_ShouldPersistPurchaseOrderWithGeneratedNumber()
     {
         // Arrange
-        var warehouse = Warehouse.Create("SYD", "Sydney", TestData.User, TestData.OccurredAt);
+        var warehouse = Warehouse.Create("NSW", "New South Wales", TestData.User, TestData.OccurredAt);
         var item = TestData.CreateUnitItem(standardCost: 2.50m);
         var purchaseOrder = PurchaseOrder.CreatePending(warehouse.Id, TestData.User, TestData.OccurredAt);
         purchaseOrder.AddLine(item, new Quantity(4), TestData.User, TestData.OccurredAt);

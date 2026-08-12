@@ -11,8 +11,8 @@ public sealed class WarehouseTests
     public void Create_ShouldTrimNameAndUppercaseCode()
     {
         // Arrange
-        const string code = " syd ";
-        const string name = " Sydney Fulfilment Centre ";
+        const string code = " nsw ";
+        const string name = " New South Wales ";
 
         // Act
         var warehouse = PurchaseOrderApp.Domain.Entities.Warehouse.Create(
@@ -23,8 +23,8 @@ public sealed class WarehouseTests
 
         // Assert
         warehouse.Id.Value.ShouldNotBe(Guid.Empty);
-        warehouse.Code.ShouldBe("SYD");
-        warehouse.Name.ShouldBe("Sydney Fulfilment Centre");
+        warehouse.Code.ShouldBe("NSW");
+        warehouse.Name.ShouldBe("New South Wales");
         warehouse.CreatedBy.ShouldBe(TestData.User);
     }
 
@@ -32,13 +32,13 @@ public sealed class WarehouseTests
     public void Rename_ShouldUpdateNameAndAuditFields()
     {
         // Arrange
-        var warehouse = PurchaseOrderApp.Domain.Entities.Warehouse.Create("SYD", "Sydney", TestData.User, TestData.OccurredAt);
+        var warehouse = PurchaseOrderApp.Domain.Entities.Warehouse.Create("NSW", "New South Wales", TestData.User, TestData.OccurredAt);
 
         // Act
-        warehouse.Rename(" Sydney Fulfilment Centre ", TestData.User, TestData.OccurredAt);
+        warehouse.Rename(" Queensland ", TestData.User, TestData.OccurredAt);
 
         // Assert
-        warehouse.Name.ShouldBe("Sydney Fulfilment Centre");
+        warehouse.Name.ShouldBe("Queensland");
         warehouse.UpdatedBy.ShouldBe(TestData.User);
         warehouse.UpdatedAt.ShouldBe(TestData.OccurredAt);
     }
@@ -47,7 +47,7 @@ public sealed class WarehouseTests
     public void Rename_ShouldThrow_WhenNameIsMissing()
     {
         // Arrange
-        var warehouse = PurchaseOrderApp.Domain.Entities.Warehouse.Create("SYD", "Sydney", TestData.User, TestData.OccurredAt);
+        var warehouse = PurchaseOrderApp.Domain.Entities.Warehouse.Create("NSW", "New South Wales", TestData.User, TestData.OccurredAt);
 
         // Act
         var exception = Should.Throw<DomainException>(() => warehouse.Rename(" ", TestData.User, TestData.OccurredAt));

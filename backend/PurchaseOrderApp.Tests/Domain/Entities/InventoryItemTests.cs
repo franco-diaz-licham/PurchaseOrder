@@ -13,9 +13,9 @@ public sealed class InventoryItemTests
     public void Create_ShouldTrimNamesAndSetStandardCost()
     {
         // Arrange
-        const string sku = " bolt-10 ";
-        const string name = " 10mm Bolt ";
-        var standardCost = new Money(1.25m);
+        const string sku = " shackle-12t ";
+        const string name = " 12t Bow Shackle ";
+        var standardCost = new Money(48m);
 
         // Act
         var item = PurchaseOrderApp.Domain.Entities.InventoryItem.Create(
@@ -29,11 +29,11 @@ public sealed class InventoryItemTests
 
         // Assert
         item.Id.Value.ShouldNotBe(Guid.Empty);
-        item.Sku.ShouldBe("bolt-10");
-        item.Name.ShouldBe("10mm Bolt");
+        item.Sku.ShouldBe("shackle-12t");
+        item.Name.ShouldBe("12t Bow Shackle");
         item.Category.ShouldBe(InventoryItemCategory.Hardware);
         item.TrackingMode.ShouldBe(InventoryTrackingMode.Unit);
-        item.StandardCost.Value.ShouldBe(1.25m);
+        item.StandardCost.Value.ShouldBe(48m);
     }
 
     [Test]
