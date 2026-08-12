@@ -27,10 +27,9 @@ public static class ApiAppServices
     {
         services.AddControllers(options => {
             options.Conventions.Add(new RouteTokenTransformerConvention(new RouteTransformer()));
-        })
-            .AddJsonOptions(options => {
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false));
-            });
+        }).AddJsonOptions(options => {
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false));
+        });
 
         return services;
     }
