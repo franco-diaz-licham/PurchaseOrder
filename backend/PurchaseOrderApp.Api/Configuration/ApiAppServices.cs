@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.Extensions.Options;
 using PurchaseOrderApp.Application.Ports;
 using PurchaseOrderApp.Application.UseCases;
-using PurchaseOrderApp.Infrastructure.Persistence;
-using PurchaseOrderApp.Infrastructure.Persistence.Repositories;
+using PurchaseOrderApp.Infrastructure;
+using PurchaseOrderApp.Infrastructure.Repositories;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 

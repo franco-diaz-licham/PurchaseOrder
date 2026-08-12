@@ -58,11 +58,7 @@ public sealed class PurchaseOrder : Entity<PurchaseOrderId>
     /// </summary>
     public bool HasOutstandingLines => _lines.Any(line => line.HasOutstandingQuantity);
 
-    public static PurchaseOrder CreatePending(
-        string purchaseOrderNumber,
-        WarehouseId warehouseId,
-        string user,
-        DateTimeOffset occurredAt)
+    public static PurchaseOrder CreatePending(string purchaseOrderNumber, WarehouseId warehouseId, string user, DateTimeOffset occurredAt)
     {
         return new PurchaseOrder(
             new PurchaseOrderId(Guid.NewGuid()),
@@ -73,11 +69,7 @@ public sealed class PurchaseOrder : Entity<PurchaseOrderId>
             occurredAt);
     }
 
-    public PurchaseOrderLine AddLine(
-        InventoryItem item,
-        Quantity quantityOrdered,
-        string user,
-        DateTimeOffset occurredAt)
+    public PurchaseOrderLine AddLine(InventoryItem item, Quantity quantityOrdered, string user, DateTimeOffset occurredAt)
     {
         if (Status == PurchaseOrderStatus.Cancelled) throw new DomainException("Cancelled purchase orders cannot be changed.");
         if (Status == PurchaseOrderStatus.Closed) throw new DomainException("Closed purchase orders cannot be changed.");

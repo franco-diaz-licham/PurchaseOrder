@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using PurchaseOrderApp.Infrastructure.Persistence;
+using PurchaseOrderApp.Infrastructure;
 
 namespace PurchaseOrderApp.Api.Configuration;
 

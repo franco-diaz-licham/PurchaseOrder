@@ -3,4 +3,5 @@
   <Project Path="PurchaseOrderApp.Application/PurchaseOrderApp.Application.csproj" />
   <Project Path="PurchaseOrderApp.Domain/PurchaseOrderApp.Domain.csproj" />
   <Project Path="PurchaseOrderApp.Infrastructure/PurchaseOrderApp.Infrastructure.csproj" />
+  <Project Path="PurchaseOrderApp.Tests/PurchaseOrderApp.Tests.csproj" />
 </Solution>
