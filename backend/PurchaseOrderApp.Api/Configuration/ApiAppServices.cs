@@ -67,7 +67,8 @@ public static class ApiAppServices
 
         services.AddDbContext<DatabaseContext>((sp, options) => {
             var databaseOptions = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
-            options.UseNpgsql(databaseOptions.PurchaseOrderDb);
+            options.UseNpgsql(databaseOptions.PurchaseOrderDb)
+                .UseSnakeCaseNamingConvention();
         });
 
         services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();

@@ -30,7 +30,7 @@ public sealed class WarehouseStockRepository(DatabaseContext db) : IWarehouseSto
             .FromSqlInterpolated($"""
                 SELECT *
                 FROM warehouse_stock
-                WHERE "WarehouseId" = {warehouseId.Value} AND "InventoryItemId" = {inventoryItemId.Value}
+                WHERE warehouse_id = {warehouseId.Value} AND inventory_item_id = {inventoryItemId.Value}
                 FOR UPDATE
                 """)
             .SingleOrDefaultAsync(cancellationToken);

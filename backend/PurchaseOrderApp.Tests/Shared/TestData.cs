@@ -1,4 +1,5 @@
 using PurchaseOrderApp.Domain.Entities;
+using PurchaseOrderApp.Domain.Core;
 using PurchaseOrderApp.Domain.Enums;
 using PurchaseOrderApp.Domain.ValueObjects;
 using System.Reflection;
@@ -42,16 +43,14 @@ internal static class TestData
             OccurredAt);
     }
 
-    public static WarehouseStock CreateWarehouseStock(
-        WarehouseId? warehouseId = null,
-        InventoryItemId? inventoryItemId = null,
-        decimal onHandQuantity = 100)
+    public static WarehouseStock CreateWarehouseStock(WarehouseId? warehouseId = null, InventoryItemId? inventoryItemId = null, decimal onHandQuantity = 100)
     {
         var stock = (WarehouseStock)Activator.CreateInstance(typeof(WarehouseStock), nonPublic: true)!;
         SetProperty(stock, nameof(WarehouseStock.Id), new WarehouseStockId(Guid.NewGuid()));
         SetProperty(stock, nameof(WarehouseStock.WarehouseId), warehouseId ?? WarehouseId);
         SetProperty(stock, nameof(WarehouseStock.InventoryItemId), inventoryItemId ?? new InventoryItemId(Guid.NewGuid()));
         SetProperty(stock, nameof(WarehouseStock.OnHandQuantity), new Quantity(onHandQuantity));
+        SetCreated(stock);
         return stock;
     }
 
@@ -59,5 +58,11 @@ internal static class TestData
     {
         var property = instance.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
         property!.SetValue(instance, value);
+    }
+
+    private static void SetCreated(Entity entity)
+    {
+        var method = typeof(Entity).GetMethod("SetCreated", BindingFlags.Instance | BindingFlags.NonPublic);
+        method!.Invoke(entity, [User, OccurredAt]);
     }
 }
