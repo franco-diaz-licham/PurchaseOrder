@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppField } from '@/components/ui/AppField';
 import { AppInput } from '@/components/ui/AppInput';
+import { AppTable, AppTableBody, AppTableCell, AppTableContainer, AppTableHead, AppTableHeaderCell, AppTableHeaderRow, AppTableRow } from '@/components/ui/AppTable';
 import type { ReservationModel } from '@/features/reservations/types/reservation.types';
 import { formatMoney } from '@/lib/formatMoney';
 import type { PurchaseOrderLineModel } from '../types/purchaseOrder.types';
@@ -87,58 +88,60 @@ export const ManageReservationsDialog = ({ availableQuantity, isReleasing, isRes
 
           <div className="overflow-hidden rounded-md border">
             <div className="border-b bg-card px-4 py-3 text-sm font-semibold">Active reservation records</div>
-            <table className="w-full text-left text-sm">
-              <thead className="bg-muted text-xs uppercase text-muted-foreground">
-                <tr>
-                  <th className="px-4 py-3 text-right">Active reservation</th>
-                  <th className="px-4 py-3 text-right">Unit cost</th>
-                  <th className="px-4 py-3">Reserved by</th>
-                  <th className="px-4 py-3">Reserved at</th>
-                  <th className="px-4 py-3 text-right">{releaseLabel}</th>
-                  <th className="px-4 py-3">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {reservations.length === 0 && (
-                  <tr className="border-t">
-                    <td className="px-4 py-3 text-muted-foreground" colSpan={6}>
-                      No active reservations.
-                    </td>
-                  </tr>
-                )}
-                {reservations.map((reservation) => (
-                  <tr className="border-t" key={reservation.id}>
-                    <td className="px-4 py-3 text-right">
-                      {reservation.quantityReserved} {quantityUnit}
-                    </td>
-                    <td className="px-4 py-3 text-right">{formatMoney(reservation.unitCostSnapshot)}</td>
-                    <td className="px-4 py-3">{reservation.reservedBy}</td>
-                    <td className="px-4 py-3">{dateTime.format(reservation.reservedAt)}</td>
-                    <td className="px-4 py-3">
-                      <AppInput
-                        className="w-32 text-right"
-                        max={reservation.quantityReserved}
-                        min={minimumQuantity}
-                        onChange={(event) =>
-                          setReleaseQuantities((current) => ({
-                            ...current,
-                            [reservation.id]: event.target.value
-                          }))
-                        }
-                        step={quantityStep}
-                        type="number"
-                        value={releaseQuantities[reservation.id] ?? ''}
-                      />
-                    </td>
-                    <td className="px-4 py-3">
-                      <AppButton appearance="secondary" disabled={!canRelease(reservation)} onClick={() => release(reservation)} type="button">
-                        Release
-                      </AppButton>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <AppTableContainer maxHeight="18rem">
+              <AppTable>
+                <AppTableHead sticky>
+                  <AppTableHeaderRow>
+                    <AppTableHeaderCell align="right">Active reservation</AppTableHeaderCell>
+                    <AppTableHeaderCell align="right">Unit cost</AppTableHeaderCell>
+                    <AppTableHeaderCell>Reserved by</AppTableHeaderCell>
+                    <AppTableHeaderCell>Reserved at</AppTableHeaderCell>
+                    <AppTableHeaderCell align="right">{releaseLabel}</AppTableHeaderCell>
+                    <AppTableHeaderCell>Action</AppTableHeaderCell>
+                  </AppTableHeaderRow>
+                </AppTableHead>
+                <AppTableBody>
+                  {reservations.length === 0 && (
+                    <AppTableRow>
+                      <AppTableCell className="text-muted-foreground" colSpan={6}>
+                        No active reservations.
+                      </AppTableCell>
+                    </AppTableRow>
+                  )}
+                  {reservations.map((reservation) => (
+                    <AppTableRow key={reservation.id}>
+                      <AppTableCell align="right">
+                        {reservation.quantityReserved} {quantityUnit}
+                      </AppTableCell>
+                      <AppTableCell align="right">{formatMoney(reservation.unitCostSnapshot)}</AppTableCell>
+                      <AppTableCell>{reservation.reservedBy}</AppTableCell>
+                      <AppTableCell>{dateTime.format(reservation.reservedAt)}</AppTableCell>
+                      <AppTableCell>
+                        <AppInput
+                          className="w-32 text-right"
+                          max={reservation.quantityReserved}
+                          min={minimumQuantity}
+                          onChange={(event) =>
+                            setReleaseQuantities((current) => ({
+                              ...current,
+                              [reservation.id]: event.target.value
+                            }))
+                          }
+                          step={quantityStep}
+                          type="number"
+                          value={releaseQuantities[reservation.id] ?? ''}
+                        />
+                      </AppTableCell>
+                      <AppTableCell>
+                        <AppButton appearance="secondary" disabled={!canRelease(reservation)} onClick={() => release(reservation)} type="button">
+                          Release
+                        </AppButton>
+                      </AppTableCell>
+                    </AppTableRow>
+                  ))}
+                </AppTableBody>
+              </AppTable>
+            </AppTableContainer>
           </div>
         </div>
 

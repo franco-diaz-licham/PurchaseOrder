@@ -1,7 +1,7 @@
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { StatusBadge } from '@/components/common/StatusBadge';
-import { AppTable, AppTableBody, AppTableCell, AppTableContainer, AppTableHead, AppTableHeaderCell, AppTableRow } from '@/components/ui/AppTable';
+import { AppTable, AppTableBody, AppTableCell, AppTableContainer, AppTableHead, AppTableHeaderCell, AppTableHeaderRow, AppTableRow } from '@/components/ui/AppTable';
 import type { WarehouseModel } from '@/features/catalog/types/catalog.types';
 import { findWarehouse } from '@/features/catalog/utils/catalogLookup';
 import { formatMoney } from '@/lib/formatMoney';
@@ -22,10 +22,10 @@ export const PurchaseOrderSummaryTable = ({ isError, isLoading, purchaseOrders, 
       {purchaseOrders.length === 0 && !isLoading && <EmptyState title="No purchase orders found." />}
 
       {purchaseOrders.length > 0 && (
-        <AppTableContainer>
+        <AppTableContainer maxHeight="calc(100vh - 10.5rem)">
           <AppTable minWidth="56.25rem">
-            <AppTableHead>
-              <tr>
+            <AppTableHead sticky>
+              <AppTableHeaderRow>
                 <AppTableHeaderCell>PO number</AppTableHeaderCell>
                 <AppTableHeaderCell>Warehouse</AppTableHeaderCell>
                 <AppTableHeaderCell>Status</AppTableHeaderCell>
@@ -34,7 +34,7 @@ export const PurchaseOrderSummaryTable = ({ isError, isLoading, purchaseOrders, 
                 <AppTableHeaderCell align="right">Reserved</AppTableHeaderCell>
                 <AppTableHeaderCell align="right">Remaining</AppTableHeaderCell>
                 <AppTableHeaderCell align="right">Total</AppTableHeaderCell>
-              </tr>
+              </AppTableHeaderRow>
             </AppTableHead>
             <AppTableBody>
               {purchaseOrders.map((order) => {

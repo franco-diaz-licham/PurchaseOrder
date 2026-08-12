@@ -7,6 +7,7 @@ type AppTableContainerProps = {
   bordered?: boolean;
   children: ReactNode;
   className?: string;
+  maxHeight?: string;
 };
 
 type AppTableProps = {
@@ -18,6 +19,7 @@ type AppTableProps = {
 type AppTableSectionProps = {
   children: ReactNode;
   className?: string;
+  sticky?: boolean;
 };
 
 type AppTableRowProps = {
@@ -27,6 +29,11 @@ type AppTableRowProps = {
   onClick?: MouseEventHandler<HTMLTableRowElement>;
   onKeyDown?: KeyboardEventHandler<HTMLTableRowElement>;
   tabIndex?: number;
+};
+
+type AppTableHeaderRowProps = {
+  children: ReactNode;
+  className?: string;
 };
 
 type AppTableHeaderCellProps = {
@@ -41,15 +48,18 @@ type AppTableCellProps = {
   align?: CellAlign;
   children: ReactNode;
   className?: string;
+  colSpan?: number;
 };
 
-export const AppTableContainer = ({ bordered = false, className, ...props }: AppTableContainerProps) => <div className={cn('overflow-x-auto', bordered && 'rounded-md border', className)} {...props} />;
+export const AppTableContainer = ({ bordered = false, className, maxHeight, ...props }: AppTableContainerProps) => <div className={cn('overflow-auto', bordered && 'rounded-md border', className)} style={{ maxHeight }} {...props} />;
 
 export const AppTable = ({ className, minWidth, ...props }: AppTableProps) => <table className={cn('w-full text-left text-sm', className)} style={{ minWidth }} {...props} />;
 
-export const AppTableHead = ({ className, ...props }: AppTableSectionProps) => <thead className={cn('bg-muted text-xs uppercase text-muted-foreground', className)} {...props} />;
+export const AppTableHead = ({ className, sticky = false, ...props }: AppTableSectionProps) => <thead className={cn('bg-muted text-xs uppercase text-muted-foreground', sticky && 'sticky top-0 z-10', className)} {...props} />;
 
 export const AppTableBody = ({ className, ...props }: AppTableSectionProps) => <tbody className={className} {...props} />;
+
+export const AppTableHeaderRow = ({ className, ...props }: AppTableHeaderRowProps) => <tr className={className} {...props} />;
 
 export const AppTableRow = ({ className, interactive = false, ...props }: AppTableRowProps) => <tr className={cn('border-t', interactive && 'cursor-pointer hover:bg-muted/60', className)} {...props} />;
 

@@ -10,7 +10,8 @@ const buttonVariants = cva(
         primary: 'bg-primary text-primary-foreground hover:bg-teal-800',
         secondary: 'border bg-card text-foreground hover:bg-muted',
         danger: 'bg-destructive text-white hover:bg-red-800',
-        ghost: 'text-secondary hover:bg-muted'
+        ghost: 'text-secondary hover:bg-muted',
+        link: 'min-h-0 px-0 text-primary underline-offset-4 hover:underline'
       },
       size: {
         sm: 'min-h-8 px-3 text-xs',

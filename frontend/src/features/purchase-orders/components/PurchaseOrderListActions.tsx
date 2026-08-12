@@ -1,5 +1,6 @@
 import { UilPlus } from '@iconscout/react-unicons';
 import { AppButton } from '@/components/ui/AppButton';
+import { AppCheckbox } from '@/components/ui/AppCheckbox';
 import { AppSelect } from '@/components/ui/AppSelect';
 import type { WarehouseModel } from '@/features/catalog/types/catalog.types';
 
@@ -14,10 +15,7 @@ type PurchaseOrderListActionsProps = {
 
 export const PurchaseOrderListActions = ({ showReadyToReserveOnly, warehouseFilter, warehouses, onAdd, onShowReadyToReserveOnlyChange, onWarehouseFilterChange }: PurchaseOrderListActionsProps) => (
   <div className="flex flex-wrap items-center gap-3">
-    <label className="flex items-center gap-2 text-sm font-medium">
-      <input checked={showReadyToReserveOnly} className="h-4 w-4 accent-primary" onChange={(event) => onShowReadyToReserveOnlyChange(event.target.checked)} type="checkbox" />
-      Ready to reserve
-    </label>
+    <AppCheckbox checked={showReadyToReserveOnly} label="Ready to reserve" onChange={onShowReadyToReserveOnlyChange} />
     <AppSelect
       options={warehouses.map((warehouse) => ({
         label: warehouse.displayName,
@@ -29,7 +27,7 @@ export const PurchaseOrderListActions = ({ showReadyToReserveOnly, warehouseFilt
     />
     <AppButton onClick={onAdd}>
       <UilPlus className="h-4 w-4" />
-      Add
+      New PO
     </AppButton>
   </div>
 );

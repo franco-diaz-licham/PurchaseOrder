@@ -1,6 +1,6 @@
 import { UilPen, UilPlus, UilTrash } from '@iconscout/react-unicons';
 import { AppButton } from '@/components/ui/AppButton';
-import { AppTable, AppTableBody, AppTableCell, AppTableContainer, AppTableHeaderCell, AppTableRow } from '@/components/ui/AppTable';
+import { AppTable, AppTableBody, AppTableCell, AppTableContainer, AppTableHead, AppTableHeaderCell, AppTableHeaderRow, AppTableRow } from '@/components/ui/AppTable';
 import type { InventoryItemModel, WarehouseStockModel } from '@/features/catalog/types/catalog.types';
 import { findInventoryItem } from '@/features/catalog/utils/catalogLookup';
 import type { ReservationModel } from '@/features/reservations/types/reservation.types';
@@ -43,17 +43,17 @@ export const PurchaseOrderLinesTable = ({
   <article className="rounded-md border bg-card">
     <div className="grid gap-3 p-4">
       {!canReserveStock && <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">Reservations are available after the purchase order is approved.</div>}
-      <AppTableContainer bordered>
+      <AppTableContainer bordered maxHeight="calc(100vh - 21rem)">
         <AppTable minWidth="73.75rem">
-          <thead>
-            <tr className="border-b bg-card text-sm">
+          <AppTableHead sticky>
+            <AppTableHeaderRow className="border-b bg-card text-sm">
               <AppTableHeaderCell className="font-semibold" colSpan={canChangeLines ? 7 : 6}>
                 <div className="flex items-center justify-between gap-3">
                   <span>Purchase order lines</span>
                   {canChangeLines && (
                     <AppButton disabled={isAddingLine || availableItemCount === 0} onClick={onAddLine} type="button">
                       <UilPlus className="h-4 w-4" />
-                      Add line
+                      Add item
                     </AppButton>
                   )}
                 </div>
@@ -61,8 +61,8 @@ export const PurchaseOrderLinesTable = ({
               <AppTableHeaderCell className="border-l font-semibold" colSpan={3}>
                 Reservations
               </AppTableHeaderCell>
-            </tr>
-            <tr className="bg-muted text-xs uppercase text-muted-foreground">
+            </AppTableHeaderRow>
+            <AppTableHeaderRow className="bg-muted text-xs uppercase text-muted-foreground">
               <AppTableHeaderCell>Item</AppTableHeaderCell>
               <AppTableHeaderCell align="right">Ordered</AppTableHeaderCell>
               <AppTableHeaderCell align="right">Reserved</AppTableHeaderCell>
@@ -75,8 +75,8 @@ export const PurchaseOrderLinesTable = ({
               </AppTableHeaderCell>
               <AppTableHeaderCell align="right">Active</AppTableHeaderCell>
               <AppTableHeaderCell align="right" ariaLabel="Reservation actions" />
-            </tr>
-          </thead>
+            </AppTableHeaderRow>
+          </AppTableHead>
           <AppTableBody>
             {purchaseOrder.lines.map((line) => {
               const item = findInventoryItem(inventoryItems, line.inventoryItemId);

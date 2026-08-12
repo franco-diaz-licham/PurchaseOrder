@@ -1,5 +1,5 @@
 import { AppButton } from '@/components/ui/AppButton';
-import { AppTable, AppTableBody, AppTableCell, AppTableContainer, AppTableHead, AppTableHeaderCell, AppTableRow } from '@/components/ui/AppTable';
+import { AppTable, AppTableBody, AppTableCell, AppTableContainer, AppTableHead, AppTableHeaderCell, AppTableHeaderRow, AppTableRow } from '@/components/ui/AppTable';
 import { formatMoney } from '@/lib/formatMoney';
 import type { WarehouseCommittedValueModel } from '../types/finance.types';
 
@@ -20,24 +20,24 @@ export const WarehouseReservationDetailTable = ({ warehouse, onClose, onOpenPurc
         Close
       </AppButton>
     </div>
-    <AppTableContainer>
+    <AppTableContainer maxHeight="18rem">
       <AppTable minWidth="51.25rem">
-        <AppTableHead>
-          <tr>
+        <AppTableHead sticky>
+          <AppTableHeaderRow>
             <AppTableHeaderCell>PO number</AppTableHeaderCell>
             <AppTableHeaderCell>Item</AppTableHeaderCell>
             <AppTableHeaderCell align="right">Qty reserved</AppTableHeaderCell>
             <AppTableHeaderCell align="right">Unit cost at reservation</AppTableHeaderCell>
             <AppTableHeaderCell align="right">Committed value</AppTableHeaderCell>
-          </tr>
+          </AppTableHeaderRow>
         </AppTableHead>
         <AppTableBody>
           {warehouse.reservations.map((reservation) => (
             <AppTableRow key={reservation.stockReservationId}>
               <AppTableCell>
-                <button className="font-semibold text-primary underline-offset-4 hover:underline" type="button" onClick={() => onOpenPurchaseOrder(reservation.purchaseOrderId, warehouse.warehouseId)}>
+                <AppButton appearance="link" className="font-semibold" type="button" onClick={() => onOpenPurchaseOrder(reservation.purchaseOrderId, warehouse.warehouseId)}>
                   {reservation.purchaseOrderNumber}
-                </button>
+                </AppButton>
               </AppTableCell>
               <AppTableCell className="font-medium">{reservation.itemDisplayName}</AppTableCell>
               <AppTableCell align="right">{reservation.quantityReserved}</AppTableCell>
