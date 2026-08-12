@@ -1,4 +1,6 @@
 using PurchaseOrderApp.Domain.Entities;
+using PurchaseOrderApp.Domain.Services;
+using PurchaseOrderApp.Domain.ValueObjects;
 using PurchaseOrderApp.Infrastructure.Repositories;
 using PurchaseOrderApp.Tests.Shared;
 using Shouldly;
@@ -9,7 +11,7 @@ namespace PurchaseOrderApp.Tests.Infrastructure;
 public sealed class WarehouseStockRepositoryTests : DatabaseFixture
 {
     [Test]
-    public async Task ListAsync_ShouldReturnStockForWarehouseOnly()
+    public async Task ListResponsesAsync_ShouldReturnStockForWarehouseOnly()
     {
         // Arrange
         var warehouse = Warehouse.Create("SYD", "Sydney", TestData.User, TestData.OccurredAt);
@@ -17,18 +19,33 @@ public sealed class WarehouseStockRepositoryTests : DatabaseFixture
         var item = TestData.CreateUnitItem();
         var warehouseStock = TestData.CreateWarehouseStock(warehouse.Id, item.Id, onHandQuantity: 35);
         var otherStock = TestData.CreateWarehouseStock(otherWarehouse.Id, item.Id, onHandQuantity: 50);
+        var purchaseOrder = PurchaseOrder.CreatePending(warehouse.Id, TestData.User, TestData.OccurredAt);
+        purchaseOrder.AddLine(item, new Quantity(20), TestData.User, TestData.OccurredAt);
+        purchaseOrder.Approve(TestData.User, TestData.OccurredAt);
+        var reservation = StockReservationDomainService.Reserve(
+            purchaseOrder,
+            purchaseOrder.Lines.Single().Id,
+            warehouseStock,
+            item,
+            Quantity.Zero,
+            new Quantity(12),
+            TestData.User,
+            TestData.OccurredAt);
 
-        await Db.AddRangeAsync(warehouse, otherWarehouse, item, warehouseStock, otherStock);
+        await Db.AddRangeAsync(warehouse, otherWarehouse, item, warehouseStock, otherStock, purchaseOrder, reservation);
         await Db.SaveChangesAsync();
         var sut = new WarehouseStockRepository(Db);
 
         // Act
-        var result = await sut.ListAsync(warehouse.Id, CancellationToken.None);
+        var result = await sut.ListResponsesAsync(warehouse.Id, CancellationToken.None);
 
         // Assert
         result.Count.ShouldBe(1);
-        result.Single().WarehouseId.ShouldBe(warehouse.Id);
-        result.Single().OnHandQuantity.Value.ShouldBe(35);
+        result.Single().WarehouseId.ShouldBe(warehouse.Id.Value);
+        result.Single().InventoryItemId.ShouldBe(item.Id.Value);
+        result.Single().OnHandQuantity.ShouldBe(35);
+        result.Single().ActiveReservedQuantity.ShouldBe(12);
+        result.Single().AvailableQuantity.ShouldBe(23);
     }
 
     [Test]

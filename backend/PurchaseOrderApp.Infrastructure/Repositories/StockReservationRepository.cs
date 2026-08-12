@@ -23,10 +23,29 @@ public sealed class StockReservationRepository(DatabaseContext db) : IStockReser
         var reservations = await query
             .OrderBy(reservation => reservation.Status)
             .ThenBy(reservation => reservation.Id)
+            .Select(reservation => new ReservationProjection(
+                reservation.Id,
+                reservation.PurchaseOrderLineId,
+                reservation.WarehouseId,
+                reservation.InventoryItemId,
+                reservation.QuantityReserved.Value,
+                reservation.UnitCostSnapshot.Value,
+                reservation.Status,
+                reservation.CreatedBy,
+                reservation.CreatedAt))
             .ToListAsync(cancellationToken);
 
         return reservations
-            .Select(ToResponse)
+            .Select(reservation => new ReservationResponse(
+                reservation.StockReservationId.Value,
+                reservation.PurchaseOrderLineId.Value,
+                reservation.WarehouseId.Value,
+                reservation.InventoryItemId.Value,
+                reservation.QuantityReserved,
+                reservation.UnitCostSnapshot,
+                reservation.Status.ToString(),
+                reservation.CreatedBy,
+                reservation.CreatedAt))
             .ToList();
     }
 
@@ -58,17 +77,14 @@ public sealed class StockReservationRepository(DatabaseContext db) : IStockReser
         await db.StockReservations.AddAsync(stockReservation, cancellationToken);
     }
 
-    private static ReservationResponse ToResponse(StockReservation reservation)
-    {
-        return new ReservationResponse(
-            reservation.Id.Value,
-            reservation.PurchaseOrderLineId.Value,
-            reservation.WarehouseId.Value,
-            reservation.InventoryItemId.Value,
-            reservation.QuantityReserved.Value,
-            reservation.UnitCostSnapshot.Value,
-            reservation.Status.ToString(),
-            reservation.CreatedBy,
-            reservation.CreatedAt);
-    }
+    private sealed record ReservationProjection(
+        StockReservationId StockReservationId,
+        PurchaseOrderLineId PurchaseOrderLineId,
+        WarehouseId WarehouseId,
+        InventoryItemId InventoryItemId,
+        decimal QuantityReserved,
+        decimal UnitCostSnapshot,
+        ReservationStatus Status,
+        string CreatedBy,
+        DateTimeOffset CreatedAt);
 }
