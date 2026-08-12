@@ -64,7 +64,7 @@ export const CreatePurchaseOrderDialog = ({ isError, isSaving, warehouses, onCan
           <AppButton appearance="secondary" onClick={onCancel} type="button">
             Cancel
           </AppButton>
-          <AppButton disabled={isSaving} type="submit">
+          <AppButton isLoading={isSaving} type="submit">
             Create
           </AppButton>
         </div>

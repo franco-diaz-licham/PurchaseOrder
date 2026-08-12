@@ -61,7 +61,7 @@ export const InventoryItemsPage = () => {
                       <AppTableCell>
                         <form className="flex items-center justify-end gap-2" onSubmit={(event) => changeStandardCost(event, item.id)}>
                           <AppInput className="w-28 text-right" defaultValue={item.standardCost} min="0" name="standardCost" step="0.01" type="number" />
-                          <AppButton disabled={changeStandardCostMutation.isPending} type="submit">
+                          <AppButton isLoading={changeStandardCostMutation.isPending} type="submit">
                             Save
                           </AppButton>
                         </form>

@@ -66,7 +66,7 @@ export const AddPurchaseOrderLineDialog = ({ inventoryItems, isSaving, onCancel,
           <AppButton appearance="secondary" onClick={onCancel} type="button">
             Cancel
           </AppButton>
-          <AppButton disabled={isSaving || inventoryItems.length === 0} type="submit">
+          <AppButton disabled={inventoryItems.length === 0} isLoading={isSaving} type="submit">
             Add line
           </AppButton>
         </div>

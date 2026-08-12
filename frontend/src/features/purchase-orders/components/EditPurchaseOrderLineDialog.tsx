@@ -58,7 +58,7 @@ export const EditPurchaseOrderLineDialog = ({ itemName, quantityOrdered, quantit
           <AppButton appearance="secondary" onClick={onCancel} type="button">
             Cancel
           </AppButton>
-          <AppButton disabled={isSaving} type="submit">
+          <AppButton isLoading={isSaving} type="submit">
             Save
           </AppButton>
         </div>

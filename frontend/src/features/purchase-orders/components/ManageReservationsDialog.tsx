@@ -81,7 +81,7 @@ export const ManageReservationsDialog = ({ availableQuantity, isReleasing, isRes
             <AppField label="User">
               <AppInput onChange={(event) => onUserChange(event.target.value)} required value={user} />
             </AppField>
-            <AppButton disabled={!canReserve} onClick={() => void reserve()} type="button">
+            <AppButton disabled={!canReserve} isLoading={isReserving} onClick={() => void reserve()} type="button">
               Reserve
             </AppButton>
           </div>
@@ -133,7 +133,7 @@ export const ManageReservationsDialog = ({ availableQuantity, isReleasing, isRes
                         />
                       </AppTableCell>
                       <AppTableCell>
-                        <AppButton appearance="secondary" disabled={!canRelease(reservation)} onClick={() => release(reservation)} type="button">
+                        <AppButton appearance="secondary" disabled={!canRelease(reservation)} isLoading={isReleasing} onClick={() => release(reservation)} type="button">
                           Release
                         </AppButton>
                       </AppTableCell>

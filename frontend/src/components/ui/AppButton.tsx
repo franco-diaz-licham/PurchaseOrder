@@ -25,6 +25,14 @@ const buttonVariants = cva(
   }
 );
 
-type AppButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & VariantProps<typeof buttonVariants>;
+type AppButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
+  VariantProps<typeof buttonVariants> & {
+    isLoading?: boolean;
+  };
 
-export const AppButton = ({ className, appearance, size, type = 'button', ...props }: AppButtonProps) => <button className={cn(buttonVariants({ appearance, size }), className)} type={type} {...props} />;
+export const AppButton = ({ children, className, appearance, disabled, isLoading = false, size, type = 'button', ...props }: AppButtonProps) => (
+  <button className={cn(buttonVariants({ appearance, size }), className)} disabled={disabled || isLoading} type={type} {...props}>
+    {isLoading && <span className="h-4 w-4 animate-spin rounded-full border-2 border-current/30 border-t-current" />}
+    {children}
+  </button>
+);
