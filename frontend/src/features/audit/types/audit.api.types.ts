@@ -1,4 +1,4 @@
-export type AuditLogEntryDto = {
+export type AuditLogEntryResponseDto = {
   auditLogEntryId: string;
   action: string;
   inventoryItemId: string;

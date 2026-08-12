@@ -48,7 +48,7 @@ export const CreatePurchaseOrderDialog = ({ isError, isSaving, warehouses, onCan
         <div className="grid gap-3 p-4">
           {isError && <ErrorMessage message="Purchase order could not be created." />}
 
-          <AppField label="WarehouseModel">
+          <AppField label="Warehouse">
             <AppSelect autoFocus required {...form.register('warehouseId')}>
               <option value="">Select warehouse</option>
               {warehouses.map((warehouse) => (

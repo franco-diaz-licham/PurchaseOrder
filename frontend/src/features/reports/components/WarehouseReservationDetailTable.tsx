@@ -13,7 +13,7 @@ export const WarehouseReservationDetailTable = ({ warehouse, onClose, onOpenPurc
     <div className="flex flex-col gap-2 border-b p-4 md:flex-row md:items-center md:justify-between">
       <div>
         <h2 className="text-base font-semibold">{warehouse.warehouseDisplayName}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">ReservationModel detail uses the unit cost captured when each reservation was created.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Reservation detail uses the unit cost captured when each reservation was created.</p>
       </div>
       <AppButton appearance="secondary" onClick={onClose}>
         Close

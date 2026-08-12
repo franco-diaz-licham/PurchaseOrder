@@ -1,7 +1,7 @@
-import type { AuditLogEntryDto } from '../types/audit.api.types';
+import type { AuditLogEntryResponseDto } from '../types/audit.api.types';
 import type { AuditLogEntryModel } from '../types/audit.types';
 
-export const toAuditLogEntry = (dto: AuditLogEntryDto): AuditLogEntryModel => ({
+export const toAuditLogEntry = (dto: AuditLogEntryResponseDto): AuditLogEntryModel => ({
   id: dto.auditLogEntryId,
   action: dto.action,
   inventoryItemId: dto.inventoryItemId,
@@ -14,4 +14,4 @@ export const toAuditLogEntry = (dto: AuditLogEntryDto): AuditLogEntryModel => ({
   timestamp: new Date(dto.timestamp)
 });
 
-export const toAuditLogEntries = (dtos: AuditLogEntryDto[]): AuditLogEntryModel[] => dtos.map(toAuditLogEntry);
+export const toAuditLogEntries = (dtos: AuditLogEntryResponseDto[]): AuditLogEntryModel[] => dtos.map(toAuditLogEntry);

@@ -1,4 +1,4 @@
-export type PurchaseOrderLineDto = {
+export type PurchaseOrderLineResponseDto = {
   purchaseOrderLineId: string;
   inventoryItemId: string;
   quantityOrdered: number;
@@ -8,7 +8,7 @@ export type PurchaseOrderLineDto = {
   lineAmount: number;
 };
 
-export type PurchaseOrderDto = {
+export type PurchaseOrderResponseDto = {
   purchaseOrderId: string;
   purchaseOrderNumber: string;
   warehouseId: string;
@@ -16,10 +16,10 @@ export type PurchaseOrderDto = {
   subtotalAmount: number;
   gstAmount: number;
   totalAmount: number;
-  lines: PurchaseOrderLineDto[];
+  lines: PurchaseOrderLineResponseDto[];
 };
 
-export type PurchaseOrderSummaryDto = {
+export type PurchaseOrderSummaryResponseDto = {
   purchaseOrderId: string;
   purchaseOrderNumber: string;
   warehouseId: string;

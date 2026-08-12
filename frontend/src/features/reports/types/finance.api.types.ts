@@ -1,14 +1,14 @@
-export type WarehouseCommittedValueDto = {
+export type WarehouseCommittedValueResponseDto = {
   warehouseId: string;
   warehouseCode: string;
   warehouseName: string;
   reservedQuantity: number;
   reservationCount: number;
   committedValue: number;
-  reservations: WarehouseCommittedReservationDto[];
+  reservations: WarehouseCommittedReservationResponseDto[];
 };
 
-export type WarehouseCommittedReservationDto = {
+export type WarehouseCommittedReservationResponseDto = {
   stockReservationId: string;
   purchaseOrderId: string;
   purchaseOrderNumber: string;

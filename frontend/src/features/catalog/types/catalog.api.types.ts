@@ -1,10 +1,10 @@
-export type WarehouseDto = {
+export type WarehouseResponseDto = {
   warehouseId: string;
   code: string;
   name: string;
 };
 
-export type InventoryItemDto = {
+export type InventoryItemResponseDto = {
   inventoryItemId: string;
   sku: string;
   name: string;
@@ -13,7 +13,7 @@ export type InventoryItemDto = {
   standardCost: number;
 };
 
-export type WarehouseStockDto = {
+export type WarehouseStockResponseDto = {
   warehouseId: string;
   inventoryItemId: string;
   onHandQuantity: number;

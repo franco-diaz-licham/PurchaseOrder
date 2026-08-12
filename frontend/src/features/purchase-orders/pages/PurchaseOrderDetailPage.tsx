@@ -1,18 +1,17 @@
-import { UilCheck, UilPlus, UilSync, UilTimes } from '@iconscout/react-unicons';
 import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { PageHeader } from '@/components/common/PageHeader';
-import { StatusBadge } from '@/components/common/StatusBadge';
 import { AppButton } from '@/components/ui/AppButton';
 import { useInventoryItemsQuery, useWarehousesQuery, useWarehouseStockQuery } from '@/features/catalog/queries/catalog.queries';
 import { findInventoryItem, findWarehouse } from '@/features/catalog/utils/catalogLookup';
 import { useCreateReservationMutation, useReleaseReservationMutation, useReservationsQuery } from '@/features/reservations/queries/reservation.queries';
 import { useFinanceNavigationStore } from '@/features/reports/stores/financeNavigation.store';
-import { formatMoney } from '@/lib/formatMoney';
 import { AddPurchaseOrderLineDialog, type AddPurchaseOrderLineFormValues } from '../components/AddPurchaseOrderLineDialog';
 import { ManageReservationsDialog } from '../components/ManageReservationsDialog';
+import { PurchaseOrderHeaderCard } from '../components/PurchaseOrderHeaderCard';
+import { PurchaseOrderLinesTable } from '../components/PurchaseOrderLinesTable';
 import { useAddPurchaseOrderLineMutation, usePurchaseOrderQuery, usePurchaseOrderStatusMutation, useRemovePurchaseOrderLineMutation } from '../queries/purchaseOrder.queries';
 
 export const PurchaseOrderDetailPage = () => {
@@ -115,145 +114,43 @@ export const PurchaseOrderDetailPage = () => {
         {addLineMutation.isError && <ErrorMessage message="Purchase order line could not be added." />}
         {removeLineMutation.isError && <ErrorMessage message="Purchase order line could not be removed." />}
         {createReservationMutation.isError && <ErrorMessage message="Stock could not be reserved for this line." />}
-        {releaseReservationMutation.isError && <ErrorMessage message="ReservationModel could not be released." />}
+        {releaseReservationMutation.isError && <ErrorMessage message="Reservation could not be released." />}
         {!purchaseOrder && !purchaseOrderQuery.isLoading && !purchaseOrderQuery.isError && <EmptyState title="Purchase order was not found." />}
 
         {purchaseOrder && (
-          <article className="rounded-md border bg-card">
-            <div className="flex flex-col gap-3 border-b p-4 md:flex-row md:items-center md:justify-between">
-              <div>
-                <div className="flex items-center gap-3">
-                  <h2 className="text-base font-semibold">{purchaseOrder.number}</h2>
-                  <StatusBadge status={purchaseOrder.status} />
-                </div>
-                <p className="mt-1 text-sm text-muted-foreground">{warehouse?.displayName ?? purchaseOrder.warehouseId}</p>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {canChangeLines && (
-                  <AppButton disabled={addLineMutation.isPending || availableItemsToAdd.length === 0} onClick={openAddLineDialog} type="button">
-                    <UilPlus className="h-4 w-4" />
-                    Add line
-                  </AppButton>
-                )}
-                <AppButton appearance="secondary" disabled={purchaseOrder.status !== 'Pending' || statusMutation.isPending} onClick={() => statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'approve', user: 'Franco Diaz' })}>
-                  <UilCheck className="h-4 w-4" />
-                  Approve
-                </AppButton>
-                <AppButton
-                  appearance="secondary"
-                  disabled={purchaseOrder.status === 'Closed' || purchaseOrder.status === 'Cancelled' || statusMutation.isPending}
-                  onClick={() => statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'close', user: 'Franco Diaz' })}
-                >
-                  <UilSync className="h-4 w-4" />
-                  Close
-                </AppButton>
-                <AppButton
-                  appearance="danger"
-                  disabled={purchaseOrder.status === 'Closed' || purchaseOrder.status === 'Cancelled' || statusMutation.isPending}
-                  onClick={() => statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'cancel', user: 'Franco Diaz' })}
-                >
-                  <UilTimes className="h-4 w-4" />
-                  Cancel
-                </AppButton>
-              </div>
-            </div>
-
-            <div className="grid gap-3 border-b p-4 text-sm md:grid-cols-3">
-              <div>
-                <p className="text-xs uppercase text-muted-foreground">Subtotal</p>
-                <p className="mt-1 font-semibold">{formatMoney(purchaseOrder.subtotalAmount)}</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase text-muted-foreground">GST</p>
-                <p className="mt-1 font-semibold">{formatMoney(purchaseOrder.gstAmount)}</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase text-muted-foreground">Total</p>
-                <p className="mt-1 font-semibold">{formatMoney(purchaseOrder.totalAmount)}</p>
-              </div>
-            </div>
-          </article>
+          <PurchaseOrderHeaderCard
+            availableItemCount={availableItemsToAdd.length}
+            canChangeLines={canChangeLines}
+            isAddingLine={addLineMutation.isPending}
+            isChangingStatus={statusMutation.isPending}
+            onAddLine={openAddLineDialog}
+            onApprove={() => statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'approve', user: 'Franco Diaz' })}
+            onCancel={() => statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'cancel', user: 'Franco Diaz' })}
+            onClose={() => statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'close', user: 'Franco Diaz' })}
+            purchaseOrder={purchaseOrder}
+            warehouseDisplayName={warehouse?.displayName ?? purchaseOrder.warehouseId}
+          />
         )}
 
         {purchaseOrder && (
-          <article className="rounded-md border bg-card">
-            <div className="p-4">
-              <div className="overflow-x-auto rounded-md border">
-                <table className={`w-full text-left text-sm ${canReserveStock ? 'min-w-[1180px]' : 'min-w-[720px]'}`}>
-                  <thead>
-                    <tr className="border-b bg-card text-sm">
-                      <th className="px-4 py-3 font-semibold" colSpan={canChangeLines ? 7 : 6}>
-                        Purchase order lines
-                      </th>
-                      {canReserveStock && (
-                        <th className="border-l px-4 py-3 font-semibold" colSpan={2}>
-                          Reservations
-                        </th>
-                      )}
-                    </tr>
-                    <tr className="bg-muted text-xs uppercase text-muted-foreground">
-                      <th className="px-4 py-3">Item</th>
-                      <th className="px-4 py-3">Ordered</th>
-                      <th className="px-4 py-3">Reserved</th>
-                      <th className="px-4 py-3">Remaining</th>
-                      <th className="px-4 py-3">Unit cost</th>
-                      <th className="px-4 py-3">Total Amount</th>
-                      {canChangeLines && <th className="px-4 py-3">Remove</th>}
-                      {canReserveStock && <th className="border-l px-4 py-3">Available</th>}
-                      {canReserveStock && <th className="px-4 py-3">Active</th>}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {purchaseOrder.lines.map((line) => {
-                      const item = findInventoryItem(itemsQuery.data, line.inventoryItemId);
-                      const stock = stockByItemId.get(line.inventoryItemId);
-                      const lineReservations = activeReservations.filter((reservation) => reservation.purchaseOrderLineId === line.id);
-                      return (
-                        <tr className="border-t" key={line.id}>
-                          <td className="px-4 py-3">{item?.displayName ?? line.inventoryItemId}</td>
-                          <td className="px-4 py-3">{line.quantityOrdered}</td>
-                          <td className="px-4 py-3">{line.quantityReserved}</td>
-                          <td className="px-4 py-3">{line.quantityRemaining}</td>
-                          <td className="px-4 py-3">{formatMoney(line.unitCost)}</td>
-                          <td className="px-4 py-3">{formatMoney(line.lineAmount)}</td>
-                          {canChangeLines && (
-                            <td className="px-4 py-3">
-                              <AppButton
-                                appearance="secondary"
-                                disabled={removeLineMutation.isPending}
-                                onClick={() =>
-                                  removeLineMutation.mutate({
-                                    purchaseOrderId: purchaseOrder.id,
-                                    purchaseOrderLineId: line.id,
-                                    user: reservationUser
-                                  })
-                                }
-                              >
-                                <UilTimes className="h-4 w-4" />
-                                Remove
-                              </AppButton>
-                            </td>
-                          )}
-                          {canReserveStock && <td className="border-l px-4 py-3">{stock ? stock.availableQuantity : 'Not stocked'}</td>}
-                          {canReserveStock && (
-                            <td className="px-4 py-3">
-                              <div className="flex items-center justify-between gap-2">
-                                {lineReservations.length === 0 && <span className="text-muted-foreground">None</span>}
-                                {lineReservations.length > 0 && <span>{lineReservations.length}</span>}
-                                <AppButton appearance="secondary" onClick={() => setManageReservationsLineId(line.id)}>
-                                  Manage
-                                </AppButton>
-                              </div>
-                            </td>
-                          )}
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </article>
+          <PurchaseOrderLinesTable
+            activeReservations={activeReservations}
+            canChangeLines={canChangeLines}
+            canReserveStock={canReserveStock}
+            inventoryItems={itemsQuery.data}
+            isRemovingLine={removeLineMutation.isPending}
+            onManageReservations={setManageReservationsLineId}
+            onRemoveLine={(purchaseOrderLineId, user) =>
+              removeLineMutation.mutate({
+                purchaseOrderId: purchaseOrder.id,
+                purchaseOrderLineId,
+                user
+              })
+            }
+            purchaseOrder={purchaseOrder}
+            reservationUser={reservationUser}
+            stockByItemId={stockByItemId}
+          />
         )}
       </div>
 

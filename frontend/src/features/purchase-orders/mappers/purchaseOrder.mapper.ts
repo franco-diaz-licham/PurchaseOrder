@@ -1,23 +1,15 @@
 import type {
   AddPurchaseOrderLineRequestDto,
   ChangePurchaseOrderStatusRequestDto,
-  PurchaseOrderDto,
-  PurchaseOrderLineDto,
-  PurchaseOrderSummaryDto,
+  PurchaseOrderResponseDto,
+  PurchaseOrderLineResponseDto,
+  PurchaseOrderSummaryResponseDto,
   RemovePurchaseOrderLineRequestDto,
   SubmitPurchaseOrderRequestDto
 } from '../types/purchaseOrder.api.types';
-import type {
-  AddPurchaseOrderLineModel,
-  ChangePurchaseOrderStatusModel,
-  PurchaseOrderModel,
-  PurchaseOrderLineModel,
-  PurchaseOrderSummaryModel,
-  RemovePurchaseOrderLineModel,
-  SubmitPurchaseOrderModel
-} from '../types/purchaseOrder.types';
+import type { AddPurchaseOrderLineModel, ChangePurchaseOrderStatusModel, PurchaseOrderModel, PurchaseOrderLineModel, PurchaseOrderSummaryModel, RemovePurchaseOrderLineModel, SubmitPurchaseOrderModel } from '../types/purchaseOrder.types';
 
-export const toPurchaseOrderLine = (dto: PurchaseOrderLineDto): PurchaseOrderLineModel => ({
+export const toPurchaseOrderLine = (dto: PurchaseOrderLineResponseDto): PurchaseOrderLineModel => ({
   id: dto.purchaseOrderLineId,
   inventoryItemId: dto.inventoryItemId,
   quantityOrdered: dto.quantityOrdered,
@@ -27,7 +19,7 @@ export const toPurchaseOrderLine = (dto: PurchaseOrderLineDto): PurchaseOrderLin
   lineAmount: dto.lineAmount
 });
 
-export const toPurchaseOrder = (dto: PurchaseOrderDto): PurchaseOrderModel => ({
+export const toPurchaseOrder = (dto: PurchaseOrderResponseDto): PurchaseOrderModel => ({
   id: dto.purchaseOrderId,
   number: dto.purchaseOrderNumber,
   warehouseId: dto.warehouseId,
@@ -38,7 +30,7 @@ export const toPurchaseOrder = (dto: PurchaseOrderDto): PurchaseOrderModel => ({
   lines: dto.lines.map(toPurchaseOrderLine)
 });
 
-export const toPurchaseOrderSummary = (dto: PurchaseOrderSummaryDto): PurchaseOrderSummaryModel => ({
+export const toPurchaseOrderSummary = (dto: PurchaseOrderSummaryResponseDto): PurchaseOrderSummaryModel => ({
   id: dto.purchaseOrderId,
   number: dto.purchaseOrderNumber,
   warehouseId: dto.warehouseId,
@@ -52,7 +44,7 @@ export const toPurchaseOrderSummary = (dto: PurchaseOrderSummaryDto): PurchaseOr
   totalAmount: dto.totalAmount
 });
 
-export const toPurchaseOrderSummaries = (dtos: PurchaseOrderSummaryDto[]): PurchaseOrderSummaryModel[] => dtos.map(toPurchaseOrderSummary);
+export const toPurchaseOrderSummaries = (dtos: PurchaseOrderSummaryResponseDto[]): PurchaseOrderSummaryModel[] => dtos.map(toPurchaseOrderSummary);
 
 export const toSubmitPurchaseOrderRequestDto = (command: SubmitPurchaseOrderModel): SubmitPurchaseOrderRequestDto => ({
   warehouseId: command.warehouseId,

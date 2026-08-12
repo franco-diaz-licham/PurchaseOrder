@@ -19,7 +19,7 @@ export const WarehouseCommittedValueTable = ({ isError, isLoading, rows, onViewW
       <table className="w-full text-left text-sm">
         <thead className="bg-muted text-xs uppercase text-muted-foreground">
           <tr>
-            <th className="px-4 py-3">WarehouseModel</th>
+            <th className="px-4 py-3">Warehouse</th>
             <th className="px-4 py-3">Reserved qty</th>
             <th className="px-4 py-3">Reservations</th>
             <th className="px-4 py-3">Committed value</th>

@@ -1,4 +1,4 @@
-export type ReservationDto = {
+export type ReservationResponseDto = {
   stockReservationId: string;
   purchaseOrderLineId: string;
   warehouseId: string;
