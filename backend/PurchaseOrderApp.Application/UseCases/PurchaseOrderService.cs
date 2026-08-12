@@ -273,7 +273,7 @@ public sealed class PurchaseOrderService(
     private async Task<string> CreatePurchaseOrderNumberAsync(CancellationToken cancellationToken)
     {
         for (var attempt = 0; attempt < 10; attempt++) {
-            var purchaseOrderNumber = $"PO-{Random.Shared.Next(10000, 100000)}";
+            var purchaseOrderNumber = PurchaseOrderNumberGenerator.Create();
             if (!await purchaseOrderRepository.ExistsByNumberAsync(purchaseOrderNumber, cancellationToken)) return purchaseOrderNumber;
         }
 
