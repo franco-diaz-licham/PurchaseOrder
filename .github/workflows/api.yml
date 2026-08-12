@@ -10,7 +10,7 @@ env:
   IMAGE_TAG: ${{ github.sha }}
   ACR_NAME: ${{ secrets.ACR_NAME }}
   AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-  API_CONTAINER_APP: ${{ secrets.API_CONTAINER_APP_NAME }}
+  API_CONTAINER_APP: ${{ secrets.API_CONTAINER_APP }}
   API_RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}
 
 jobs:
