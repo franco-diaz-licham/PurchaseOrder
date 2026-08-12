@@ -1,0 +1,69 @@
+name: Frontend
+
+on:
+  workflow_dispatch:
+
+env:
+  BUILD_DIR: frontend
+  OUTPUT_DIR: dist
+  NODE_VERSION: 22.x
+  SWA_NAME: ${{ secrets.SWA_NAME }}
+  SWA_RESOURCE_GROUP: ${{ secrets.SWA_RESOURCE_GROUP }}
+  AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+  VITE_API_BASE_URL: ${{ secrets.API_BASE_URL }}
+  VITE_APP_NAME: PurchaseOrderApp
+  VITE_PRIMEREACT_LICENSE_KEY: ${{ secrets.PRIMEREACT_LICENSE_KEY }}
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy Frontend
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ${{ env.BUILD_DIR }}/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: ${{ env.BUILD_DIR }}
+        run: npm ci --include=optional
+
+      - name: Run frontend tests
+        working-directory: ${{ env.BUILD_DIR }}
+        run: npm run test
+
+      - name: Build frontend
+        working-directory: ${{ env.BUILD_DIR }}
+        run: npm run build
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ env.AZURE_CREDENTIALS }}
+
+      - name: Deploy frontend
+        run: |
+          $artifactPath = Join-Path `
+            $env:GITHUB_WORKSPACE `
+            "$env:BUILD_DIR/$env:OUTPUT_DIR"
+
+          $deploymentToken = az staticwebapp secrets list `
+            --name $env:SWA_NAME `
+            --resource-group $env:SWA_RESOURCE_GROUP `
+            --query "properties.apiKey" `
+            --output tsv
+
+          npx --yes @azure/static-web-apps-cli@2 deploy `
+            $artifactPath `
+            --env production `
+            --deployment-token $deploymentToken
