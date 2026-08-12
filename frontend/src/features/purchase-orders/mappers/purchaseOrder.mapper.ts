@@ -1,6 +1,5 @@
 import type {
   AddPurchaseOrderLineRequestDto,
-  ApprovedPurchaseOrderLineDto,
   ChangePurchaseOrderStatusRequestDto,
   PurchaseOrderDto,
   PurchaseOrderLineDto,
@@ -10,7 +9,6 @@ import type {
 } from '../types/purchaseOrder.api.types';
 import type {
   AddPurchaseOrderLineCommand,
-  ApprovedPurchaseOrderLine,
   ChangePurchaseOrderStatusCommand,
   PurchaseOrder,
   PurchaseOrderLine,
@@ -40,8 +38,6 @@ export const toPurchaseOrder = (dto: PurchaseOrderDto): PurchaseOrder => ({
   lines: dto.lines.map(toPurchaseOrderLine)
 });
 
-export const toPurchaseOrders = (dtos: PurchaseOrderDto[]): PurchaseOrder[] => dtos.map(toPurchaseOrder);
-
 export const toPurchaseOrderSummary = (dto: PurchaseOrderSummaryDto): PurchaseOrderSummary => ({
   id: dto.purchaseOrderId,
   number: dto.purchaseOrderNumber,
@@ -57,24 +53,6 @@ export const toPurchaseOrderSummary = (dto: PurchaseOrderSummaryDto): PurchaseOr
 });
 
 export const toPurchaseOrderSummaries = (dtos: PurchaseOrderSummaryDto[]): PurchaseOrderSummary[] => dtos.map(toPurchaseOrderSummary);
-
-export const toApprovedPurchaseOrderLine = (dto: ApprovedPurchaseOrderLineDto): ApprovedPurchaseOrderLine => ({
-  id: dto.purchaseOrderLineId,
-  purchaseOrderId: dto.purchaseOrderId,
-  purchaseOrderNumber: dto.purchaseOrderNumber,
-  warehouseId: dto.warehouseId,
-  warehouseCode: dto.warehouseCode,
-  warehouseName: dto.warehouseName,
-  inventoryItemId: dto.inventoryItemId,
-  sku: dto.sku,
-  itemName: dto.itemName,
-  quantityOrdered: dto.quantityOrdered,
-  quantityReserved: dto.quantityReserved,
-  quantityRemaining: dto.quantityRemaining,
-  displayName: `${dto.purchaseOrderNumber} - ${dto.sku} - remaining ${dto.quantityRemaining}`
-});
-
-export const toApprovedPurchaseOrderLines = (dtos: ApprovedPurchaseOrderLineDto[]): ApprovedPurchaseOrderLine[] => dtos.map(toApprovedPurchaseOrderLine);
 
 export const toSubmitPurchaseOrderRequestDto = (command: SubmitPurchaseOrderCommand): SubmitPurchaseOrderRequestDto => ({
   warehouseId: command.warehouseId,

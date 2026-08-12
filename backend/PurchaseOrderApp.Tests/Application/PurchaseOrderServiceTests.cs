@@ -188,14 +188,4 @@ public sealed class PurchaseOrderServiceTests
         _unitOfWork.Verify(uow => uow.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         _unitOfWork.Verify(uow => uow.CommitTransactionAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
-
-    private void VerifyNoOtherCalls()
-    {
-        _purchaseOrders.VerifyNoOtherCalls();
-        _warehouses.VerifyNoOtherCalls();
-        _inventoryItems.VerifyNoOtherCalls();
-        _warehouseStock.VerifyNoOtherCalls();
-        _stockReservations.VerifyNoOtherCalls();
-        _unitOfWork.VerifyNoOtherCalls();
-    }
 }

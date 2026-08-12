@@ -14,15 +14,6 @@ public sealed class StockReservationRepository(DatabaseContext db) : IStockReser
         return db.StockReservations.SingleOrDefaultAsync(reservation => reservation.Id == stockReservationId, cancellationToken);
     }
 
-    public async Task<ReservationResponse?> GetResponseAsync(StockReservationId stockReservationId, CancellationToken cancellationToken)
-    {
-        var reservation = await db.StockReservations
-            .AsNoTracking()
-            .SingleOrDefaultAsync(reservation => reservation.Id == stockReservationId, cancellationToken);
-
-        return reservation is null ? null : ToResponse(reservation);
-    }
-
     public async Task<List<ReservationResponse>> ListResponsesAsync(WarehouseId? warehouseId, ReservationStatus? status, CancellationToken cancellationToken)
     {
         var query = db.StockReservations.AsNoTracking();

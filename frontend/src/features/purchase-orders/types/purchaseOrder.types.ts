@@ -33,22 +33,6 @@ export type PurchaseOrderSummary = {
   totalAmount: number;
 };
 
-export type ApprovedPurchaseOrderLine = {
-  id: string;
-  purchaseOrderId: string;
-  purchaseOrderNumber: string;
-  warehouseId: string;
-  warehouseCode: string;
-  warehouseName: string;
-  inventoryItemId: string;
-  sku: string;
-  itemName: string;
-  quantityOrdered: number;
-  quantityReserved: number;
-  quantityRemaining: number;
-  displayName: string;
-};
-
 export type SubmitPurchaseOrderCommand = {
   warehouseId: string;
   user: string;

@@ -110,7 +110,6 @@ public abstract class DatabaseFixture
     private ServiceProvider CreateServiceProvider()
     {
         var services = new ServiceCollection();
-
         services.AddDbContext<DatabaseContext>(options => {
             options.UseNpgsql(ConnectionString).UseSnakeCaseNamingConvention();
         });

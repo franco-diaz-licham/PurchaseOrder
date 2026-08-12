@@ -15,11 +15,7 @@ public sealed class InventoryItemService(IInventoryItemRepository inventoryItemR
 {
     public async Task<Result<List<InventoryItemResponse>>> ListAsync(CancellationToken cancellationToken)
     {
-        var inventoryItems = await inventoryItemRepository.ListAsync(cancellationToken);
-        var response = inventoryItems
-            .Select(item => new InventoryItemResponse(item.Id.Value, item.Sku, item.Name, item.Category.ToString(), item.TrackingMode.ToString(), item.StandardCost.Value))
-            .ToList();
-
+        var response = await inventoryItemRepository.ListResponsesAsync(cancellationToken);
         return Result.Success(response);
     }
 

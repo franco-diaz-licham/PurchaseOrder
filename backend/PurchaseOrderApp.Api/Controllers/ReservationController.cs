@@ -24,15 +24,6 @@ public sealed class ReservationController(IReservationService reservationService
         return result.ToActionResult();
     }
 
-    [HttpGet("{stockReservationId:guid}")]
-    public async Task<ActionResult<ApiResponse<ReservationResponse>>> Get(
-        Guid stockReservationId,
-        CancellationToken cancellationToken)
-    {
-        var result = await reservationService.GetAsync(new StockReservationId(stockReservationId), cancellationToken);
-        return result.ToActionResult();
-    }
-
     [HttpPost]
     public async Task<ActionResult<ApiResponse<ReservationResponse>>> Create([FromBody] CreateReservationRequest request, CancellationToken cancellationToken)
     {

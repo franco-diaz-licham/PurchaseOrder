@@ -12,11 +12,7 @@ public sealed class WarehouseService(IWarehouseRepository warehouseRepository) :
 {
     public async Task<Result<List<WarehouseResponse>>> ListAsync(CancellationToken cancellationToken)
     {
-        var warehouses = await warehouseRepository.ListAsync(cancellationToken);
-        var response = warehouses
-            .Select(warehouse => new WarehouseResponse(warehouse.Id.Value, warehouse.Code, warehouse.Name))
-            .ToList();
-
+        var response = await warehouseRepository.ListResponsesAsync(cancellationToken);
         return Result.Success(response);
     }
 }

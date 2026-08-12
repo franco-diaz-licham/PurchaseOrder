@@ -16,8 +16,6 @@ public interface IPurchaseOrderService
 
     Task<Result<List<PurchaseOrderSummaryResponse>>> ListSummariesAsync(CancellationToken cancellationToken);
 
-    Task<Result<List<PurchaseOrderResponse>>> ListAsync(CancellationToken cancellationToken);
-
     Task<Result<PurchaseOrderResponse>> AddLineAsync(AddPurchaseOrderLineCommand command, CancellationToken cancellationToken);
 
     Task<Result<PurchaseOrderResponse>> RemoveLineAsync(RemovePurchaseOrderLineCommand command, CancellationToken cancellationToken);
@@ -28,7 +26,6 @@ public interface IPurchaseOrderService
 
     Task<Result<PurchaseOrderResponse>> CancelAsync(ChangePurchaseOrderStatusCommand command, CancellationToken cancellationToken);
 
-    Task<Result<List<ApprovedPurchaseOrderLineResponse>>> ListApprovedOutstandingLinesAsync(WarehouseId warehouseId, CancellationToken cancellationToken);
 }
 
 public sealed class PurchaseOrderService(
@@ -85,12 +82,6 @@ public sealed class PurchaseOrderService(
         if (purchaseOrder is null) return Result.Fail<PurchaseOrderResponse>("Purchase order was not found.", ResultStatus.NotFound);
 
         return Result.Success(purchaseOrder);
-    }
-
-    public async Task<Result<List<PurchaseOrderResponse>>> ListAsync(CancellationToken cancellationToken)
-    {
-        var purchaseOrders = await purchaseOrderRepository.ListResponsesAsync(cancellationToken);
-        return Result.Success(purchaseOrders);
     }
 
     public async Task<Result<List<PurchaseOrderSummaryResponse>>> ListSummariesAsync(CancellationToken cancellationToken)
@@ -262,10 +253,4 @@ public sealed class PurchaseOrderService(
         }
     }
 
-    public async Task<Result<List<ApprovedPurchaseOrderLineResponse>>> ListApprovedOutstandingLinesAsync(WarehouseId warehouseId, CancellationToken cancellationToken)
-    {
-        if (warehouseId.Value == Guid.Empty) return Result.Fail<List<ApprovedPurchaseOrderLineResponse>>("Warehouse id is required.", ResultStatus.Invalid);
-        var lines = await purchaseOrderRepository.ListApprovedOutstandingLinesAsync(warehouseId, cancellationToken);
-        return Result.Success(lines);
-    }
 }

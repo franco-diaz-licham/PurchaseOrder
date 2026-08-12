@@ -30,17 +30,8 @@ public interface IPurchaseOrderRepository
     Task<List<PurchaseOrderSummaryResponse>> ListSummariesAsync(CancellationToken cancellationToken);
 
     /// <summary>
-    /// Lists purchase order read models.
-    /// </summary>
-    Task<List<PurchaseOrderResponse>> ListResponsesAsync(CancellationToken cancellationToken);
-
-    /// <summary>
     /// Adds a purchase order to the current unit of work.
     /// </summary>
     Task AddAsync(PurchaseOrder purchaseOrder, CancellationToken cancellationToken);
 
-    /// <summary>
-    /// Lists approved purchase order lines that still have quantity left to reserve for a warehouse.
-    /// </summary>
-    Task<List<ApprovedPurchaseOrderLineResponse>> ListApprovedOutstandingLinesAsync(WarehouseId warehouseId, CancellationToken cancellationToken);
 }

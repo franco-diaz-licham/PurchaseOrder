@@ -12,13 +12,6 @@ namespace PurchaseOrderApp.Api.Controllers;
 [ApiController]
 public sealed class PurchaseOrderController(IPurchaseOrderService purchaseOrderService) : ControllerBase
 {
-    [HttpGet]
-    public async Task<ActionResult<ApiResponse<List<PurchaseOrderResponse>>>> GetAll(CancellationToken cancellationToken)
-    {
-        var result = await purchaseOrderService.ListAsync(cancellationToken);
-        return result.ToActionResult();
-    }
-
     [HttpGet("summary")]
     public async Task<ActionResult<ApiResponse<List<PurchaseOrderSummaryResponse>>>> GetSummary(CancellationToken cancellationToken)
     {
@@ -107,10 +100,4 @@ public sealed class PurchaseOrderController(IPurchaseOrderService purchaseOrderS
         return result.ToActionResult();
     }
 
-    [HttpGet("warehouses/{warehouseId:guid}/approved-lines")]
-    public async Task<ActionResult<ApiResponse<List<ApprovedPurchaseOrderLineResponse>>>> GetApprovedLines(Guid warehouseId, CancellationToken cancellationToken)
-    {
-        var result = await purchaseOrderService.ListApprovedOutstandingLinesAsync(new WarehouseId(warehouseId), cancellationToken);
-        return result.ToActionResult();
-    }
 }

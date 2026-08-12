@@ -29,9 +29,16 @@ public sealed class InventoryItemServiceTests
     {
         // Arrange
         var item = TestData.CreateUnitItem();
+        var expectedResponse = new InventoryItemResponse(
+            item.Id.Value,
+            item.Sku,
+            item.Name,
+            item.Category.ToString(),
+            item.TrackingMode.ToString(),
+            item.StandardCost.Value);
         _inventoryItems
-            .Setup(repo => repo.ListAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync([item]);
+            .Setup(repo => repo.ListResponsesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([expectedResponse]);
 
         // Act
         var result = await _sut.ListAsync(CancellationToken.None);
@@ -41,7 +48,7 @@ public sealed class InventoryItemServiceTests
         var response = result.Value!.Single();
         response.InventoryItemId.ShouldBe(item.Id.Value);
         response.Sku.ShouldBe(item.Sku);
-        _inventoryItems.Verify(repo => repo.ListAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _inventoryItems.Verify(repo => repo.ListResponsesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Test]
@@ -90,11 +97,5 @@ public sealed class InventoryItemServiceTests
         result.Error.ShouldBe("Inventory item was not found.");
         _unitOfWork.Verify(uow => uow.BeginTransactionAsync(It.IsAny<CancellationToken>()), Times.Once);
         _unitOfWork.Verify(uow => uow.RollbackTransactionAsync(It.IsAny<CancellationToken>()), Times.Once);
-    }
-
-    private void VerifyNoOtherCalls()
-    {
-        _inventoryItems.VerifyNoOtherCalls();
-        _unitOfWork.VerifyNoOtherCalls();
     }
 }

@@ -7,14 +7,6 @@ namespace PurchaseOrderApp.Infrastructure.Repositories;
 
 public sealed class WarehouseStockRepository(DatabaseContext db) : IWarehouseStockRepository
 {
-    public Task<WarehouseStock?> GetAsync(WarehouseId warehouseId, InventoryItemId inventoryItemId, CancellationToken cancellationToken)
-    {
-        return db.WarehouseStock.SingleOrDefaultAsync(stock =>
-            stock.WarehouseId == warehouseId &&
-            stock.InventoryItemId == inventoryItemId,
-            cancellationToken);
-    }
-
     public Task<List<WarehouseStock>> ListAsync(WarehouseId warehouseId, CancellationToken cancellationToken)
     {
         return db.WarehouseStock

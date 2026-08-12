@@ -194,13 +194,4 @@ public sealed class ReservationServiceTests
         _unitOfWork.Verify(uow => uow.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         _unitOfWork.Verify(uow => uow.CommitTransactionAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
-
-    private void VerifyNoOtherCalls()
-    {
-        _purchaseOrders.VerifyNoOtherCalls();
-        _inventoryItems.VerifyNoOtherCalls();
-        _warehouseStock.VerifyNoOtherCalls();
-        _stockReservations.VerifyNoOtherCalls();
-        _unitOfWork.VerifyNoOtherCalls();
-    }
 }

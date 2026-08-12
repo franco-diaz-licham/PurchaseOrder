@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using PurchaseOrderApp.Application.Models;
 using PurchaseOrderApp.Application.Ports;
 using PurchaseOrderApp.Domain.Entities;
 using PurchaseOrderApp.Domain.ValueObjects;
@@ -7,11 +8,15 @@ namespace PurchaseOrderApp.Infrastructure.Repositories;
 
 public sealed class WarehouseRepository(DatabaseContext db) : IWarehouseRepository
 {
-    public Task<List<Warehouse>> ListAsync(CancellationToken cancellationToken)
+    public Task<List<WarehouseResponse>> ListResponsesAsync(CancellationToken cancellationToken)
     {
         return db.Warehouses
             .AsNoTracking()
             .OrderBy(warehouse => warehouse.Code)
+            .Select(warehouse => new WarehouseResponse(
+                warehouse.Id.Value,
+                warehouse.Code,
+                warehouse.Name))
             .ToListAsync(cancellationToken);
     }
 
@@ -20,8 +25,4 @@ public sealed class WarehouseRepository(DatabaseContext db) : IWarehouseReposito
         return db.Warehouses.SingleOrDefaultAsync(warehouse => warehouse.Id == warehouseId, cancellationToken);
     }
 
-    public async Task AddAsync(Warehouse warehouse, CancellationToken cancellationToken)
-    {
-        await db.Warehouses.AddAsync(warehouse, cancellationToken);
-    }
 }

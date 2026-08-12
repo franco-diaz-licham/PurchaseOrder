@@ -9,11 +9,6 @@ namespace PurchaseOrderApp.Application.Ports;
 public interface IWarehouseStockRepository
 {
     /// <summary>
-    /// Gets warehouse stock for one warehouse and inventory item.
-    /// </summary>
-    Task<WarehouseStock?> GetAsync(WarehouseId warehouseId, InventoryItemId inventoryItemId, CancellationToken cancellationToken);
-
-    /// <summary>
     /// Lists warehouse stock balances for one warehouse.
     /// </summary>
     Task<List<WarehouseStock>> ListAsync(WarehouseId warehouseId, CancellationToken cancellationToken);

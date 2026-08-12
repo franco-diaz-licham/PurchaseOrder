@@ -1,22 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { catalogKeys } from '@/features/catalog/queries/catalog.queries';
-import { toAddPurchaseOrderLineRequestDto, toApprovedPurchaseOrderLines, toChangePurchaseOrderStatusRequestDto, toPurchaseOrder, toPurchaseOrders, toPurchaseOrderSummaries, toRemovePurchaseOrderLineRequestDto, toSubmitPurchaseOrderRequestDto } from '../mappers/purchaseOrder.mapper';
-import { addPurchaseOrderLine, changePurchaseOrderStatus, getPurchaseOrder, listApprovedPurchaseOrderLines, listPurchaseOrders, listPurchaseOrderSummaries, removePurchaseOrderLine, submitPurchaseOrder } from '../services/purchaseOrder.services';
+import { toAddPurchaseOrderLineRequestDto, toChangePurchaseOrderStatusRequestDto, toPurchaseOrder, toPurchaseOrderSummaries, toRemovePurchaseOrderLineRequestDto, toSubmitPurchaseOrderRequestDto } from '../mappers/purchaseOrder.mapper';
+import { addPurchaseOrderLine, changePurchaseOrderStatus, getPurchaseOrder, listPurchaseOrderSummaries, removePurchaseOrderLine, submitPurchaseOrder } from '../services/purchaseOrder.services';
 import type { AddPurchaseOrderLineCommand, ChangePurchaseOrderStatusCommand, RemovePurchaseOrderLineCommand, SubmitPurchaseOrderCommand } from '../types/purchaseOrder.types';
 
 export const purchaseOrderKeys = {
   all: ['purchase-orders'] as const,
-  list: ['purchase-orders', 'list'] as const,
   summaries: ['purchase-orders', 'summary'] as const,
-  detail: (purchaseOrderId: string) => ['purchase-orders', 'detail', purchaseOrderId] as const,
-  approvedLines: (warehouseId: string) => ['approved-lines', warehouseId] as const
+  detail: (purchaseOrderId: string) => ['purchase-orders', 'detail', purchaseOrderId] as const
 };
-
-export const usePurchaseOrdersQuery = () =>
-  useQuery({
-    queryKey: purchaseOrderKeys.list,
-    queryFn: async () => toPurchaseOrders(await listPurchaseOrders())
-  });
 
 export const usePurchaseOrderSummariesQuery = () =>
   useQuery({
@@ -29,13 +21,6 @@ export const usePurchaseOrderQuery = (purchaseOrderId: string | undefined) =>
     queryKey: purchaseOrderKeys.detail(purchaseOrderId ?? ''),
     queryFn: async () => toPurchaseOrder(await getPurchaseOrder(purchaseOrderId ?? '')),
     enabled: Boolean(purchaseOrderId)
-  });
-
-export const useApprovedPurchaseOrderLinesQuery = (warehouseId: string) =>
-  useQuery({
-    queryKey: purchaseOrderKeys.approvedLines(warehouseId),
-    queryFn: async () => toApprovedPurchaseOrderLines(await listApprovedPurchaseOrderLines(warehouseId)),
-    enabled: warehouseId.length > 0
   });
 
 export const useSubmitPurchaseOrderMutation = () => {

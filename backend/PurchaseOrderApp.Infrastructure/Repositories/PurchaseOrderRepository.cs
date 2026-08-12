@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using PurchaseOrderApp.Application.Models;
 using PurchaseOrderApp.Application.Ports;
 using PurchaseOrderApp.Domain.Entities;
-using PurchaseOrderApp.Domain.Enums;
 using PurchaseOrderApp.Domain.ValueObjects;
 
 namespace PurchaseOrderApp.Infrastructure.Repositories;
@@ -41,21 +40,6 @@ public sealed class PurchaseOrderRepository(DatabaseContext db) : IPurchaseOrder
         return purchaseOrder is null ? null : ToResponse(purchaseOrder);
     }
 
-    public async Task<List<PurchaseOrderResponse>> ListResponsesAsync(CancellationToken cancellationToken)
-    {
-        var purchaseOrders = await db.PurchaseOrders
-            .AsNoTracking()
-            .AsSplitQuery()
-            .Include(order => order.Lines)
-                .ThenInclude(line => line.InventoryItem)
-            .OrderBy(order => order.PurchaseOrderNumber)
-            .ToListAsync(cancellationToken);
-
-        return purchaseOrders
-            .Select(ToResponse)
-            .ToList();
-    }
-
     public async Task<List<PurchaseOrderSummaryResponse>> ListSummariesAsync(CancellationToken cancellationToken)
     {
         var purchaseOrders = await db.PurchaseOrders
@@ -74,40 +58,6 @@ public sealed class PurchaseOrderRepository(DatabaseContext db) : IPurchaseOrder
     public async Task AddAsync(PurchaseOrder purchaseOrder, CancellationToken cancellationToken)
     {
         await db.PurchaseOrders.AddAsync(purchaseOrder, cancellationToken);
-    }
-
-    public async Task<List<ApprovedPurchaseOrderLineResponse>> ListApprovedOutstandingLinesAsync(WarehouseId warehouseId, CancellationToken cancellationToken)
-    {
-        var approvedOrders = await db.PurchaseOrders
-            .AsNoTracking()
-            .AsSplitQuery()
-            .Include(order => order.Warehouse)
-            .Include(order => order.Lines)
-                .ThenInclude(line => line.InventoryItem)
-            .Where(order => order.WarehouseId == warehouseId)
-            .Where(order => order.Status == PurchaseOrderStatus.Approved)
-            .OrderBy(line => line.PurchaseOrderNumber)
-            .ToListAsync(cancellationToken);
-
-        return approvedOrders
-            .SelectMany(order => order.Lines
-                .Where(line => !line.QuantityRemaining.IsZero)
-                .Select(line => new ApprovedPurchaseOrderLineResponse(
-                    order.Id.Value,
-                    order.PurchaseOrderNumber,
-                    line.Id.Value,
-                    order.Warehouse.Id.Value,
-                    order.Warehouse.Code,
-                    order.Warehouse.Name,
-                    line.InventoryItem.Id.Value,
-                    line.InventoryItem.Sku,
-                    line.InventoryItem.Name,
-                    line.QuantityOrdered.Value,
-                    line.QuantityReserved.Value,
-                    line.QuantityRemaining.Value)))
-            .OrderBy(line => line.PurchaseOrderNumber)
-            .ThenBy(line => line.Sku)
-            .ToList();
     }
 
     private static PurchaseOrderResponse ToResponse(PurchaseOrder order)

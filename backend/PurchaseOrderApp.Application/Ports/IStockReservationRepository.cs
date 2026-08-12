@@ -16,11 +16,6 @@ public interface IStockReservationRepository
     Task<StockReservation?> GetAsync(StockReservationId stockReservationId, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Gets a stock reservation read model by id.
-    /// </summary>
-    Task<ReservationResponse?> GetResponseAsync(StockReservationId stockReservationId, CancellationToken cancellationToken);
-
-    /// <summary>
     /// Lists stock reservation read models.
     /// </summary>
     Task<List<ReservationResponse>> ListResponsesAsync(WarehouseId? warehouseId, ReservationStatus? status, CancellationToken cancellationToken);

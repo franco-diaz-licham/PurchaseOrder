@@ -1,25 +1,22 @@
+using PurchaseOrderApp.Application.Models;
 using PurchaseOrderApp.Domain.Entities;
 using PurchaseOrderApp.Domain.ValueObjects;
 
 namespace PurchaseOrderApp.Application.Ports;
 
 /// <summary>
-/// Loads and persists warehouse aggregate roots.
+/// Loads warehouse read models and warehouse aggregate roots.
 /// </summary>
 public interface IWarehouseRepository
 {
     /// <summary>
-    /// Lists all warehouses.
+    /// Lists all warehouses as read models.
     /// </summary>
-    Task<List<Warehouse>> ListAsync(CancellationToken cancellationToken);
+    Task<List<WarehouseResponse>> ListResponsesAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Gets a warehouse by id.
     /// </summary>
     Task<Warehouse?> GetAsync(WarehouseId warehouseId, CancellationToken cancellationToken);
 
-    /// <summary>
-    /// Adds a warehouse to the current unit of work.
-    /// </summary>
-    Task AddAsync(Warehouse warehouse, CancellationToken cancellationToken);
 }

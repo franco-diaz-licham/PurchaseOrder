@@ -33,21 +33,6 @@ export type PurchaseOrderSummaryDto = {
   totalAmount: number;
 };
 
-export type ApprovedPurchaseOrderLineDto = {
-  purchaseOrderId: string;
-  purchaseOrderNumber: string;
-  purchaseOrderLineId: string;
-  warehouseId: string;
-  warehouseCode: string;
-  warehouseName: string;
-  inventoryItemId: string;
-  sku: string;
-  itemName: string;
-  quantityOrdered: number;
-  quantityReserved: number;
-  quantityRemaining: number;
-};
-
 export type SubmitPurchaseOrderRequestDto = {
   warehouseId: string;
   user: string;
