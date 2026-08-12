@@ -10,14 +10,10 @@ import { useInventoryItemsQuery, useWarehousesQuery, useWarehouseStockQuery } fr
 import { findInventoryItem, findWarehouse } from '@/features/catalog/utils/catalogLookup';
 import { useCreateReservationMutation, useReleaseReservationMutation, useReservationsQuery } from '@/features/reservations/queries/reservation.queries';
 import { useFinanceNavigationStore } from '@/features/reports/stores/financeNavigation.store';
+import { formatMoney } from '@/lib/formatMoney';
 import { AddPurchaseOrderLineDialog, type AddPurchaseOrderLineFormValues } from '../components/AddPurchaseOrderLineDialog';
 import { ManageReservationsDialog } from '../components/ManageReservationsDialog';
 import { useAddPurchaseOrderLineMutation, usePurchaseOrderQuery, usePurchaseOrderStatusMutation, useRemovePurchaseOrderLineMutation } from '../queries/purchaseOrder.queries';
-
-const money = new Intl.NumberFormat('en-AU', {
-  style: 'currency',
-  currency: 'AUD'
-});
 
 export const PurchaseOrderDetailPage = () => {
   const { purchaseOrderId } = useParams();
@@ -37,8 +33,12 @@ export const PurchaseOrderDetailPage = () => {
   const warehouse = purchaseOrder ? findWarehouse(warehousesQuery.data, purchaseOrder.warehouseId) : undefined;
   const canChangeLines = purchaseOrder !== undefined && purchaseOrder.status !== 'Closed' && purchaseOrder.status !== 'Cancelled';
   const canReserveStock = purchaseOrder?.status === 'Approved';
-  const reservationsQuery = useReservationsQuery(purchaseOrder?.warehouseId, 'Active', canReserveStock);
-  const activeReservations = useMemo(() => reservationsQuery.data ?? [], [reservationsQuery.data]);
+  const reservationsQuery = useReservationsQuery(canReserveStock);
+  const activeReservations = useMemo(() => {
+    const reservations = reservationsQuery.data ?? [];
+    if (!purchaseOrder) return [];
+    return reservations.filter((reservation) => reservation.warehouseId === purchaseOrder.warehouseId && reservation.status === 'Active');
+  }, [purchaseOrder, reservationsQuery.data]);
   const stockByItemId = useMemo(() => new Map((warehouseStockQuery.data ?? []).map((stock) => [stock.inventoryItemId, stock])), [warehouseStockQuery.data]);
   const existingLineItemIds = useMemo(() => new Set((purchaseOrder?.lines ?? []).map((line) => line.inventoryItemId)), [purchaseOrder?.lines]);
   const availableItemsToAdd = useMemo(() => (itemsQuery.data ?? []).filter((item) => !existingLineItemIds.has(item.id)), [existingLineItemIds, itemsQuery.data]);
@@ -161,15 +161,15 @@ export const PurchaseOrderDetailPage = () => {
             <div className="grid gap-3 border-b p-4 text-sm md:grid-cols-3">
               <div>
                 <p className="text-xs uppercase text-muted-foreground">Subtotal</p>
-                <p className="mt-1 font-semibold">{money.format(purchaseOrder.subtotalAmount)}</p>
+                <p className="mt-1 font-semibold">{formatMoney(purchaseOrder.subtotalAmount)}</p>
               </div>
               <div>
                 <p className="text-xs uppercase text-muted-foreground">GST</p>
-                <p className="mt-1 font-semibold">{money.format(purchaseOrder.gstAmount)}</p>
+                <p className="mt-1 font-semibold">{formatMoney(purchaseOrder.gstAmount)}</p>
               </div>
               <div>
                 <p className="text-xs uppercase text-muted-foreground">Total</p>
-                <p className="mt-1 font-semibold">{money.format(purchaseOrder.totalAmount)}</p>
+                <p className="mt-1 font-semibold">{formatMoney(purchaseOrder.totalAmount)}</p>
               </div>
             </div>
           </article>
@@ -214,8 +214,8 @@ export const PurchaseOrderDetailPage = () => {
                           <td className="px-4 py-3">{line.quantityOrdered}</td>
                           <td className="px-4 py-3">{line.quantityReserved}</td>
                           <td className="px-4 py-3">{line.quantityRemaining}</td>
-                          <td className="px-4 py-3">{money.format(line.unitCost)}</td>
-                          <td className="px-4 py-3">{money.format(line.lineAmount)}</td>
+                          <td className="px-4 py-3">{formatMoney(line.unitCost)}</td>
+                          <td className="px-4 py-3">{formatMoney(line.lineAmount)}</td>
                           {canChangeLines && (
                             <td className="px-4 py-3">
                               <AppButton

@@ -2,13 +2,8 @@ import type { ApiResponse } from '@/lib/api/api.types';
 import http from '@/lib/api/http';
 import type { CreateReservationRequestDto, ReleaseReservationRequestDto, ReservationDto } from '../types/reservation.api.types';
 
-export const listReservations = async (warehouseId?: string, status?: string) => {
-  const response = await http.get<ApiResponse<ReservationDto[]>>('/reservation', {
-    params: {
-      warehouseId: warehouseId || undefined,
-      status: status || undefined
-    }
-  });
+export const listReservations = async () => {
+  const response = await http.get<ApiResponse<ReservationDto[]>>('/reservation');
   return response.data.data;
 };
 

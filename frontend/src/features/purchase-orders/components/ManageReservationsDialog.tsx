@@ -4,12 +4,8 @@ import { AppButton } from '@/components/ui/AppButton';
 import { AppField } from '@/components/ui/AppField';
 import { AppInput } from '@/components/ui/AppInput';
 import type { Reservation } from '@/features/reservations/types/reservation.types';
+import { formatMoney } from '@/lib/formatMoney';
 import type { PurchaseOrderLine } from '../types/purchaseOrder.types';
-
-const money = new Intl.NumberFormat('en-AU', {
-  style: 'currency',
-  currency: 'AUD'
-});
 
 const dateTime = new Intl.DateTimeFormat('en-AU', {
   dateStyle: 'short',
@@ -117,7 +113,7 @@ export const ManageReservationsDialog = ({ availableQuantity, isReleasing, isRes
                     <td className="px-4 py-3">
                       {reservation.quantityReserved} {quantityUnit}
                     </td>
-                    <td className="px-4 py-3">{money.format(reservation.unitCostSnapshot)}</td>
+                    <td className="px-4 py-3">{formatMoney(reservation.unitCostSnapshot)}</td>
                     <td className="px-4 py-3">{reservation.reservedBy}</td>
                     <td className="px-4 py-3">{dateTime.format(reservation.reservedAt)}</td>
                     <td className="px-4 py-3">

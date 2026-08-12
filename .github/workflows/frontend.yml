@@ -12,7 +12,6 @@ env:
   AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
   VITE_API_BASE_URL: ${{ secrets.API_BASE_URL }}
   VITE_APP_NAME: PurchaseOrderApp
-  VITE_PRIMEREACT_LICENSE_KEY: ${{ secrets.PRIMEREACT_LICENSE_KEY }}
 
 jobs:
   build-and-deploy:

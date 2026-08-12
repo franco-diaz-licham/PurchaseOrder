@@ -5,11 +5,7 @@ import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { PageHeader } from '@/components/common/PageHeader';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppInput } from '@/components/ui/AppInput';
-
-const money = new Intl.NumberFormat('en-AU', {
-  style: 'currency',
-  currency: 'AUD'
-});
+import { formatMoney } from '@/lib/formatMoney';
 
 export const InventoryItemsPage = () => {
   const itemsQuery = useInventoryItemsQuery();
@@ -58,7 +54,7 @@ export const InventoryItemsPage = () => {
                       <td className="px-4 py-3">{item.name}</td>
                       <td className="px-4 py-3">{item.category}</td>
                       <td className="px-4 py-3">{item.trackingMode}</td>
-                      <td className="px-4 py-3">{money.format(item.standardCost)}</td>
+                      <td className="px-4 py-3">{formatMoney(item.standardCost)}</td>
                       <td className="px-4 py-3">
                         <form className="flex items-center gap-2" onSubmit={(event) => changeStandardCost(event, item.id)}>
                           <AppInput className="w-28" defaultValue={item.standardCost} min="0" name="standardCost" step="0.01" type="number" />

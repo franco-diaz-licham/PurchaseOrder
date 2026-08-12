@@ -6,13 +6,13 @@ import type { CreateReservationCommand, ReleaseReservationCommand } from '../typ
 
 export const reservationKeys = {
   all: ['reservations'] as const,
-  list: (warehouseId?: string, status?: string) => ['reservations', warehouseId ?? 'all', status ?? 'all'] as const
+  list: () => ['reservations', 'list'] as const
 };
 
-export const useReservationsQuery = (warehouseId?: string, status?: string, enabled = true) =>
+export const useReservationsQuery = (enabled = true) =>
   useQuery({
-    queryKey: reservationKeys.list(warehouseId, status),
-    queryFn: async () => toReservations(await listReservations(warehouseId, status)),
+    queryKey: reservationKeys.list(),
+    queryFn: async () => toReservations(await listReservations()),
     enabled
   });
 

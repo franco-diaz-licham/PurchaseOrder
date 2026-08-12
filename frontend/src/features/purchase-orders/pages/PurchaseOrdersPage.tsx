@@ -9,14 +9,10 @@ import { AppButton } from '@/components/ui/AppButton';
 import { AppSelect } from '@/components/ui/AppSelect';
 import { useWarehousesQuery } from '@/features/catalog/queries/catalog.queries';
 import { findWarehouse } from '@/features/catalog/utils/catalogLookup';
+import { formatMoney } from '@/lib/formatMoney';
 import { CreatePurchaseOrderDialog, type CreatePurchaseOrderFormValues } from '../components/CreatePurchaseOrderDialog';
 import { usePurchaseOrderSummariesQuery, useSubmitPurchaseOrderMutation } from '../queries/purchaseOrder.queries';
 import { usePurchaseOrderListStore } from '../stores/purchaseOrderList.store';
-
-const money = new Intl.NumberFormat('en-AU', {
-  style: 'currency',
-  currency: 'AUD'
-});
 
 export const PurchaseOrdersPage = () => {
   const warehouseFilter = usePurchaseOrderListStore((state) => state.selectedWarehouseId);
@@ -117,7 +113,7 @@ export const PurchaseOrdersPage = () => {
                         <td className="px-4 py-3">{order.quantityOrdered}</td>
                         <td className="px-4 py-3">{order.quantityReserved}</td>
                         <td className="px-4 py-3">{order.quantityRemaining}</td>
-                        <td className="px-4 py-3 font-semibold">{money.format(order.totalAmount)}</td>
+                        <td className="px-4 py-3 font-semibold">{formatMoney(order.totalAmount)}</td>
                       </tr>
                     );
                   })}
