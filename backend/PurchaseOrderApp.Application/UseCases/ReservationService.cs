@@ -2,7 +2,6 @@ using PurchaseOrderApp.Application.Helpers;
 using PurchaseOrderApp.Application.Models;
 using PurchaseOrderApp.Application.Ports;
 using PurchaseOrderApp.Domain.Core;
-using PurchaseOrderApp.Domain.Enums;
 using PurchaseOrderApp.Domain.Services;
 using PurchaseOrderApp.Domain.ValueObjects;
 
@@ -14,9 +13,9 @@ namespace PurchaseOrderApp.Application.UseCases;
 public interface IReservationService
 {
     /// <summary>
-    /// Lists reservations, optionally filtered by warehouse and status.
+    /// Lists stock reservations.
     /// </summary>
-    Task<Result<List<ReservationResponse>>> ListAsync(WarehouseId? warehouseId, ReservationStatus? status, CancellationToken cancellationToken);
+    Task<Result<List<ReservationResponse>>> ListAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Reserves stock against an approved purchase order line.
@@ -36,11 +35,9 @@ public sealed class ReservationService(
     IStockReservationRepository stockReservationRepository,
     IUnitOfWork unitOfWork) : IReservationService
 {
-    public async Task<Result<List<ReservationResponse>>> ListAsync(WarehouseId? warehouseId, ReservationStatus? status, CancellationToken cancellationToken)
+    public async Task<Result<List<ReservationResponse>>> ListAsync(CancellationToken cancellationToken)
     {
-        if (warehouseId is not null && warehouseId.Value.Value == Guid.Empty) return Result.Fail<List<ReservationResponse>>("Warehouse id is required.", ResultStatus.Invalid);
-
-        var reservations = await stockReservationRepository.ListResponsesAsync(warehouseId, status, cancellationToken);
+        var reservations = await stockReservationRepository.ListResponsesAsync(cancellationToken);
         return Result.Success(reservations);
     }
 

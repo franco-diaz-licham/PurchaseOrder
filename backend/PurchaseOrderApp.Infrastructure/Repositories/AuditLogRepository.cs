@@ -1,26 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using PurchaseOrderApp.Application.Models;
 using PurchaseOrderApp.Application.Ports;
-using PurchaseOrderApp.Domain.ValueObjects;
 
 namespace PurchaseOrderApp.Infrastructure.Repositories;
 
 public sealed class AuditLogRepository(DatabaseContext db) : IAuditLogRepository
 {
-    public async Task<List<AuditLogResponse>> ListAsync(WarehouseId? warehouseId, CancellationToken cancellationToken)
+    public Task<List<AuditLogResponse>> ListAsync(CancellationToken cancellationToken)
     {
-        var query = db.AuditLogEntries.AsNoTracking();
-
-        if (warehouseId is not null)
-        {
-            query = query.Where(entry => entry.WarehouseId == warehouseId.Value);
-        }
-
-        var entries = await query
+        return db.AuditLogEntries
+            .AsNoTracking()
             .OrderByDescending(entry => entry.CreatedAt)
-            .ToListAsync(cancellationToken);
-
-        return entries
             .Select(entry => new AuditLogResponse(
                 entry.Id.Value,
                 entry.Action.ToString(),
@@ -32,6 +22,6 @@ public sealed class AuditLogRepository(DatabaseContext db) : IAuditLogRepository
                 entry.ResultingAvailableQuantity.Value,
                 entry.CreatedBy,
                 entry.CreatedAt))
-            .ToList();
+            .ToListAsync(cancellationToken);
     }
 }

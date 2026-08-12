@@ -1,6 +1,5 @@
 using PurchaseOrderApp.Application.Models;
 using PurchaseOrderApp.Domain.Entities;
-using PurchaseOrderApp.Domain.Enums;
 using PurchaseOrderApp.Domain.ValueObjects;
 
 namespace PurchaseOrderApp.Application.Ports;
@@ -18,7 +17,7 @@ public interface IStockReservationRepository
     /// <summary>
     /// Lists stock reservation read models.
     /// </summary>
-    Task<List<ReservationResponse>> ListResponsesAsync(WarehouseId? warehouseId, ReservationStatus? status, CancellationToken cancellationToken);
+    Task<List<ReservationResponse>> ListResponsesAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Gets the active reserved quantity for one inventory item at one warehouse.

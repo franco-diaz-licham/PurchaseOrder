@@ -14,13 +14,10 @@ public sealed class StockReservationRepository(DatabaseContext db) : IStockReser
         return db.StockReservations.SingleOrDefaultAsync(reservation => reservation.Id == stockReservationId, cancellationToken);
     }
 
-    public async Task<List<ReservationResponse>> ListResponsesAsync(WarehouseId? warehouseId, ReservationStatus? status, CancellationToken cancellationToken)
+    public async Task<List<ReservationResponse>> ListResponsesAsync(CancellationToken cancellationToken)
     {
-        var query = db.StockReservations.AsNoTracking();
-        if (warehouseId is not null) query = query.Where(reservation => reservation.WarehouseId == warehouseId.Value);
-        if (status is not null) query = query.Where(reservation => reservation.Status == status.Value);
-
-        var reservations = await query
+        var reservations = await db.StockReservations
+            .AsNoTracking()
             .OrderBy(reservation => reservation.Status)
             .ThenBy(reservation => reservation.Id)
             .Select(reservation => new ReservationProjection(
