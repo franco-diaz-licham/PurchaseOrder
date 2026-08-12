@@ -13,6 +13,14 @@ export type InventoryItemDto = {
   standardCost: number;
 };
 
+export type WarehouseStockDto = {
+  warehouseId: string;
+  inventoryItemId: string;
+  onHandQuantity: number;
+  activeReservedQuantity: number;
+  availableQuantity: number;
+};
+
 export type ChangeInventoryItemStandardCostRequestDto = {
   standardCost: number;
   user: string;

@@ -51,7 +51,6 @@ export const toApprovedPurchaseOrderLine = (dto: ApprovedPurchaseOrderLineDto): 
 export const toApprovedPurchaseOrderLines = (dtos: ApprovedPurchaseOrderLineDto[]): ApprovedPurchaseOrderLine[] => dtos.map(toApprovedPurchaseOrderLine);
 
 export const toSubmitPurchaseOrderRequestDto = (command: SubmitPurchaseOrderCommand): SubmitPurchaseOrderRequestDto => ({
-  purchaseOrderNumber: command.purchaseOrderNumber,
   warehouseId: command.warehouseId,
   user: command.user,
   lines: command.lines.map((line) => ({

@@ -3,7 +3,6 @@ using PurchaseOrderApp.Domain.ValueObjects;
 namespace PurchaseOrderApp.Application.Models;
 
 public sealed record SubmitPurchaseOrderCommand(
-    string PurchaseOrderNumber,
     WarehouseId WarehouseId,
     List<SubmitPurchaseOrderLineCommand> Lines,
     string User,

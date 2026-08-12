@@ -27,12 +27,12 @@ public interface IPurchaseOrderRepository
     /// <summary>
     /// Lists lightweight purchase order summaries for list screens.
     /// </summary>
-    Task<List<PurchaseOrderSummaryResponse>> ListSummariesAsync(WarehouseId? warehouseId, CancellationToken cancellationToken);
+    Task<List<PurchaseOrderSummaryResponse>> ListSummariesAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Lists purchase order read models.
     /// </summary>
-    Task<List<PurchaseOrderResponse>> ListResponsesAsync(WarehouseId? warehouseId, CancellationToken cancellationToken);
+    Task<List<PurchaseOrderResponse>> ListResponsesAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Adds a purchase order to the current unit of work.

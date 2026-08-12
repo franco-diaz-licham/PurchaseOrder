@@ -41,7 +41,6 @@ export type ApprovedPurchaseOrderLineDto = {
 };
 
 export type SubmitPurchaseOrderRequestDto = {
-  purchaseOrderNumber: string;
   warehouseId: string;
   user: string;
   lines: Array<{

@@ -5,22 +5,22 @@ import type { AddPurchaseOrderLineCommand, ChangePurchaseOrderStatusCommand, Sub
 
 export const purchaseOrderKeys = {
   all: ['purchase-orders'] as const,
-  list: (warehouseId?: string) => ['purchase-orders', warehouseId ?? 'all'] as const,
-  summaries: (warehouseId?: string) => ['purchase-orders', 'summary', warehouseId ?? 'all'] as const,
+  list: ['purchase-orders', 'list'] as const,
+  summaries: ['purchase-orders', 'summary'] as const,
   detail: (purchaseOrderId: string) => ['purchase-orders', 'detail', purchaseOrderId] as const,
   approvedLines: (warehouseId: string) => ['approved-lines', warehouseId] as const
 };
 
-export const usePurchaseOrdersQuery = (warehouseId?: string) =>
+export const usePurchaseOrdersQuery = () =>
   useQuery({
-    queryKey: purchaseOrderKeys.list(warehouseId),
-    queryFn: async () => toPurchaseOrders(await listPurchaseOrders(warehouseId))
+    queryKey: purchaseOrderKeys.list,
+    queryFn: async () => toPurchaseOrders(await listPurchaseOrders())
   });
 
-export const usePurchaseOrderSummariesQuery = (warehouseId?: string) =>
+export const usePurchaseOrderSummariesQuery = () =>
   useQuery({
-    queryKey: purchaseOrderKeys.summaries(warehouseId),
-    queryFn: async () => toPurchaseOrderSummaries(await listPurchaseOrderSummaries(warehouseId))
+    queryKey: purchaseOrderKeys.summaries,
+    queryFn: async () => toPurchaseOrderSummaries(await listPurchaseOrderSummaries())
   });
 
 export const usePurchaseOrderQuery = (purchaseOrderId: string | undefined) =>

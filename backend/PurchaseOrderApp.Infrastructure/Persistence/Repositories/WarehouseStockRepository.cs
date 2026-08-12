@@ -15,6 +15,15 @@ public sealed class WarehouseStockRepository(DatabaseContext db) : IWarehouseSto
             cancellationToken);
     }
 
+    public Task<List<WarehouseStock>> ListAsync(WarehouseId warehouseId, CancellationToken cancellationToken)
+    {
+        return db.WarehouseStock
+            .AsNoTracking()
+            .Where(stock => stock.WarehouseId == warehouseId)
+            .OrderBy(stock => stock.InventoryItemId)
+            .ToListAsync(cancellationToken);
+    }
+
     public Task<WarehouseStock?> GetForUpdateAsync(WarehouseId warehouseId, InventoryItemId inventoryItemId, CancellationToken cancellationToken)
     {
         return db.WarehouseStock

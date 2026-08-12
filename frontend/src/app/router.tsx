@@ -11,7 +11,6 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate replace to="/purchase-orders" /> },
       { path: '/purchase-orders', element: <PurchaseOrdersPage /> },
-      { path: '/purchase-orders/new', element: <PurchaseOrderDetailPage /> },
       { path: '/purchase-orders/:purchaseOrderId', element: <PurchaseOrderDetailPage /> },
       { path: '/finance', element: <FinancePage /> },
       { path: '/audit-log', element: <AuditLogPage /> }

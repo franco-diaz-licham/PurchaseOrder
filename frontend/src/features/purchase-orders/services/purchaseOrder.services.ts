@@ -2,17 +2,13 @@ import type { ApiResponse } from '@/lib/api/api.types';
 import http from '@/lib/api/http';
 import type { AddPurchaseOrderLineRequestDto, ApprovedPurchaseOrderLineDto, ChangePurchaseOrderStatusRequestDto, PurchaseOrderDto, PurchaseOrderSummaryDto, SubmitPurchaseOrderRequestDto } from '../types/purchaseOrder.api.types';
 
-export const listPurchaseOrders = async (warehouseId?: string) => {
-  const response = await http.get<ApiResponse<PurchaseOrderDto[]>>('/purchase-order', {
-    params: warehouseId ? { warehouseId } : undefined
-  });
+export const listPurchaseOrders = async () => {
+  const response = await http.get<ApiResponse<PurchaseOrderDto[]>>('/purchase-order');
   return response.data.data;
 };
 
-export const listPurchaseOrderSummaries = async (warehouseId?: string) => {
-  const response = await http.get<ApiResponse<PurchaseOrderSummaryDto[]>>('/purchase-order/summary', {
-    params: warehouseId ? { warehouseId } : undefined
-  });
+export const listPurchaseOrderSummaries = async () => {
+  const response = await http.get<ApiResponse<PurchaseOrderSummaryDto[]>>('/purchase-order/summary');
   return response.data.data;
 };
 
@@ -22,9 +18,7 @@ export const getPurchaseOrder = async (purchaseOrderId: string) => {
 };
 
 export const listApprovedPurchaseOrderLines = async (warehouseId: string) => {
-  const response = await http.get<ApiResponse<ApprovedPurchaseOrderLineDto[]>>('/purchase-order/approved-lines', {
-    params: { warehouseId }
-  });
+  const response = await http.get<ApiResponse<ApprovedPurchaseOrderLineDto[]>>(`/purchase-order/warehouses/${warehouseId}/approved-lines`);
   return response.data.data;
 };
 

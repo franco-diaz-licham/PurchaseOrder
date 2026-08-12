@@ -33,16 +33,11 @@ public sealed class PurchaseOrderRepository(DatabaseContext db) : IPurchaseOrder
         return purchaseOrder is null ? null : ToResponse(purchaseOrder);
     }
 
-    public async Task<List<PurchaseOrderResponse>> ListResponsesAsync(WarehouseId? warehouseId, CancellationToken cancellationToken)
+    public async Task<List<PurchaseOrderResponse>> ListResponsesAsync(CancellationToken cancellationToken)
     {
-        var query = db.PurchaseOrders
+        var purchaseOrders = await db.PurchaseOrders
             .AsNoTracking()
             .Include(order => order.Lines)
-            .AsQueryable();
-
-        if (warehouseId is not null) query = query.Where(order => order.WarehouseId == warehouseId.Value);
-
-        var purchaseOrders = await query
             .OrderBy(order => order.PurchaseOrderNumber)
             .ToListAsync(cancellationToken);
 
@@ -51,16 +46,11 @@ public sealed class PurchaseOrderRepository(DatabaseContext db) : IPurchaseOrder
             .ToList();
     }
 
-    public async Task<List<PurchaseOrderSummaryResponse>> ListSummariesAsync(WarehouseId? warehouseId, CancellationToken cancellationToken)
+    public async Task<List<PurchaseOrderSummaryResponse>> ListSummariesAsync(CancellationToken cancellationToken)
     {
-        var query = db.PurchaseOrders
+        var purchaseOrders = await db.PurchaseOrders
             .AsNoTracking()
             .Include(order => order.Lines)
-            .AsQueryable();
-
-        if (warehouseId is not null) query = query.Where(order => order.WarehouseId == warehouseId.Value);
-
-        var purchaseOrders = await query
             .OrderBy(order => order.PurchaseOrderNumber)
             .ToListAsync(cancellationToken);
 

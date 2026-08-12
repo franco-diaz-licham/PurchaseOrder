@@ -58,7 +58,7 @@ public sealed class PurchaseOrder : Entity<PurchaseOrderId>
     /// </summary>
     public bool HasOutstandingLines => _lines.Any(line => line.HasOutstandingQuantity);
 
-    public static PurchaseOrder CreateDraft(
+    public static PurchaseOrder CreatePending(
         string purchaseOrderNumber,
         WarehouseId warehouseId,
         string user,
@@ -68,7 +68,7 @@ public sealed class PurchaseOrder : Entity<PurchaseOrderId>
             new PurchaseOrderId(Guid.NewGuid()),
             purchaseOrderNumber,
             warehouseId,
-            PurchaseOrderStatus.Draft,
+            PurchaseOrderStatus.Pending,
             user,
             occurredAt);
     }

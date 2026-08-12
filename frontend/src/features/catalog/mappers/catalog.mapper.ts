@@ -1,5 +1,5 @@
-import type { ChangeInventoryItemStandardCostRequestDto, InventoryItemDto, WarehouseDto } from '../types/catalog.api.types';
-import type { ChangeInventoryItemStandardCostCommand, InventoryItem, Warehouse } from '../types/catalog.types';
+import type { ChangeInventoryItemStandardCostRequestDto, InventoryItemDto, WarehouseDto, WarehouseStockDto } from '../types/catalog.api.types';
+import type { ChangeInventoryItemStandardCostCommand, InventoryItem, Warehouse, WarehouseStock } from '../types/catalog.types';
 
 export const toWarehouse = (dto: WarehouseDto): Warehouse => ({
   id: dto.warehouseId,
@@ -21,6 +21,16 @@ export const toInventoryItem = (dto: InventoryItemDto): InventoryItem => ({
 });
 
 export const toInventoryItems = (dtos: InventoryItemDto[]): InventoryItem[] => dtos.map(toInventoryItem);
+
+export const toWarehouseStock = (dto: WarehouseStockDto): WarehouseStock => ({
+  warehouseId: dto.warehouseId,
+  inventoryItemId: dto.inventoryItemId,
+  onHandQuantity: dto.onHandQuantity,
+  activeReservedQuantity: dto.activeReservedQuantity,
+  availableQuantity: dto.availableQuantity
+});
+
+export const toWarehouseStockList = (dtos: WarehouseStockDto[]): WarehouseStock[] => dtos.map(toWarehouseStock);
 
 export const toChangeInventoryItemStandardCostRequestDto = (command: ChangeInventoryItemStandardCostCommand): ChangeInventoryItemStandardCostRequestDto => ({
   standardCost: command.standardCost,

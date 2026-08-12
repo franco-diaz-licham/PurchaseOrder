@@ -5,7 +5,7 @@ namespace PurchaseOrderApp.Domain.Enums;
 /// </summary>
 public enum PurchaseOrderStatus
 {
-    Draft = 1,
+    Pending = 1,
     Approved = 2,
     Closed = 3,
     Cancelled = 4

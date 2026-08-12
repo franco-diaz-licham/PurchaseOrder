@@ -15,6 +15,14 @@ export type InventoryItem = {
   displayName: string;
 };
 
+export type WarehouseStock = {
+  warehouseId: string;
+  inventoryItemId: string;
+  onHandQuantity: number;
+  activeReservedQuantity: number;
+  availableQuantity: number;
+};
+
 export type ChangeInventoryItemStandardCostCommand = {
   inventoryItemId: string;
   standardCost: number;

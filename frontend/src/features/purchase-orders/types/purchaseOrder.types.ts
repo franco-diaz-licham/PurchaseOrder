@@ -42,7 +42,6 @@ export type ApprovedPurchaseOrderLine = {
 };
 
 export type SubmitPurchaseOrderCommand = {
-  purchaseOrderNumber: string;
   warehouseId: string;
   user: string;
   lines: Array<{
