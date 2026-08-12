@@ -5,7 +5,7 @@ import { AppButton } from '@/components/ui/AppButton';
 import { AppField } from '@/components/ui/AppField';
 import { AppInput } from '@/components/ui/AppInput';
 import { AppSelect } from '@/components/ui/AppSelect';
-import type { Warehouse } from '@/features/catalog/types/catalog.types';
+import type { WarehouseModel } from '@/features/catalog/types/catalog.types';
 
 export type CreatePurchaseOrderFormValues = {
   warehouseId: string;
@@ -15,7 +15,7 @@ export type CreatePurchaseOrderFormValues = {
 type CreatePurchaseOrderDialogProps = {
   isError: boolean;
   isSaving: boolean;
-  warehouses: Warehouse[];
+  warehouses: WarehouseModel[];
   onCancel: () => void;
   onSubmit: (values: CreatePurchaseOrderFormValues) => Promise<void>;
 };
@@ -48,7 +48,7 @@ export const CreatePurchaseOrderDialog = ({ isError, isSaving, warehouses, onCan
         <div className="grid gap-3 p-4">
           {isError && <ErrorMessage message="Purchase order could not be created." />}
 
-          <AppField label="Warehouse">
+          <AppField label="WarehouseModel">
             <AppSelect autoFocus required {...form.register('warehouseId')}>
               <option value="">Select warehouse</option>
               {warehouses.map((warehouse) => (

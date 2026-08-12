@@ -4,7 +4,7 @@ import { AppButton } from '@/components/ui/AppButton';
 import { AppField } from '@/components/ui/AppField';
 import { AppInput } from '@/components/ui/AppInput';
 import { AppSelect } from '@/components/ui/AppSelect';
-import type { InventoryItem } from '@/features/catalog/types/catalog.types';
+import type { InventoryItemModel } from '@/features/catalog/types/catalog.types';
 
 export type AddPurchaseOrderLineFormValues = {
   inventoryItemId: string;
@@ -13,7 +13,7 @@ export type AddPurchaseOrderLineFormValues = {
 };
 
 type AddPurchaseOrderLineDialogProps = {
-  inventoryItems: InventoryItem[];
+  inventoryItems: InventoryItemModel[];
   isSaving: boolean;
   onCancel: () => void;
   onSubmit: (values: AddPurchaseOrderLineFormValues) => Promise<void>;

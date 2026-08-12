@@ -82,7 +82,7 @@ export const PurchaseOrdersPage = () => {
                 <thead className="bg-muted text-xs uppercase text-muted-foreground">
                   <tr>
                     <th className="px-4 py-3">PO number</th>
-                    <th className="px-4 py-3">Warehouse</th>
+                    <th className="px-4 py-3">WarehouseModel</th>
                     <th className="px-4 py-3">Status</th>
                     <th className="px-4 py-3">Lines</th>
                     <th className="px-4 py-3">Ordered</th>

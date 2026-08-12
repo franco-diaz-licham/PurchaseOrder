@@ -1,7 +1,7 @@
 import type { CreateReservationRequestDto, ReleaseReservationRequestDto, ReservationDto } from '../types/reservation.api.types';
-import type { CreateReservationCommand, ReleaseReservationCommand, Reservation } from '../types/reservation.types';
+import type { CreateReservationModel, ReleaseReservationModel, ReservationModel } from '../types/reservation.types';
 
-export const toReservation = (dto: ReservationDto): Reservation => ({
+export const toReservation = (dto: ReservationDto): ReservationModel => ({
   id: dto.stockReservationId,
   purchaseOrderLineId: dto.purchaseOrderLineId,
   warehouseId: dto.warehouseId,
@@ -13,16 +13,16 @@ export const toReservation = (dto: ReservationDto): Reservation => ({
   reservedAt: new Date(dto.reservedAt)
 });
 
-export const toReservations = (dtos: ReservationDto[]): Reservation[] => dtos.map(toReservation);
+export const toReservations = (dtos: ReservationDto[]): ReservationModel[] => dtos.map(toReservation);
 
-export const toCreateReservationRequestDto = (command: CreateReservationCommand): CreateReservationRequestDto => ({
+export const toCreateReservationRequestDto = (command: CreateReservationModel): CreateReservationRequestDto => ({
   purchaseOrderLineId: command.purchaseOrderLineId,
   warehouseId: command.warehouseId,
   quantity: command.quantity,
   user: command.user
 });
 
-export const toReleaseReservationRequestDto = (command: ReleaseReservationCommand): ReleaseReservationRequestDto => ({
+export const toReleaseReservationRequestDto = (command: ReleaseReservationModel): ReleaseReservationRequestDto => ({
   quantity: command.quantity,
   user: command.user
 });

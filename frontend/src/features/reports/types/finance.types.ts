@@ -1,4 +1,4 @@
-export type WarehouseCommittedValue = {
+export type WarehouseCommittedValueModel = {
   warehouseId: string;
   warehouseCode: string;
   warehouseName: string;
@@ -6,10 +6,10 @@ export type WarehouseCommittedValue = {
   reservedQuantity: number;
   reservationCount: number;
   committedValue: number;
-  reservations: WarehouseCommittedReservation[];
+  reservations: WarehouseCommittedReservationModel[];
 };
 
-export type WarehouseCommittedReservation = {
+export type WarehouseCommittedReservationModel = {
   stockReservationId: string;
   purchaseOrderId: string;
   purchaseOrderNumber: string;

@@ -1,4 +1,4 @@
-export type PurchaseOrderLine = {
+export type PurchaseOrderLineModel = {
   id: string;
   inventoryItemId: string;
   quantityOrdered: number;
@@ -8,7 +8,7 @@ export type PurchaseOrderLine = {
   lineAmount: number;
 };
 
-export type PurchaseOrder = {
+export type PurchaseOrderModel = {
   id: string;
   number: string;
   warehouseId: string;
@@ -16,10 +16,10 @@ export type PurchaseOrder = {
   subtotalAmount: number;
   gstAmount: number;
   totalAmount: number;
-  lines: PurchaseOrderLine[];
+  lines: PurchaseOrderLineModel[];
 };
 
-export type PurchaseOrderSummary = {
+export type PurchaseOrderSummaryModel = {
   id: string;
   number: string;
   warehouseId: string;
@@ -33,7 +33,7 @@ export type PurchaseOrderSummary = {
   totalAmount: number;
 };
 
-export type SubmitPurchaseOrderCommand = {
+export type SubmitPurchaseOrderModel = {
   warehouseId: string;
   user: string;
   lines: Array<{
@@ -42,20 +42,20 @@ export type SubmitPurchaseOrderCommand = {
   }>;
 };
 
-export type AddPurchaseOrderLineCommand = {
+export type AddPurchaseOrderLineModel = {
   purchaseOrderId: string;
   inventoryItemId: string;
   quantityOrdered: number;
   user: string;
 };
 
-export type RemovePurchaseOrderLineCommand = {
+export type RemovePurchaseOrderLineModel = {
   purchaseOrderId: string;
   purchaseOrderLineId: string;
   user: string;
 };
 
-export type ChangePurchaseOrderStatusCommand = {
+export type ChangePurchaseOrderStatusModel = {
   purchaseOrderId: string;
   status: 'approve' | 'close' | 'cancel';
   user: string;

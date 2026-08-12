@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { catalogKeys } from '@/features/catalog/queries/catalog.queries';
 import { toAddPurchaseOrderLineRequestDto, toChangePurchaseOrderStatusRequestDto, toPurchaseOrder, toPurchaseOrderSummaries, toRemovePurchaseOrderLineRequestDto, toSubmitPurchaseOrderRequestDto } from '../mappers/purchaseOrder.mapper';
 import { addPurchaseOrderLine, changePurchaseOrderStatus, getPurchaseOrder, listPurchaseOrderSummaries, removePurchaseOrderLine, submitPurchaseOrder } from '../services/purchaseOrder.services';
-import type { AddPurchaseOrderLineCommand, ChangePurchaseOrderStatusCommand, RemovePurchaseOrderLineCommand, SubmitPurchaseOrderCommand } from '../types/purchaseOrder.types';
+import type { AddPurchaseOrderLineModel, ChangePurchaseOrderStatusModel, RemovePurchaseOrderLineModel, SubmitPurchaseOrderModel } from '../types/purchaseOrder.types';
 
 export const purchaseOrderKeys = {
   all: ['purchase-orders'] as const,
@@ -26,7 +26,7 @@ export const usePurchaseOrderQuery = (purchaseOrderId: string | undefined) =>
 export const useSubmitPurchaseOrderMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (command: SubmitPurchaseOrderCommand) => toPurchaseOrder(await submitPurchaseOrder(toSubmitPurchaseOrderRequestDto(command))),
+    mutationFn: async (command: SubmitPurchaseOrderModel) => toPurchaseOrder(await submitPurchaseOrder(toSubmitPurchaseOrderRequestDto(command))),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.all });
     }
@@ -36,7 +36,7 @@ export const useSubmitPurchaseOrderMutation = () => {
 export const useAddPurchaseOrderLineMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (command: AddPurchaseOrderLineCommand) => toPurchaseOrder(await addPurchaseOrderLine(command.purchaseOrderId, toAddPurchaseOrderLineRequestDto(command))),
+    mutationFn: async (command: AddPurchaseOrderLineModel) => toPurchaseOrder(await addPurchaseOrderLine(command.purchaseOrderId, toAddPurchaseOrderLineRequestDto(command))),
     onSuccess: async (purchaseOrder) => {
       await queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.all });
       await queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.detail(purchaseOrder.id) });
@@ -47,7 +47,7 @@ export const useAddPurchaseOrderLineMutation = () => {
 export const useRemovePurchaseOrderLineMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (command: RemovePurchaseOrderLineCommand) => toPurchaseOrder(await removePurchaseOrderLine(command.purchaseOrderId, command.purchaseOrderLineId, toRemovePurchaseOrderLineRequestDto(command))),
+    mutationFn: async (command: RemovePurchaseOrderLineModel) => toPurchaseOrder(await removePurchaseOrderLine(command.purchaseOrderId, command.purchaseOrderLineId, toRemovePurchaseOrderLineRequestDto(command))),
     onSuccess: async (purchaseOrder) => {
       await queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.all });
       await queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.detail(purchaseOrder.id) });
@@ -62,7 +62,7 @@ export const useRemovePurchaseOrderLineMutation = () => {
 export const usePurchaseOrderStatusMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (command: ChangePurchaseOrderStatusCommand) => toPurchaseOrder(await changePurchaseOrderStatus(command.purchaseOrderId, command.status, toChangePurchaseOrderStatusRequestDto(command))),
+    mutationFn: async (command: ChangePurchaseOrderStatusModel) => toPurchaseOrder(await changePurchaseOrderStatus(command.purchaseOrderId, command.status, toChangePurchaseOrderStatusRequestDto(command))),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.all });
     }

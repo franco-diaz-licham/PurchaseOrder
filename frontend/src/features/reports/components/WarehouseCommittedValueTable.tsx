@@ -2,12 +2,12 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { AppButton } from '@/components/ui/AppButton';
 import { formatMoney } from '@/lib/formatMoney';
-import type { WarehouseCommittedValue } from '../types/finance.types';
+import type { WarehouseCommittedValueModel } from '../types/finance.types';
 
 type WarehouseCommittedValueTableProps = {
   isError: boolean;
   isLoading: boolean;
-  rows: WarehouseCommittedValue[];
+  rows: WarehouseCommittedValueModel[];
   onViewWarehouse: (warehouseId: string) => void;
 };
 
@@ -19,7 +19,7 @@ export const WarehouseCommittedValueTable = ({ isError, isLoading, rows, onViewW
       <table className="w-full text-left text-sm">
         <thead className="bg-muted text-xs uppercase text-muted-foreground">
           <tr>
-            <th className="px-4 py-3">Warehouse</th>
+            <th className="px-4 py-3">WarehouseModel</th>
             <th className="px-4 py-3">Reserved qty</th>
             <th className="px-4 py-3">Reservations</th>
             <th className="px-4 py-3">Committed value</th>

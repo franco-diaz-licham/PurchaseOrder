@@ -1,7 +1,7 @@
 import type { WarehouseCommittedReservationDto, WarehouseCommittedValueDto } from '../types/finance.api.types';
-import type { WarehouseCommittedReservation, WarehouseCommittedValue } from '../types/finance.types';
+import type { WarehouseCommittedReservationModel, WarehouseCommittedValueModel } from '../types/finance.types';
 
-export const toWarehouseCommittedReservation = (dto: WarehouseCommittedReservationDto): WarehouseCommittedReservation => ({
+export const toWarehouseCommittedReservation = (dto: WarehouseCommittedReservationDto): WarehouseCommittedReservationModel => ({
   stockReservationId: dto.stockReservationId,
   purchaseOrderId: dto.purchaseOrderId,
   purchaseOrderNumber: dto.purchaseOrderNumber,
@@ -16,7 +16,7 @@ export const toWarehouseCommittedReservation = (dto: WarehouseCommittedReservati
   committedValue: dto.committedValue
 });
 
-export const toWarehouseCommittedValue = (dto: WarehouseCommittedValueDto): WarehouseCommittedValue => ({
+export const toWarehouseCommittedValue = (dto: WarehouseCommittedValueDto): WarehouseCommittedValueModel => ({
   warehouseId: dto.warehouseId,
   warehouseCode: dto.warehouseCode,
   warehouseName: dto.warehouseName,
@@ -27,4 +27,4 @@ export const toWarehouseCommittedValue = (dto: WarehouseCommittedValueDto): Ware
   reservations: dto.reservations.map(toWarehouseCommittedReservation)
 });
 
-export const toWarehouseCommittedValues = (dtos: WarehouseCommittedValueDto[]): WarehouseCommittedValue[] => dtos.map(toWarehouseCommittedValue);
+export const toWarehouseCommittedValues = (dtos: WarehouseCommittedValueDto[]): WarehouseCommittedValueModel[] => dtos.map(toWarehouseCommittedValue);

@@ -1,4 +1,4 @@
-export type Reservation = {
+export type ReservationModel = {
   id: string;
   purchaseOrderLineId: string;
   warehouseId: string;
@@ -10,14 +10,14 @@ export type Reservation = {
   reservedAt: Date;
 };
 
-export type CreateReservationCommand = {
+export type CreateReservationModel = {
   purchaseOrderLineId: string;
   warehouseId: string;
   quantity: number;
   user: string;
 };
 
-export type ReleaseReservationCommand = {
+export type ReleaseReservationModel = {
   stockReservationId: string;
   quantity: number;
   user: string;

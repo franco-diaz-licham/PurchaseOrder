@@ -1,5 +1,5 @@
-import type { InventoryItem, Warehouse } from '../types/catalog.types';
+import type { InventoryItemModel, WarehouseModel } from '../types/catalog.types';
 
-export const findWarehouse = (warehouses: Warehouse[] | undefined, warehouseId: string) => warehouses?.find((warehouse) => warehouse.id === warehouseId);
+export const findWarehouse = (warehouses: WarehouseModel[] | undefined, warehouseId: string) => warehouses?.find((warehouse) => warehouse.id === warehouseId);
 
-export const findInventoryItem = (items: InventoryItem[] | undefined, inventoryItemId: string) => items?.find((item) => item.id === inventoryItemId);
+export const findInventoryItem = (items: InventoryItemModel[] | undefined, inventoryItemId: string) => items?.find((item) => item.id === inventoryItemId);

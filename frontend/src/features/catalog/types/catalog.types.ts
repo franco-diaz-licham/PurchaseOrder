@@ -1,11 +1,11 @@
-export type Warehouse = {
+export type WarehouseModel = {
   id: string;
   code: string;
   name: string;
   displayName: string;
 };
 
-export type InventoryItem = {
+export type InventoryItemModel = {
   id: string;
   sku: string;
   name: string;
@@ -15,7 +15,7 @@ export type InventoryItem = {
   displayName: string;
 };
 
-export type WarehouseStock = {
+export type WarehouseStockModel = {
   warehouseId: string;
   inventoryItemId: string;
   onHandQuantity: number;
@@ -23,7 +23,7 @@ export type WarehouseStock = {
   availableQuantity: number;
 };
 
-export type ChangeInventoryItemStandardCostCommand = {
+export type ChangeInventoryItemStandardCostModel = {
   inventoryItemId: string;
   standardCost: number;
   user: string;

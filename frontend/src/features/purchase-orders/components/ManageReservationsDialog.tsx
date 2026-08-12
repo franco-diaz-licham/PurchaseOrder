@@ -3,9 +3,9 @@ import { useState } from 'react';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppField } from '@/components/ui/AppField';
 import { AppInput } from '@/components/ui/AppInput';
-import type { Reservation } from '@/features/reservations/types/reservation.types';
+import type { ReservationModel } from '@/features/reservations/types/reservation.types';
 import { formatMoney } from '@/lib/formatMoney';
-import type { PurchaseOrderLine } from '../types/purchaseOrder.types';
+import type { PurchaseOrderLineModel } from '../types/purchaseOrder.types';
 
 const dateTime = new Intl.DateTimeFormat('en-AU', {
   dateStyle: 'short',
@@ -18,12 +18,12 @@ type ManageReservationsDialogProps = {
   isReserving: boolean;
   itemName: string;
   trackingMode: string | undefined;
-  line: PurchaseOrderLine;
+  line: PurchaseOrderLineModel;
   maxReserveQuantity: number;
-  reservations: Reservation[];
+  reservations: ReservationModel[];
   user: string;
   onCancel: () => void;
-  onRelease: (reservation: Reservation, quantity: number) => void;
+  onRelease: (reservation: ReservationModel, quantity: number) => void;
   onReserve: (quantity: number, user: string) => Promise<void>;
   onUserChange: (user: string) => void;
 };
@@ -45,12 +45,12 @@ export const ManageReservationsDialog = ({ availableQuantity, isReleasing, isRes
     setQuantity('');
   };
 
-  const release = (reservation: Reservation) => {
+  const release = (reservation: ReservationModel) => {
     const quantityToRelease = Number(releaseQuantities[reservation.id] || 0);
     onRelease(reservation, quantityToRelease);
   };
 
-  const canRelease = (reservation: Reservation) => {
+  const canRelease = (reservation: ReservationModel) => {
     const quantityToRelease = Number(releaseQuantities[reservation.id] || 0);
     return !isReleasing && user.trim().length > 0 && quantityToRelease > 0 && quantityToRelease <= reservation.quantityReserved;
   };

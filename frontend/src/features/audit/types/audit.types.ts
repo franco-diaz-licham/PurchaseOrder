@@ -1,4 +1,4 @@
-export type AuditLogEntry = {
+export type AuditLogEntryModel = {
   id: string;
   action: string;
   inventoryItemId: string;

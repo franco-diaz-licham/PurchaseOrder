@@ -115,7 +115,7 @@ export const PurchaseOrderDetailPage = () => {
         {addLineMutation.isError && <ErrorMessage message="Purchase order line could not be added." />}
         {removeLineMutation.isError && <ErrorMessage message="Purchase order line could not be removed." />}
         {createReservationMutation.isError && <ErrorMessage message="Stock could not be reserved for this line." />}
-        {releaseReservationMutation.isError && <ErrorMessage message="Reservation could not be released." />}
+        {releaseReservationMutation.isError && <ErrorMessage message="ReservationModel could not be released." />}
         {!purchaseOrder && !purchaseOrderQuery.isLoading && !purchaseOrderQuery.isError && <EmptyState title="Purchase order was not found." />}
 
         {purchaseOrder && (

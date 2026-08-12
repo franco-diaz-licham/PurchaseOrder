@@ -1,15 +1,15 @@
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
-import type { InventoryItem, Warehouse } from '@/features/catalog/types/catalog.types';
+import type { InventoryItemModel, WarehouseModel } from '@/features/catalog/types/catalog.types';
 import { findInventoryItem, findWarehouse } from '@/features/catalog/utils/catalogLookup';
-import type { AuditLogEntry } from '../types/audit.types';
+import type { AuditLogEntryModel } from '../types/audit.types';
 
 type AuditLogTableProps = {
-  entries: AuditLogEntry[];
-  inventoryItems?: InventoryItem[];
+  entries: AuditLogEntryModel[];
+  inventoryItems?: InventoryItemModel[];
   isError: boolean;
   isLoading: boolean;
-  warehouses?: Warehouse[];
+  warehouses?: WarehouseModel[];
 };
 
 export const AuditLogTable = ({ entries, inventoryItems, isError, isLoading, warehouses }: AuditLogTableProps) => (
