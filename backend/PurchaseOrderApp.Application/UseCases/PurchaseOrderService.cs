@@ -55,8 +55,7 @@ public sealed class PurchaseOrderService(
             var warehouse = await warehouseRepository.GetAsync(command.WarehouseId, cancellationToken);
             if (warehouse is null) return await TransactionResult.RollBackNotFoundAsync<PurchaseOrderResponse>(unitOfWork, "Warehouse was not found.", cancellationToken);
 
-            var purchaseOrderNumber = await CreatePurchaseOrderNumberAsync(cancellationToken);
-            var purchaseOrder = PurchaseOrder.CreatePending(purchaseOrderNumber, warehouse.Id, command.User, command.OccurredAt);
+            var purchaseOrder = PurchaseOrder.CreatePending(warehouse.Id, command.User, command.OccurredAt);
 
             foreach (var line in command.Lines) {
                 var item = await inventoryItemRepository.GetAsync(line.InventoryItemId, cancellationToken);
@@ -268,15 +267,5 @@ public sealed class PurchaseOrderService(
         if (warehouseId.Value == Guid.Empty) return Result.Fail<List<ApprovedPurchaseOrderLineResponse>>("Warehouse id is required.", ResultStatus.Invalid);
         var lines = await purchaseOrderRepository.ListApprovedOutstandingLinesAsync(warehouseId, cancellationToken);
         return Result.Success(lines);
-    }
-
-    private async Task<string> CreatePurchaseOrderNumberAsync(CancellationToken cancellationToken)
-    {
-        for (var attempt = 0; attempt < 10; attempt++) {
-            var purchaseOrderNumber = PurchaseOrderNumberGenerator.Create();
-            if (!await purchaseOrderRepository.ExistsByNumberAsync(purchaseOrderNumber, cancellationToken)) return purchaseOrderNumber;
-        }
-
-        throw new DomainException("Could not generate a unique purchase order number.");
     }
 }

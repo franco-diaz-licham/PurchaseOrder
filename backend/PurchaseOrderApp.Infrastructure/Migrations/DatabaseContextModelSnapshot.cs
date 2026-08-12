@@ -22,6 +22,10 @@ namespace PurchaseOrderApp.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.HasSequence<long>("purchase_order_number_seq")
+                .StartsAt(1021L)
+                .HasMax(99999L);
+
             modelBuilder.Entity("PurchaseOrderApp.Domain.Entities.AuditLogEntry", b =>
                 {
                     b.Property<Guid>("Id")
@@ -139,7 +143,9 @@ namespace PurchaseOrderApp.Infrastructure.Migrations
 
                     b.Property<string>("PurchaseOrderNumber")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
+                        .HasDefaultValueSql("'PO-' || nextval('purchase_order_number_seq')::text")
                         .HasColumnType("character varying(50)");
 
                     b.Property<string>("Status")

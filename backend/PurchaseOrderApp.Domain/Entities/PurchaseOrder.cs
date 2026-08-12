@@ -15,14 +15,12 @@ public sealed class PurchaseOrder : Entity<PurchaseOrderId>
 
     private PurchaseOrder(
         PurchaseOrderId id,
-        string purchaseOrderNumber,
         WarehouseId warehouseId,
         PurchaseOrderStatus status,
         string user,
         DateTimeOffset occurredAt)
     {
         Id = id;
-        PurchaseOrderNumber = Required(purchaseOrderNumber, nameof(purchaseOrderNumber));
         WarehouseId = warehouseId;
         Status = status;
         SetCreated(user, occurredAt);
@@ -58,11 +56,10 @@ public sealed class PurchaseOrder : Entity<PurchaseOrderId>
     /// </summary>
     public bool HasOutstandingLines => _lines.Any(line => line.HasOutstandingQuantity);
 
-    public static PurchaseOrder CreatePending(string purchaseOrderNumber, WarehouseId warehouseId, string user, DateTimeOffset occurredAt)
+    public static PurchaseOrder CreatePending(WarehouseId warehouseId, string user, DateTimeOffset occurredAt)
     {
         return new PurchaseOrder(
             new PurchaseOrderId(Guid.NewGuid()),
-            purchaseOrderNumber,
             warehouseId,
             PurchaseOrderStatus.Pending,
             user,

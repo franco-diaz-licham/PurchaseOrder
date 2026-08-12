@@ -13,9 +13,9 @@ internal static class TestData
 
     public static WarehouseId WarehouseId => new(Guid.Parse("11111111-1111-1111-1111-111111111111"));
 
-    public static PurchaseOrder CreatePendingPurchaseOrder(string purchaseOrderNumber = " PO-1001 ")
+    public static PurchaseOrder CreatePendingPurchaseOrder()
     {
-        return PurchaseOrder.CreatePending(purchaseOrderNumber, WarehouseId, User, OccurredAt);
+        return PurchaseOrder.CreatePending(WarehouseId, User, OccurredAt);
     }
 
     public static InventoryItem CreateUnitItem(string sku = "BOLT-10", string name = "10mm Bolt", decimal standardCost = 1.25m)

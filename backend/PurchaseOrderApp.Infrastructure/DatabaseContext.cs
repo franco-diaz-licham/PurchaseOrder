@@ -28,6 +28,11 @@ public sealed class DatabaseContext(DbContextOptions<DatabaseContext> options) :
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder
+            .HasSequence<long>("purchase_order_number_seq")
+            .StartsAt(1021)
+            .HasMax(99999);
+
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(DatabaseContext).Assembly);
         base.OnModelCreating(modelBuilder);
     }

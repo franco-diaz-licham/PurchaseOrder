@@ -11,6 +11,11 @@ namespace PurchaseOrderApp.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateSequence<long>(
+                name: "purchase_order_number_seq",
+                startValue: 1021L,
+                maxValue: 99999L);
+
             migrationBuilder.CreateTable(
                 name: "audit_log_entries",
                 columns: table => new
@@ -75,7 +80,7 @@ namespace PurchaseOrderApp.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    PurchaseOrderNumber = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    PurchaseOrderNumber = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false, defaultValueSql: "'PO-' || nextval('purchase_order_number_seq')::text"),
                     WarehouseId = table.Column<Guid>(type: "uuid", nullable: false),
                     Status = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -277,6 +282,9 @@ namespace PurchaseOrderApp.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "warehouses");
+
+            migrationBuilder.DropSequence(
+                name: "purchase_order_number_seq");
         }
     }
 }

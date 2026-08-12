@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PurchaseOrderApp.Domain.Entities;
 using PurchaseOrderApp.Domain.ValueObjects;
@@ -17,9 +18,14 @@ public sealed class PurchaseOrderConfig : IEntityTypeConfiguration<PurchaseOrder
             .HasConversion(id => id.Value, value => new PurchaseOrderId(value))
             .ValueGeneratedNever();
 
-        builder.Property(order => order.PurchaseOrderNumber)
+        // Database sequence generation
+        var numberProperty = builder.Property(order => order.PurchaseOrderNumber)
+            .HasDefaultValueSql("'PO-' || nextval('purchase_order_number_seq')::text")
             .HasMaxLength(50)
-            .IsRequired();
+            .IsRequired()
+            .ValueGeneratedOnAdd();
+        numberProperty.Metadata.SetBeforeSaveBehavior(PropertySaveBehavior.Ignore);
+        numberProperty.Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
         builder.Property(order => order.WarehouseId)
             .HasConversion(id => id.Value, value => new WarehouseId(value))

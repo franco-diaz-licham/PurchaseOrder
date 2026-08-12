@@ -57,9 +57,6 @@ public sealed class PurchaseOrderServiceTests
         _warehouses
             .Setup(repo => repo.GetAsync(command.WarehouseId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(warehouse);
-        _purchaseOrders
-            .Setup(repo => repo.ExistsByNumberAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(false);
         _inventoryItems
             .Setup(repo => repo.GetAsync(item.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(item);

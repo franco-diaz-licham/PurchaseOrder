@@ -17,14 +17,13 @@ public sealed class PurchaseOrderTests
 
         // Act
         var purchaseOrder = PurchaseOrderApp.Domain.Entities.PurchaseOrder.CreatePending(
-            " PO-1001 ",
             warehouseId,
             TestData.User,
             TestData.OccurredAt);
 
         // Assert
         purchaseOrder.Id.Value.ShouldNotBe(Guid.Empty);
-        purchaseOrder.PurchaseOrderNumber.ShouldBe("PO-1001");
+        purchaseOrder.PurchaseOrderNumber.ShouldBeNull();
         purchaseOrder.WarehouseId.ShouldBe(warehouseId);
         purchaseOrder.Status.ShouldBe(PurchaseOrderStatus.Pending);
         purchaseOrder.CreatedBy.ShouldBe(TestData.User);

@@ -15,11 +15,6 @@ public interface IPurchaseOrderRepository
     Task<PurchaseOrder?> GetAsync(PurchaseOrderId purchaseOrderId, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Checks whether a purchase order number is already in use.
-    /// </summary>
-    Task<bool> ExistsByNumberAsync(string purchaseOrderNumber, CancellationToken cancellationToken);
-
-    /// <summary>
     /// Gets the purchase order that owns the requested line.
     /// </summary>
     Task<PurchaseOrder?> GetByLineIdAsync(PurchaseOrderLineId purchaseOrderLineId, CancellationToken cancellationToken);

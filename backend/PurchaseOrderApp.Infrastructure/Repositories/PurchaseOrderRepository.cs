@@ -20,11 +20,6 @@ public sealed class PurchaseOrderRepository(DatabaseContext db) : IPurchaseOrder
             .SingleOrDefaultAsync(order => order.Id == purchaseOrderId, cancellationToken);
     }
 
-    public Task<bool> ExistsByNumberAsync(string purchaseOrderNumber, CancellationToken cancellationToken)
-    {
-        return db.PurchaseOrders.AnyAsync(order => order.PurchaseOrderNumber == purchaseOrderNumber, cancellationToken);
-    }
-
     public Task<PurchaseOrder?> GetByLineIdAsync(PurchaseOrderLineId purchaseOrderLineId, CancellationToken cancellationToken)
     {
         return db.PurchaseOrders
