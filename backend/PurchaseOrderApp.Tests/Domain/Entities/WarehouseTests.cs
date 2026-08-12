@@ -10,10 +10,14 @@ public sealed class WarehouseTests
     [Test]
     public void Create_ShouldTrimNameAndUppercaseCode()
     {
+        // Arrange
+        const string code = " syd ";
+        const string name = " Sydney Fulfilment Centre ";
+
         // Act
         var warehouse = PurchaseOrderApp.Domain.Entities.Warehouse.Create(
-            " syd ",
-            " Sydney Fulfilment Centre ",
+            code,
+            name,
             TestData.User,
             TestData.OccurredAt);
 

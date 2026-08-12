@@ -1,6 +1,4 @@
-using Microsoft.EntityFrameworkCore;
 using PurchaseOrderApp.Domain.Entities;
-using PurchaseOrderApp.Infrastructure;
 using PurchaseOrderApp.Infrastructure.Repositories;
 using PurchaseOrderApp.Tests.Shared;
 using Shouldly;
@@ -60,7 +58,7 @@ public sealed class WarehouseStockRepositoryTests : DatabaseFixture
     {
         // Arrange
         var seed = await PurchaseOrderScenarioSeeder.SeedApprovedLineAsync(Db, onHandQuantity: 10m);
-        await using var firstContext = CreateContext();
+        await using var firstContext = CreateDatabaseContext();
         await using var firstTransaction = await firstContext.Database.BeginTransactionAsync();
         var firstRepository = new WarehouseStockRepository(firstContext);
 
@@ -69,7 +67,7 @@ public sealed class WarehouseStockRepositoryTests : DatabaseFixture
 
         var secondLockStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var secondLockTask = Task.Run(async () => {
-            await using var secondContext = CreateContext();
+            await using var secondContext = CreateDatabaseContext();
             await using var secondTransaction = await secondContext.Database.BeginTransactionAsync();
             var secondRepository = new WarehouseStockRepository(secondContext);
 
@@ -82,23 +80,99 @@ public sealed class WarehouseStockRepositoryTests : DatabaseFixture
         await secondLockStarted.Task;
         await Task.Delay(250);
 
-        // Assert
-        secondLockTask.IsCompleted.ShouldBeFalse();
-
+        // Act
+        var secondLockWasStillWaiting = !secondLockTask.IsCompleted;
         await firstTransaction.CommitAsync();
         var result = await secondLockTask.WaitAsync(TimeSpan.FromSeconds(5));
 
+        // Assert
+        secondLockWasStillWaiting.ShouldBeTrue();
         result.ShouldNotBeNull();
         result.Id.ShouldBe(seed.WarehouseStockId);
     }
 
-    private DatabaseContext CreateContext()
+    [Test]
+    public async Task GetForUpdateAsync_ShouldNotBlockDifferentItemInSameWarehouse()
     {
-        var options = new DbContextOptionsBuilder<DatabaseContext>()
-            .UseNpgsql(ConnectionString)
-            .UseSnakeCaseNamingConvention()
-            .Options;
+        // Arrange
+        var seed = await PurchaseOrderScenarioSeeder.SeedTwoItemsInOneWarehouseAsync(Db);
+        await using var firstContext = CreateDatabaseContext();
+        await using var firstTransaction = await firstContext.Database.BeginTransactionAsync();
+        var firstRepository = new WarehouseStockRepository(firstContext);
 
-        return new DatabaseContext(options);
+        var firstLock = await firstRepository.GetForUpdateAsync(seed.WarehouseId, seed.FirstInventoryItemId, CancellationToken.None);
+        firstLock.ShouldNotBeNull();
+
+        // Act
+        await using var secondContext = CreateDatabaseContext();
+        await using var secondTransaction = await secondContext.Database.BeginTransactionAsync();
+        var secondRepository = new WarehouseStockRepository(secondContext);
+        var secondLock = await secondRepository
+            .GetForUpdateAsync(seed.WarehouseId, seed.SecondInventoryItemId, CancellationToken.None)
+            .WaitAsync(TimeSpan.FromSeconds(5));
+
+        // Assert
+        secondLock.ShouldNotBeNull();
+        secondLock.Id.ShouldBe(seed.SecondWarehouseStockId);
+
+        await secondTransaction.CommitAsync();
+        await firstTransaction.CommitAsync();
+    }
+
+    [Test]
+    public async Task GetForUpdateAsync_ShouldNotBlockSameItemInDifferentWarehouse()
+    {
+        // Arrange
+        var seed = await PurchaseOrderScenarioSeeder.SeedSameItemInTwoWarehousesAsync(Db);
+        await using var firstContext = CreateDatabaseContext();
+        await using var firstTransaction = await firstContext.Database.BeginTransactionAsync();
+        var firstRepository = new WarehouseStockRepository(firstContext);
+
+        var firstLock = await firstRepository.GetForUpdateAsync(seed.FirstWarehouseId, seed.InventoryItemId, CancellationToken.None);
+        firstLock.ShouldNotBeNull();
+
+        // Act
+        await using var secondContext = CreateDatabaseContext();
+        await using var secondTransaction = await secondContext.Database.BeginTransactionAsync();
+        var secondRepository = new WarehouseStockRepository(secondContext);
+        var secondLock = await secondRepository
+            .GetForUpdateAsync(seed.SecondWarehouseId, seed.InventoryItemId, CancellationToken.None)
+            .WaitAsync(TimeSpan.FromSeconds(5));
+
+        // Assert
+        secondLock.ShouldNotBeNull();
+        secondLock.Id.ShouldBe(seed.SecondWarehouseStockId);
+
+        await secondTransaction.CommitAsync();
+        await firstTransaction.CommitAsync();
+    }
+
+    [Test]
+    public async Task GetForUpdateAsync_ShouldCancelWaitingLockRequest()
+    {
+        // Arrange
+        var seed = await PurchaseOrderScenarioSeeder.SeedApprovedLineAsync(Db, onHandQuantity: 10m);
+        await using var firstContext = CreateDatabaseContext();
+        await using var firstTransaction = await firstContext.Database.BeginTransactionAsync();
+        var firstRepository = new WarehouseStockRepository(firstContext);
+
+        var firstLock = await firstRepository.GetForUpdateAsync(seed.WarehouseId, seed.InventoryItemId, CancellationToken.None);
+        firstLock.ShouldNotBeNull();
+
+        await using var secondContext = CreateDatabaseContext();
+        await using var secondTransaction = await secondContext.Database.BeginTransactionAsync();
+        var secondRepository = new WarehouseStockRepository(secondContext);
+        using var cancellation = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
+
+        try {
+            // Act
+            var exception = await Should.ThrowAsync<OperationCanceledException>(async () => await secondRepository.GetForUpdateAsync(seed.WarehouseId, seed.InventoryItemId, cancellation.Token));
+
+            // Assert
+            exception.ShouldNotBeNull();
+        } finally {
+            await secondTransaction.RollbackAsync();
+            await firstTransaction.CommitAsync();
+        }
     }
 }

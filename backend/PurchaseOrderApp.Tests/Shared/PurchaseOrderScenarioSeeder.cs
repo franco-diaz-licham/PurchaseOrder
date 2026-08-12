@@ -69,6 +69,60 @@ public static class PurchaseOrderScenarioSeeder
             stock.Id);
     }
 
+    /// <summary>
+    /// Seeds one warehouse with two stocked items so lock-boundary tests can prove different items do not block each other.
+    /// </summary>
+    public static async Task<TwoItemStockSeedResult> SeedTwoItemsInOneWarehouseAsync(
+        DatabaseContext db,
+        decimal firstOnHandQuantity = 10m,
+        decimal secondOnHandQuantity = 10m,
+        CancellationToken cancellationToken = default)
+    {
+        var warehouse = Warehouse.Create("SYD", "Sydney Fulfilment Centre", TestData.User, TestData.OccurredAt);
+        var firstItem = TestData.CreateUnitItem("BOLT-10", "10mm Bolt");
+        var secondItem = TestData.CreateUnitItem("NUT-10", "10mm Nut");
+        var firstStock = TestData.CreateWarehouseStock(warehouse.Id, firstItem.Id, firstOnHandQuantity);
+        var secondStock = TestData.CreateWarehouseStock(warehouse.Id, secondItem.Id, secondOnHandQuantity);
+
+        await db.AddRangeAsync(warehouse, firstItem, secondItem, firstStock, secondStock);
+        await db.SaveChangesAsync(cancellationToken);
+        db.ChangeTracker.Clear();
+
+        return new TwoItemStockSeedResult(
+            warehouse.Id,
+            firstItem.Id,
+            secondItem.Id,
+            firstStock.Id,
+            secondStock.Id);
+    }
+
+    /// <summary>
+    /// Seeds the same stocked item in two warehouses so lock-boundary tests can prove different warehouses do not block each other.
+    /// </summary>
+    public static async Task<TwoWarehouseStockSeedResult> SeedSameItemInTwoWarehousesAsync(
+        DatabaseContext db,
+        decimal firstOnHandQuantity = 10m,
+        decimal secondOnHandQuantity = 10m,
+        CancellationToken cancellationToken = default)
+    {
+        var firstWarehouse = Warehouse.Create("SYD", "Sydney Fulfilment Centre", TestData.User, TestData.OccurredAt);
+        var secondWarehouse = Warehouse.Create("MEL", "Melbourne Distribution Hub", TestData.User, TestData.OccurredAt);
+        var item = TestData.CreateUnitItem();
+        var firstStock = TestData.CreateWarehouseStock(firstWarehouse.Id, item.Id, firstOnHandQuantity);
+        var secondStock = TestData.CreateWarehouseStock(secondWarehouse.Id, item.Id, secondOnHandQuantity);
+
+        await db.AddRangeAsync(firstWarehouse, secondWarehouse, item, firstStock, secondStock);
+        await db.SaveChangesAsync(cancellationToken);
+        db.ChangeTracker.Clear();
+
+        return new TwoWarehouseStockSeedResult(
+            firstWarehouse.Id,
+            secondWarehouse.Id,
+            item.Id,
+            firstStock.Id,
+            secondStock.Id);
+    }
+
     public static async Task DeleteAsync(DatabaseContext db, CompetingReservationSeedResult seed, CancellationToken cancellationToken)
     {
         await db.AuditLogEntries.Where(entry => entry.WarehouseId == seed.WarehouseId).ExecuteDeleteAsync(cancellationToken);
@@ -110,4 +164,18 @@ public static class PurchaseOrderScenarioSeeder
         PurchaseOrderLineId FirstPurchaseOrderLineId,
         PurchaseOrderLineId SecondPurchaseOrderLineId,
         WarehouseStockId WarehouseStockId);
+
+    public sealed record TwoItemStockSeedResult(
+        WarehouseId WarehouseId,
+        InventoryItemId FirstInventoryItemId,
+        InventoryItemId SecondInventoryItemId,
+        WarehouseStockId FirstWarehouseStockId,
+        WarehouseStockId SecondWarehouseStockId);
+
+    public sealed record TwoWarehouseStockSeedResult(
+        WarehouseId FirstWarehouseId,
+        WarehouseId SecondWarehouseId,
+        InventoryItemId InventoryItemId,
+        WarehouseStockId FirstWarehouseStockId,
+        WarehouseStockId SecondWarehouseStockId);
 }

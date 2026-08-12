@@ -12,13 +12,18 @@ public sealed class InventoryItemTests
     [Test]
     public void Create_ShouldTrimNamesAndSetStandardCost()
     {
+        // Arrange
+        const string sku = " bolt-10 ";
+        const string name = " 10mm Bolt ";
+        var standardCost = new Money(1.25m);
+
         // Act
         var item = PurchaseOrderApp.Domain.Entities.InventoryItem.Create(
-            " bolt-10 ",
-            " 10mm Bolt ",
+            sku,
+            name,
             InventoryItemCategory.Hardware,
             InventoryTrackingMode.Unit,
-            new Money(1.25m),
+            standardCost,
             TestData.User,
             TestData.OccurredAt);
 

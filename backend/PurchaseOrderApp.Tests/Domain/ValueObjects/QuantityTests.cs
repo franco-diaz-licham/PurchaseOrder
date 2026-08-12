@@ -11,8 +11,11 @@ public sealed class QuantityTests
     [Test]
     public void Constructor_ShouldThrow_WhenQuantityIsNegative()
     {
+        // Arrange
+        const decimal value = -1m;
+
         // Act
-        var exception = Should.Throw<DomainException>(() => new Quantity(-1));
+        var exception = Should.Throw<DomainException>(() => new Quantity(value));
 
         // Assert
         exception.Message.ShouldBe("Quantity cannot be negative.");
@@ -21,8 +24,11 @@ public sealed class QuantityTests
     [Test]
     public void Constructor_ShouldThrow_WhenQuantityHasMoreThanThreeDecimalPlaces()
     {
+        // Arrange
+        const decimal value = 1.1234m;
+
         // Act
-        var exception = Should.Throw<DomainException>(() => new Quantity(1.1234m));
+        var exception = Should.Throw<DomainException>(() => new Quantity(value));
 
         // Assert
         exception.Message.ShouldBe("Quantity cannot have more than 3 decimal places.");
@@ -36,6 +42,9 @@ public sealed class QuantityTests
 
         // Act
         Should.NotThrow(() => quantity.EnsureValidFor(InventoryTrackingMode.Weight));
+
+        // Assert
+        quantity.Value.ShouldBe(10.500m);
     }
 
     [Test]
@@ -54,8 +63,12 @@ public sealed class QuantityTests
     [Test]
     public void Add_ShouldReturnCombinedQuantity()
     {
+        // Arrange
+        var firstQuantity = new Quantity(2.25m);
+        var secondQuantity = new Quantity(3.125m);
+
         // Act
-        var quantity = new Quantity(2.25m).Add(new Quantity(3.125m));
+        var quantity = firstQuantity.Add(secondQuantity);
 
         // Assert
         quantity.Value.ShouldBe(5.375m);
@@ -64,8 +77,12 @@ public sealed class QuantityTests
     [Test]
     public void Subtract_ShouldReturnReducedQuantity()
     {
+        // Arrange
+        var firstQuantity = new Quantity(5.375m);
+        var secondQuantity = new Quantity(3.125m);
+
         // Act
-        var quantity = new Quantity(5.375m).Subtract(new Quantity(3.125m));
+        var quantity = firstQuantity.Subtract(secondQuantity);
 
         // Assert
         quantity.Value.ShouldBe(2.250m);
@@ -74,8 +91,12 @@ public sealed class QuantityTests
     [Test]
     public void Subtract_ShouldThrow_WhenResultWouldBeNegative()
     {
+        // Arrange
+        var firstQuantity = new Quantity(1);
+        var secondQuantity = new Quantity(2);
+
         // Act
-        var exception = Should.Throw<DomainException>(() => new Quantity(1).Subtract(new Quantity(2)));
+        var exception = Should.Throw<DomainException>(() => firstQuantity.Subtract(secondQuantity));
 
         // Assert
         exception.Message.ShouldBe("Quantity cannot be reduced below zero.");

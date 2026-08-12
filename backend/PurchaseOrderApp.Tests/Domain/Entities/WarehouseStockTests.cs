@@ -16,6 +16,9 @@ public sealed class WarehouseStockTests
 
         // Act
         Should.NotThrow(() => stock.EnsureCanReserve(new Quantity(25), new Quantity(75)));
+
+        // Assert
+        stock.OnHandQuantity.Value.ShouldBe(100);
     }
 
     [Test]
