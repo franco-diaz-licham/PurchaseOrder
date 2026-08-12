@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { EmptyState } from '@/components/common/EmptyState';
-import { ErrorMessage } from '@/components/common/ErrorMessage';
+import { ErrorSummary } from '@/components/common/ErrorSummary';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useInventoryItemsQuery, useWarehousesQuery, useWarehouseStockQuery } from '@/features/catalog/queries/catalog.queries';
 import { findInventoryItem, findWarehouse } from '@/features/catalog/utils/catalogLookup';
@@ -13,6 +13,7 @@ import { PurchaseOrderHeaderCard } from '../components/PurchaseOrderHeaderCard';
 import { PurchaseOrderLinesTable } from '../components/PurchaseOrderLinesTable';
 import { PurchaseOrderTotalsBar } from '../components/PurchaseOrderTotalsBar';
 import { useAddPurchaseOrderLineMutation, usePurchaseOrderQuery, usePurchaseOrderStatusMutation, useRemovePurchaseOrderLineMutation, useUpdatePurchaseOrderLineMutation } from '../queries/purchaseOrder.queries';
+import { getPurchaseOrderDetailErrorMessages } from '../utils/purchaseOrderDetailErrors';
 
 export const PurchaseOrderDetailPage = () => {
   const { purchaseOrderId } = useParams();
@@ -52,6 +53,15 @@ export const PurchaseOrderDetailPage = () => {
   const manageReservationsAvailableQuantity = manageReservationsStock?.availableQuantity ?? 0;
   const manageReservationsMaxQuantity = manageReservationsLine ? Math.min(manageReservationsLine.quantityRemaining, manageReservationsAvailableQuantity) : 0;
   const manageReservations = manageReservationsLine ? activeReservations.filter((reservation) => reservation.purchaseOrderLineId === manageReservationsLine.id) : [];
+  const errorMessages = getPurchaseOrderDetailErrorMessages({
+    purchaseOrderQuery,
+    statusMutation,
+    addLineMutation,
+    removeLineMutation,
+    updateLineMutation,
+    createReservationMutation,
+    releaseReservationMutation
+  });
 
   const openAddLineDialog = () => {
     setIsAddLineOpen(true);
@@ -107,17 +117,9 @@ export const PurchaseOrderDetailPage = () => {
   return (
     <section>
       <PageHeader description="Review the full purchase order aggregate and manage its lifecycle." title={purchaseOrder?.number ?? 'Purchase Order'} />
-
       <div className="grid gap-4 p-6">
-        {purchaseOrderQuery.isError && <ErrorMessage message="Purchase order could not be loaded." />}
-        {statusMutation.isError && <ErrorMessage message="Purchase order status could not be changed." />}
-        {addLineMutation.isError && <ErrorMessage message="Purchase order line could not be added." />}
-        {removeLineMutation.isError && <ErrorMessage message="Purchase order line could not be removed." />}
-        {updateLineMutation.isError && <ErrorMessage message="Purchase order line could not be updated." />}
-        {createReservationMutation.isError && <ErrorMessage message="Stock could not be reserved for this line." />}
-        {releaseReservationMutation.isError && <ErrorMessage message="Reservation could not be released." />}
+        <ErrorSummary messages={errorMessages} />
         {!purchaseOrder && !purchaseOrderQuery.isLoading && !purchaseOrderQuery.isError && <EmptyState title="Purchase order was not found." />}
-
         {purchaseOrder && (
           <PurchaseOrderHeaderCard
             isChangingStatus={statusMutation.isPending}
@@ -128,9 +130,7 @@ export const PurchaseOrderDetailPage = () => {
             warehouseDisplayName={warehouse?.displayName ?? purchaseOrder.warehouseId}
           />
         )}
-
         {purchaseOrder && <PurchaseOrderTotalsBar gstAmount={purchaseOrder.gstAmount} subtotalAmount={purchaseOrder.subtotalAmount} totalAmount={purchaseOrder.totalAmount} />}
-
         {purchaseOrder && (
           <PurchaseOrderLinesTable
             activeReservations={activeReservations}
@@ -156,9 +156,7 @@ export const PurchaseOrderDetailPage = () => {
           />
         )}
       </div>
-
       {isAddLineOpen && <AddPurchaseOrderLineDialog inventoryItems={availableItemsToAdd} isSaving={addLineMutation.isPending} onCancel={closeAddLineDialog} onSubmit={addLine} />}
-
       {editLine && (
         <EditPurchaseOrderLineDialog
           isSaving={updateLineMutation.isPending}
@@ -169,7 +167,6 @@ export const PurchaseOrderDetailPage = () => {
           quantityReserved={editLine.quantityReserved}
         />
       )}
-
       {manageReservationsLine && (
         <ManageReservationsDialog
           availableQuantity={manageReservationsStock?.availableQuantity ?? null}

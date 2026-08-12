@@ -54,11 +54,9 @@ export const AddPurchaseOrderLineDialog = ({ inventoryItems, isSaving, onCancel,
           <AppField label="Inventory item">
             <AppSelect autoFocus options={inventoryItemOptions} placeholder="Select item" required {...form.register('inventoryItemId')} />
           </AppField>
-
           <AppField label="Quantity">
             <AppInput min="0.001" required step="0.001" type="number" {...form.register('quantityOrdered', { valueAsNumber: true })} />
           </AppField>
-
           <AppField label="User">
             <AppInput required {...form.register('user')} />
           </AppField>

@@ -33,7 +33,6 @@ export const InventoryItemsPage = () => {
           {itemsQuery.isError && <ErrorMessage message="Inventory items could not be loaded." />}
           {changeStandardCostMutation.isError && <ErrorMessage message="Standard cost could not be changed." />}
           {(itemsQuery.data ?? []).length === 0 && !itemsQuery.isLoading && <EmptyState title="No inventory items found." />}
-
           {(itemsQuery.data ?? []).length > 0 && (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[900px] text-left text-sm">

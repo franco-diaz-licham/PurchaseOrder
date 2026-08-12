@@ -77,11 +77,9 @@ export const ManageReservationsDialog = ({ availableQuantity, isReleasing, isRes
             <AppField label={quantityLabel}>
               <AppInput autoFocus max={maxReserveQuantity} min={minimumQuantity} onChange={(event) => setQuantity(event.target.value)} required step={quantityStep} type="number" value={quantity} />
             </AppField>
-
             <AppField label="User">
               <AppInput onChange={(event) => onUserChange(event.target.value)} required value={user} />
             </AppField>
-
             <AppButton disabled={!canReserve} onClick={() => void reserve()} type="button">
               Reserve
             </AppButton>

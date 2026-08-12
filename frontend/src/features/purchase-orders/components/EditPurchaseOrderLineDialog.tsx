@@ -49,7 +49,6 @@ export const EditPurchaseOrderLineDialog = ({ itemName, quantityOrdered, quantit
           <AppField label="Ordered quantity">
             <AppInput autoFocus min={quantityReserved} required step="0.001" type="number" {...form.register('quantityOrdered', { valueAsNumber: true })} />
           </AppField>
-
           <AppField label="User">
             <AppInput required {...form.register('user')} />
           </AppField>
