@@ -11,6 +11,7 @@ import { useWarehousesQuery } from '@/features/catalog/queries/catalog.queries';
 import { findWarehouse } from '@/features/catalog/utils/catalogLookup';
 import { CreatePurchaseOrderDialog, type CreatePurchaseOrderFormValues } from '../components/CreatePurchaseOrderDialog';
 import { usePurchaseOrderSummariesQuery, useSubmitPurchaseOrderMutation } from '../queries/purchaseOrder.queries';
+import { usePurchaseOrderListStore } from '../stores/purchaseOrderList.store';
 
 const money = new Intl.NumberFormat('en-AU', {
   style: 'currency',
@@ -18,7 +19,10 @@ const money = new Intl.NumberFormat('en-AU', {
 });
 
 export const PurchaseOrdersPage = () => {
-  const [warehouseFilter, setWarehouseFilter] = useState('');
+  const warehouseFilter = usePurchaseOrderListStore((state) => state.selectedWarehouseId);
+  const showReadyToReserveOnly = usePurchaseOrderListStore((state) => state.showReadyToReserveOnly);
+  const setWarehouseFilter = usePurchaseOrderListStore((state) => state.setSelectedWarehouseId);
+  const setShowReadyToReserveOnly = usePurchaseOrderListStore((state) => state.setShowReadyToReserveOnly);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const navigate = useNavigate();
   const warehousesQuery = useWarehousesQuery();
@@ -26,9 +30,12 @@ export const PurchaseOrdersPage = () => {
   const submitMutation = useSubmitPurchaseOrderMutation();
   const purchaseOrders = useMemo(() => {
     const orders = purchaseOrdersQuery.data ?? [];
-    if (warehouseFilter.length === 0) return orders;
-    return orders.filter((order) => order.warehouseId === warehouseFilter);
-  }, [purchaseOrdersQuery.data, warehouseFilter]);
+    return orders.filter((order) => {
+      if (warehouseFilter.length > 0 && order.warehouseId !== warehouseFilter) return false;
+      if (showReadyToReserveOnly && (order.status !== 'Approved' || order.quantityRemaining <= 0)) return false;
+      return true;
+    });
+  }, [purchaseOrdersQuery.data, showReadyToReserveOnly, warehouseFilter]);
 
   const closeCreateDialog = () => {
     setIsCreateOpen(false);
@@ -48,7 +55,11 @@ export const PurchaseOrdersPage = () => {
   return (
     <section>
       <PageHeader description="Review purchase order summaries and open a record to manage its lines." title="Purchase Orders">
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="flex items-center gap-2 text-sm font-medium">
+            <input checked={showReadyToReserveOnly} className="h-4 w-4 accent-primary" onChange={(event) => setShowReadyToReserveOnly(event.target.checked)} type="checkbox" />
+            Ready to reserve
+          </label>
           <AppSelect value={warehouseFilter} onChange={(event) => setWarehouseFilter(event.target.value)}>
             <option value="">All warehouses</option>
             {(warehousesQuery.data ?? []).map((warehouse) => (

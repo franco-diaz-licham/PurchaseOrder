@@ -35,6 +35,8 @@ This document captures implementation decisions, assumptions, and tradeoffs made
 - `WarehouseStock` owns on-hand quantity for a warehouse/item pair, but active reserved quantity remains derived from reservations.
 - Audit entries are immutable records created by successful reservation and release workflows.
 - Stock reservation and release actions raise domain events from the domain model. The application layer only coordinates the use case; infrastructure handles those events before `SaveChangesAsync` and writes the audit entries in the same transaction.
+- The persistence context rejects updates or deletes for audit entries so audit records remain append-only through EF Core, not only through missing API endpoints.
+- Standard cost changes are managed through inventory item workflows. Finance only reads reservation-time cost snapshots and does not manage item cost.
 
 ## Concurrency Decision
 

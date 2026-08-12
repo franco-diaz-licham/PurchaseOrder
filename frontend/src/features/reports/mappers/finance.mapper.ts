@@ -9,7 +9,8 @@ export const toWarehouseCommittedReservation = (dto: WarehouseCommittedReservati
   inventoryItemId: dto.inventoryItemId,
   sku: dto.sku,
   itemName: dto.itemName,
-  itemDisplayName: `${dto.sku} - ${dto.itemName}`,
+  trackingMode: dto.trackingMode,
+  itemDisplayName: `${dto.sku} - ${dto.itemName} [${dto.trackingMode}]`,
   quantityReserved: dto.quantityReserved,
   unitCostSnapshot: dto.unitCostSnapshot,
   committedValue: dto.committedValue

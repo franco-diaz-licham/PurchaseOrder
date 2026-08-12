@@ -17,6 +17,7 @@ export type WarehouseCommittedReservation = {
   inventoryItemId: string;
   sku: string;
   itemName: string;
+  trackingMode: string;
   itemDisplayName: string;
   quantityReserved: number;
   unitCostSnapshot: number;

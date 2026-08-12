@@ -97,6 +97,7 @@ public sealed class FinanceRepository(DatabaseContext db) : IFinanceQueryReposit
                 line.InventoryItem.Id.Value,
                 line.InventoryItem.Sku,
                 line.InventoryItem.Name,
+                line.InventoryItem.TrackingMode.ToString(),
                 reservation.QuantityReserved.Value,
                 reservation.UnitCostSnapshot.Value,
                 committedValue));

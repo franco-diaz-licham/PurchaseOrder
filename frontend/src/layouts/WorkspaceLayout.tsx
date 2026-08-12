@@ -1,10 +1,11 @@
-import { UilChartPie, UilClipboardNotes, UilHistory, UilLayerGroup } from '@iconscout/react-unicons';
+import { UilBox, UilChartPie, UilClipboardNotes, UilHistory, UilLayerGroup } from '@iconscout/react-unicons';
 import { NavLink, Outlet } from 'react-router-dom';
 import { cn } from '@/lib/cn';
 
 const navItems = [
   { label: 'Purchase Orders', to: '/purchase-orders', icon: UilClipboardNotes },
-  { label: 'Finance', to: '/finance', icon: UilChartPie },
+  { label: 'Inventory Items', to: '/inventory-items', icon: UilBox },
+  { label: 'Finance Reports', to: '/finance', icon: UilChartPie },
   { label: 'Audit Log', to: '/audit-log', icon: UilHistory }
 ];
 

@@ -17,6 +17,7 @@ public sealed record WarehouseCommittedStockReservationResponse(
     Guid InventoryItemId,
     string Sku,
     string ItemName,
+    string TrackingMode,
     decimal QuantityReserved,
     decimal UnitCostSnapshot,
     decimal CommittedValue);

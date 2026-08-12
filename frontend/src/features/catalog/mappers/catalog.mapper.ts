@@ -17,7 +17,7 @@ export const toInventoryItem = (dto: InventoryItemDto): InventoryItem => ({
   category: dto.category,
   trackingMode: dto.trackingMode,
   standardCost: dto.standardCost,
-  displayName: `${dto.sku} - ${dto.name}`
+  displayName: `${dto.sku} - ${dto.name} [${dto.trackingMode}]`
 });
 
 export const toInventoryItems = (dtos: InventoryItemDto[]): InventoryItem[] => dtos.map(toInventoryItem);

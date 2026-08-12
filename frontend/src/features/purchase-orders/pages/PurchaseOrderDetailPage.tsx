@@ -9,6 +9,7 @@ import { AppButton } from '@/components/ui/AppButton';
 import { useInventoryItemsQuery, useWarehousesQuery, useWarehouseStockQuery } from '@/features/catalog/queries/catalog.queries';
 import { findInventoryItem, findWarehouse } from '@/features/catalog/utils/catalogLookup';
 import { useCreateReservationMutation, useReleaseReservationMutation, useReservationsQuery } from '@/features/reservations/queries/reservation.queries';
+import { useFinanceNavigationStore } from '@/features/reports/stores/financeNavigation.store';
 import { AddPurchaseOrderLineDialog, type AddPurchaseOrderLineFormValues } from '../components/AddPurchaseOrderLineDialog';
 import { ManageReservationsDialog } from '../components/ManageReservationsDialog';
 import { useAddPurchaseOrderLineMutation, usePurchaseOrderQuery, usePurchaseOrderStatusMutation, useRemovePurchaseOrderLineMutation } from '../queries/purchaseOrder.queries';
@@ -21,6 +22,8 @@ const money = new Intl.NumberFormat('en-AU', {
 export const PurchaseOrderDetailPage = () => {
   const { purchaseOrderId } = useParams();
   const navigate = useNavigate();
+  const openedFinancePurchaseOrderId = useFinanceNavigationStore((state) => state.openedPurchaseOrderId);
+  const clearOpenedFinancePurchaseOrder = useFinanceNavigationStore((state) => state.clearOpenedPurchaseOrder);
   const purchaseOrderQuery = usePurchaseOrderQuery(purchaseOrderId);
   const statusMutation = usePurchaseOrderStatusMutation();
   const addLineMutation = useAddPurchaseOrderLineMutation();
@@ -42,6 +45,7 @@ export const PurchaseOrderDetailPage = () => {
   const [isAddLineOpen, setIsAddLineOpen] = useState(false);
   const [manageReservationsLineId, setManageReservationsLineId] = useState<string | null>(null);
   const [reservationUser, setReservationUser] = useState('Franco Diaz');
+  const cameFromFinance = openedFinancePurchaseOrderId === purchaseOrderId;
 
   const manageReservationsLine = purchaseOrder?.lines.find((line) => line.id === manageReservationsLineId);
   const manageReservationsItem = manageReservationsLine ? findInventoryItem(itemsQuery.data, manageReservationsLine.inventoryItemId) : undefined;
@@ -87,10 +91,20 @@ export const PurchaseOrderDetailPage = () => {
     });
   };
 
+  const goBack = () => {
+    if (cameFromFinance) {
+      clearOpenedFinancePurchaseOrder();
+      navigate('/finance');
+      return;
+    }
+
+    navigate('/purchase-orders');
+  };
+
   return (
     <section>
       <PageHeader description="Review the full purchase order aggregate and manage its lifecycle." title={purchaseOrder?.number ?? 'Purchase Order'}>
-        <AppButton appearance="secondary" onClick={() => navigate('/purchase-orders')}>
+        <AppButton appearance="secondary" onClick={goBack}>
           Back
         </AppButton>
       </PageHeader>
@@ -251,10 +265,11 @@ export const PurchaseOrderDetailPage = () => {
           isReleasing={releaseReservationMutation.isPending}
           isReserving={createReservationMutation.isPending}
           itemName={manageReservationsItem?.displayName ?? manageReservationsLine.inventoryItemId}
+          trackingMode={manageReservationsItem?.trackingMode}
           line={manageReservationsLine}
           maxReserveQuantity={manageReservationsMaxQuantity}
           onCancel={closeManageReservationsDialog}
-          onRelease={(reservation) => releaseReservationMutation.mutate({ stockReservationId: reservation.id, quantity: reservation.quantityReserved, user: reservationUser })}
+          onRelease={(reservation, quantity) => releaseReservationMutation.mutate({ stockReservationId: reservation.id, quantity, user: reservationUser })}
           onReserve={reserveLine}
           onUserChange={setReservationUser}
           reservations={manageReservations}

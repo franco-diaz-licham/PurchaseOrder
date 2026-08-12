@@ -8,7 +8,9 @@ export const toReservation = (dto: ReservationDto): Reservation => ({
   inventoryItemId: dto.inventoryItemId,
   quantityReserved: dto.quantityReserved,
   unitCostSnapshot: dto.unitCostSnapshot,
-  status: dto.status
+  status: dto.status,
+  reservedBy: dto.reservedBy,
+  reservedAt: new Date(dto.reservedAt)
 });
 
 export const toReservations = (dtos: ReservationDto[]): Reservation[] => dtos.map(toReservation);

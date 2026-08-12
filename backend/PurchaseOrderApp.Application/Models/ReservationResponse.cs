@@ -7,4 +7,6 @@ public sealed record ReservationResponse(
     Guid InventoryItemId,
     decimal QuantityReserved,
     decimal UnitCostSnapshot,
-    string Status);
+    string Status,
+    string ReservedBy,
+    DateTimeOffset ReservedAt);

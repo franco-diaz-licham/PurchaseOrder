@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { PageHeader } from '@/components/common/PageHeader';
@@ -6,9 +5,11 @@ import { AppSelect } from '@/components/ui/AppSelect';
 import { useInventoryItemsQuery, useWarehousesQuery } from '@/features/catalog/queries/catalog.queries';
 import { findInventoryItem, findWarehouse } from '@/features/catalog/utils/catalogLookup';
 import { useAuditLogQuery } from '../queries/audit.queries';
+import { useAuditLogStore } from '../stores/auditLog.store';
 
 export const AuditLogPage = () => {
-  const [warehouseId, setWarehouseId] = useState('');
+  const warehouseId = useAuditLogStore((state) => state.selectedWarehouseId);
+  const setWarehouseId = useAuditLogStore((state) => state.setSelectedWarehouseId);
   const warehousesQuery = useWarehousesQuery();
   const itemsQuery = useInventoryItemsQuery();
   const auditQuery = useAuditLogQuery(warehouseId || undefined);

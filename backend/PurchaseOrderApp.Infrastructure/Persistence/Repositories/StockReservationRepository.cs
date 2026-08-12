@@ -76,6 +76,8 @@ public sealed class StockReservationRepository(DatabaseContext db) : IStockReser
             reservation.InventoryItemId.Value,
             reservation.QuantityReserved.Value,
             reservation.UnitCostSnapshot.Value,
-            reservation.Status.ToString());
+            reservation.Status.ToString(),
+            reservation.CreatedBy,
+            reservation.CreatedAt);
     }
 }

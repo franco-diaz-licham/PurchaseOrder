@@ -6,6 +6,8 @@ export type ReservationDto = {
   quantityReserved: number;
   unitCostSnapshot: number;
   status: string;
+  reservedBy: string;
+  reservedAt: string;
 };
 
 export type CreateReservationRequestDto = {

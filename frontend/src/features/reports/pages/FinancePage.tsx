@@ -1,9 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { PageHeader } from '@/components/common/PageHeader';
 import { AppButton } from '@/components/ui/AppButton';
 import { useWarehouseCommittedValuesQuery } from '../queries/finance.queries';
+import { useFinanceNavigationStore } from '../stores/financeNavigation.store';
 
 const money = new Intl.NumberFormat('en-AU', {
   style: 'currency',
@@ -11,13 +13,21 @@ const money = new Intl.NumberFormat('en-AU', {
 });
 
 export const FinancePage = () => {
+  const navigate = useNavigate();
   const financeQuery = useWarehouseCommittedValuesQuery();
-  const [selectedWarehouseId, setSelectedWarehouseId] = useState<string | null>(null);
+  const selectedWarehouseId = useFinanceNavigationStore((state) => state.selectedWarehouseId);
+  const setSelectedWarehouseId = useFinanceNavigationStore((state) => state.setSelectedWarehouseId);
+  const openPurchaseOrder = useFinanceNavigationStore((state) => state.openPurchaseOrder);
   const reportLoadedAt = useMemo(() => new Date().toLocaleString(), []);
   const totalCommittedValue = (financeQuery.data ?? []).reduce((total, row) => total + row.committedValue, 0);
   const totalReservedQuantity = (financeQuery.data ?? []).reduce((total, row) => total + row.reservedQuantity, 0);
   const totalReservationCount = (financeQuery.data ?? []).reduce((total, row) => total + row.reservationCount, 0);
   const selectedWarehouse = (financeQuery.data ?? []).find((row) => row.warehouseId === selectedWarehouseId) ?? null;
+
+  const openPurchaseOrderDetail = (purchaseOrderId: string, warehouseId: string) => {
+    openPurchaseOrder(purchaseOrderId, warehouseId);
+    navigate(`/purchase-orders/${purchaseOrderId}`);
+  };
 
   return (
     <section>
@@ -98,7 +108,11 @@ export const FinancePage = () => {
                 <tbody>
                   {selectedWarehouse.reservations.map((reservation) => (
                     <tr className="border-t" key={reservation.stockReservationId}>
-                      <td className="px-4 py-3">{reservation.purchaseOrderNumber}</td>
+                      <td className="px-4 py-3">
+                        <button className="font-medium text-primary underline-offset-4 hover:underline" type="button" onClick={() => openPurchaseOrderDetail(reservation.purchaseOrderId, selectedWarehouse.warehouseId)}>
+                          {reservation.purchaseOrderNumber}
+                        </button>
+                      </td>
                       <td className="px-4 py-3">{reservation.itemDisplayName}</td>
                       <td className="px-4 py-3">{reservation.quantityReserved}</td>
                       <td className="px-4 py-3">{money.format(reservation.unitCostSnapshot)}</td>
@@ -108,7 +122,7 @@ export const FinancePage = () => {
                 </tbody>
               </table>
             </div>
-        </div>
+          </div>
         )}
       </div>
     </section>
