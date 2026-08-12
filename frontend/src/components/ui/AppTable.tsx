@@ -51,11 +51,11 @@ type AppTableCellProps = {
   colSpan?: number;
 };
 
-export const AppTableContainer = ({ bordered = false, className, maxHeight, ...props }: AppTableContainerProps) => <div className={cn('overflow-auto', bordered && 'rounded-md border', className)} style={{ maxHeight }} {...props} />;
+export const AppTableContainer = ({ bordered = false, className, maxHeight, ...props }: AppTableContainerProps) => <div className={cn('overflow-auto rounded-md', bordered && 'border bg-card', className)} style={{ maxHeight }} {...props} />;
 
-export const AppTable = ({ className, minWidth, ...props }: AppTableProps) => <table className={cn('w-full text-left text-sm', className)} style={{ minWidth }} {...props} />;
+export const AppTable = ({ className, minWidth, ...props }: AppTableProps) => <table className={cn('w-full border-separate border-spacing-0 text-left text-sm', className)} style={{ minWidth }} {...props} />;
 
-export const AppTableHead = ({ className, sticky = false, ...props }: AppTableSectionProps) => <thead className={cn('bg-muted text-xs uppercase text-muted-foreground', sticky && 'sticky top-0 z-10', className)} {...props} />;
+export const AppTableHead = ({ className, sticky = false, ...props }: AppTableSectionProps) => <thead className={cn('bg-muted text-xs uppercase text-muted-foreground', sticky && 'sticky top-0 z-10 shadow-[0_1px_0_hsl(var(--border))]', className)} {...props} />;
 
 export const AppTableBody = ({ className, ...props }: AppTableSectionProps) => <tbody className={className} {...props} />;
 
@@ -63,6 +63,6 @@ export const AppTableHeaderRow = ({ className, ...props }: AppTableHeaderRowProp
 
 export const AppTableRow = ({ className, interactive = false, ...props }: AppTableRowProps) => <tr className={cn('border-t', interactive && 'cursor-pointer hover:bg-muted/60', className)} {...props} />;
 
-export const AppTableHeaderCell = ({ align = 'left', ariaLabel, className, ...props }: AppTableHeaderCellProps) => <th aria-label={ariaLabel} className={cn('px-4 py-3', align === 'right' && 'text-right', className)} {...props} />;
+export const AppTableHeaderCell = ({ align = 'left', ariaLabel, className, ...props }: AppTableHeaderCellProps) => <th aria-label={ariaLabel} className={cn('border-b px-4 py-3', align === 'right' && 'text-right', className)} {...props} />;
 
-export const AppTableCell = ({ align = 'left', className, ...props }: AppTableCellProps) => <td className={cn('px-4 py-3', align === 'right' && 'text-right', className)} {...props} />;
+export const AppTableCell = ({ align = 'left', className, ...props }: AppTableCellProps) => <td className={cn('border-t px-4 py-3', align === 'right' && 'text-right', className)} {...props} />;
