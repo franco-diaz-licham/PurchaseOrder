@@ -3,6 +3,7 @@ using PurchaseOrderApp.Application.Ports;
 using PurchaseOrderApp.Application.Helpers;
 using PurchaseOrderApp.Domain.Core;
 using PurchaseOrderApp.Domain.Entities;
+using PurchaseOrderApp.Domain.Services;
 using PurchaseOrderApp.Domain.ValueObjects;
 
 namespace PurchaseOrderApp.Application.UseCases;
@@ -36,7 +37,6 @@ public sealed class PurchaseOrderService(
     IInventoryItemRepository inventoryItemRepository,
     IWarehouseStockRepository warehouseStockRepository,
     IStockReservationRepository stockReservationRepository,
-    IAuditLogRepository auditLogRepository,
     IUnitOfWork unitOfWork) : IPurchaseOrderService
 {
     public async Task<Result<PurchaseOrderResponse>> SubmitAsync(SubmitPurchaseOrderCommand command, CancellationToken cancellationToken)
@@ -158,15 +158,16 @@ public sealed class PurchaseOrderService(
                 }
 
                 var releaseQuantity = reservation.QuantityReserved;
-                reservation.Release(releaseQuantity, command.User, command.OccurredAt);
-                purchaseOrder.ReleaseLine(reservation.PurchaseOrderLineId, releaseQuantity, command.User, command.OccurredAt);
+                StockReservationDomainService.Release(
+                    purchaseOrder,
+                    reservation,
+                    stock,
+                    activeReservedQuantity,
+                    releaseQuantity,
+                    command.User,
+                    command.OccurredAt);
 
-                var resultingActiveReservedQuantity = activeReservedQuantity.Subtract(releaseQuantity);
-                activeReservedByItem[reservation.InventoryItemId] = resultingActiveReservedQuantity;
-
-                var resultingAvailableQuantity = stock.CalculateAvailableQuantity(resultingActiveReservedQuantity);
-                var auditLogEntry = AuditLogEntry.RecordRelease(reservation, releaseQuantity, resultingAvailableQuantity, command.User, command.OccurredAt);
-                await auditLogRepository.AddAsync(auditLogEntry, cancellationToken);
+                activeReservedByItem[reservation.InventoryItemId] = activeReservedQuantity.Subtract(releaseQuantity);
             }
 
             purchaseOrder.RemoveLine(command.PurchaseOrderLineId, command.User, command.OccurredAt);

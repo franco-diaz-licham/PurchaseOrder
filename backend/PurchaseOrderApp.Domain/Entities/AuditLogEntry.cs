@@ -1,5 +1,6 @@
 using PurchaseOrderApp.Domain.Core;
 using PurchaseOrderApp.Domain.Enums;
+using PurchaseOrderApp.Domain.Events;
 using PurchaseOrderApp.Domain.ValueObjects;
 
 namespace PurchaseOrderApp.Domain.Entities;
@@ -70,42 +71,33 @@ public sealed class AuditLogEntry : Entity<AuditLogEntryId>
     /// </summary>
     public Quantity ResultingAvailableQuantity { get; private set; }
 
-    public static AuditLogEntry RecordReservation(
-        StockReservation reservation,
-        Quantity resultingAvailableQuantity,
-        string user,
-        DateTimeOffset occurredAt)
+    public static AuditLogEntry RecordReservation(StockReservedEvent domainEvent)
     {
         return new AuditLogEntry(
             new AuditLogEntryId(Guid.NewGuid()),
             AuditAction.Reserve,
-            reservation.InventoryItemId,
-            reservation.WarehouseId,
-            reservation.PurchaseOrderLineId,
-            reservation.Id,
-            reservation.QuantityReserved,
-            resultingAvailableQuantity,
-            user,
-            occurredAt);
+            domainEvent.InventoryItemId,
+            domainEvent.WarehouseId,
+            domainEvent.PurchaseOrderLineId,
+            domainEvent.StockReservationId,
+            domainEvent.QuantityReserved,
+            domainEvent.ResultingAvailableQuantity,
+            domainEvent.User,
+            domainEvent.OccurredAt);
     }
 
-    public static AuditLogEntry RecordRelease(
-        StockReservation reservation,
-        Quantity releasedQuantity,
-        Quantity resultingAvailableQuantity,
-        string user,
-        DateTimeOffset occurredAt)
+    public static AuditLogEntry RecordRelease(StockReleasedEvent domainEvent)
     {
         return new AuditLogEntry(
             new AuditLogEntryId(Guid.NewGuid()),
             AuditAction.Release,
-            reservation.InventoryItemId,
-            reservation.WarehouseId,
-            reservation.PurchaseOrderLineId,
-            reservation.Id,
-            releasedQuantity,
-            resultingAvailableQuantity,
-            user,
-            occurredAt);
+            domainEvent.InventoryItemId,
+            domainEvent.WarehouseId,
+            domainEvent.PurchaseOrderLineId,
+            domainEvent.StockReservationId,
+            domainEvent.QuantityReleased,
+            domainEvent.ResultingAvailableQuantity,
+            domainEvent.User,
+            domainEvent.OccurredAt);
     }
 }

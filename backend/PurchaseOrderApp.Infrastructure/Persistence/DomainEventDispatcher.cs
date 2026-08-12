@@ -1,12 +1,23 @@
 using PurchaseOrderApp.Application.Ports;
 using PurchaseOrderApp.Domain.Core;
+using PurchaseOrderApp.Domain.Entities;
+using PurchaseOrderApp.Domain.Events;
 
 namespace PurchaseOrderApp.Infrastructure.Persistence;
 
-public sealed class DomainEventDispatcher : IDomainEventDispatcher
+public sealed class DomainEventDispatcher(DatabaseContext db) : IDomainEventDispatcher
 {
-    public Task DispatchAsync(IReadOnlyCollection<IDomainEvent> domainEvents, CancellationToken cancellationToken)
+    public async Task DispatchAsync(IReadOnlyCollection<IDomainEvent> domainEvents, CancellationToken cancellationToken)
     {
-        return Task.CompletedTask;
+        foreach (var domainEvent in domainEvents) {
+            switch (domainEvent) {
+                case StockReservedEvent stockReserved:
+                    await db.AuditLogEntries.AddAsync(AuditLogEntry.RecordReservation(stockReserved), cancellationToken);
+                    break;
+                case StockReleasedEvent stockReleased:
+                    await db.AuditLogEntries.AddAsync(AuditLogEntry.RecordRelease(stockReleased), cancellationToken);
+                    break;
+            }
+        }
     }
 }

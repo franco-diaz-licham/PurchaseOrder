@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PurchaseOrderApp.Application.Models;
 using PurchaseOrderApp.Application.Ports;
-using PurchaseOrderApp.Domain.Entities;
 using PurchaseOrderApp.Domain.ValueObjects;
 
 namespace PurchaseOrderApp.Infrastructure.Persistence.Repositories;
@@ -34,10 +33,5 @@ public sealed class AuditLogRepository(DatabaseContext db) : IAuditLogRepository
                 entry.CreatedBy,
                 entry.CreatedAt))
             .ToList();
-    }
-
-    public async Task AddAsync(AuditLogEntry auditLogEntry, CancellationToken cancellationToken)
-    {
-        await db.AuditLogEntries.AddAsync(auditLogEntry, cancellationToken);
     }
 }

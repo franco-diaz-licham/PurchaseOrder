@@ -1,5 +1,6 @@
 using PurchaseOrderApp.Domain.Core;
 using PurchaseOrderApp.Domain.Enums;
+using PurchaseOrderApp.Domain.Events;
 using PurchaseOrderApp.Domain.ValueObjects;
 
 namespace PurchaseOrderApp.Domain.Entities;
@@ -68,17 +69,18 @@ public sealed class StockReservation : Entity<StockReservationId>
     /// </summary>
     public Money CommittedValue => new(UnitCostSnapshot.Value * QuantityReserved.Value);
 
-    public static StockReservation Create(
+    internal static StockReservation Create(
         PurchaseOrderLineId purchaseOrderLineId,
         WarehouseId warehouseId,
         InventoryItem item,
         Quantity quantityReserved,
+        Quantity resultingAvailableQuantity,
         string user,
         DateTimeOffset occurredAt)
     {
         quantityReserved.EnsureValidFor(item.TrackingMode);
 
-        return new StockReservation(
+        var reservation = new StockReservation(
             new StockReservationId(Guid.NewGuid()),
             purchaseOrderLineId,
             warehouseId,
@@ -87,9 +89,21 @@ public sealed class StockReservation : Entity<StockReservationId>
             item.StandardCost,
             user,
             occurredAt);
+
+        reservation.RaiseDomainEvent(new StockReservedEvent(
+            reservation.Id,
+            reservation.PurchaseOrderLineId,
+            reservation.WarehouseId,
+            reservation.InventoryItemId,
+            reservation.QuantityReserved,
+            resultingAvailableQuantity,
+            user,
+            occurredAt));
+
+        return reservation;
     }
 
-    public void Release(Quantity quantity, string user, DateTimeOffset occurredAt)
+    internal void Release(Quantity quantity, Quantity resultingAvailableQuantity, string user, DateTimeOffset occurredAt)
     {
         if (Status != ReservationStatus.Active) throw new DomainException("Only active reservations can be released.");
         if (quantity.IsZero) throw new DomainException("Release quantity must be greater than zero.");
@@ -99,5 +113,14 @@ public sealed class StockReservation : Entity<StockReservationId>
         if (QuantityReserved.IsZero) Status = ReservationStatus.Released;
 
         SetUpdated(user, occurredAt);
+        RaiseDomainEvent(new StockReleasedEvent(
+            Id,
+            PurchaseOrderLineId,
+            WarehouseId,
+            InventoryItemId,
+            quantity,
+            resultingAvailableQuantity,
+            user,
+            occurredAt));
     }
 }

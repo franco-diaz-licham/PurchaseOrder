@@ -34,6 +34,7 @@ This document captures implementation decisions, assumptions, and tradeoffs made
 - `StockReservation` is its own entity because it has its own lifecycle, cost snapshot, and release behavior.
 - `WarehouseStock` owns on-hand quantity for a warehouse/item pair, but active reserved quantity remains derived from reservations.
 - Audit entries are immutable records created by successful reservation and release workflows.
+- Stock reservation and release actions raise domain events from the domain model. The application layer only coordinates the use case; infrastructure handles those events before `SaveChangesAsync` and writes the audit entries in the same transaction.
 
 ## Concurrency Decision
 

@@ -4,6 +4,7 @@ using PurchaseOrderApp.Application.Ports;
 using PurchaseOrderApp.Domain.Core;
 using PurchaseOrderApp.Domain.Entities;
 using PurchaseOrderApp.Domain.Enums;
+using PurchaseOrderApp.Domain.Services;
 using PurchaseOrderApp.Domain.ValueObjects;
 
 namespace PurchaseOrderApp.Application.UseCases;
@@ -24,7 +25,6 @@ public sealed class ReservationService(
     IInventoryItemRepository inventoryItemRepository,
     IWarehouseStockRepository warehouseStockRepository,
     IStockReservationRepository stockReservationRepository,
-    IAuditLogRepository auditLogRepository,
     IUnitOfWork unitOfWork) : IReservationService
 {
     public async Task<Result<ReservationResponse>> GetAsync(StockReservationId stockReservationId, CancellationToken cancellationToken)
@@ -68,23 +68,17 @@ public sealed class ReservationService(
             if (stock is null) return await TransactionResult.RollBackNotFoundAsync<ReservationResponse>(unitOfWork, "Warehouse stock was not found.", cancellationToken);
 
             var activeReservedQuantity = await stockReservationRepository.GetActiveReservedQuantityAsync(command.WarehouseId, item.Id, cancellationToken);
-            stock.EnsureCanReserve(activeReservedQuantity, command.Quantity);
-
-            purchaseOrder.ReserveLine(command.PurchaseOrderLineId, command.Quantity, command.User, command.OccurredAt);
-
-            var reservation = StockReservation.Create(
+            var reservation = StockReservationDomainService.Reserve(
+                purchaseOrder,
                 command.PurchaseOrderLineId,
-                command.WarehouseId,
+                stock,
                 item,
+                activeReservedQuantity,
                 command.Quantity,
                 command.User,
                 command.OccurredAt);
 
             await stockReservationRepository.AddAsync(reservation, cancellationToken);
-
-            var resultingAvailableQuantity = stock.CalculateAvailableQuantity(activeReservedQuantity.Add(command.Quantity));
-            var auditLogEntry = AuditLogEntry.RecordReservation(reservation, resultingAvailableQuantity, command.User, command.OccurredAt);
-            await auditLogRepository.AddAsync(auditLogEntry, cancellationToken);
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
             await unitOfWork.CommitTransactionAsync(cancellationToken);
@@ -123,13 +117,14 @@ public sealed class ReservationService(
             if (stock is null) return await TransactionResult.RollBackNotFoundAsync<ReservationResponse>(unitOfWork, "Warehouse stock was not found.", cancellationToken);
 
             var activeReservedQuantity = await stockReservationRepository.GetActiveReservedQuantityAsync(reservation.WarehouseId, reservation.InventoryItemId, cancellationToken);
-
-            reservation.Release(command.Quantity, command.User, command.OccurredAt);
-            purchaseOrder.ReleaseLine(reservation.PurchaseOrderLineId, command.Quantity, command.User, command.OccurredAt);
-
-            var resultingAvailableQuantity = stock.CalculateAvailableQuantity(activeReservedQuantity.Subtract(command.Quantity));
-            var auditLogEntry = AuditLogEntry.RecordRelease(reservation, command.Quantity, resultingAvailableQuantity, command.User, command.OccurredAt);
-            await auditLogRepository.AddAsync(auditLogEntry, cancellationToken);
+            StockReservationDomainService.Release(
+                purchaseOrder,
+                reservation,
+                stock,
+                activeReservedQuantity,
+                command.Quantity,
+                command.User,
+                command.OccurredAt);
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
             await unitOfWork.CommitTransactionAsync(cancellationToken);
