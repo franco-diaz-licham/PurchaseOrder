@@ -118,6 +118,7 @@ export const ManageReservationsDialog = ({ availableQuantity, isReleasing, isRes
                       <AppTableCell>{dateTime.format(reservation.reservedAt)}</AppTableCell>
                       <AppTableCell>
                         <AppInput
+                          aria-label={releaseLabel}
                           className="w-32 text-right"
                           max={reservation.quantityReserved}
                           min={minimumQuantity}

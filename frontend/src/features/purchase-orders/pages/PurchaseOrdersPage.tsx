@@ -8,6 +8,7 @@ import { PurchaseOrderListActions } from '../components/PurchaseOrderListActions
 import { PurchaseOrderSummaryTable } from '../components/PurchaseOrderSummaryTable';
 import { usePurchaseOrderSummariesQuery, useSubmitPurchaseOrderMutation } from '../queries/purchaseOrder.queries';
 import { usePurchaseOrderListStore } from '../stores/purchaseOrderList.store';
+import { filterPurchaseOrders } from '../utils/purchaseOrderFilters';
 
 export const PurchaseOrdersPage = () => {
   const warehouseFilter = usePurchaseOrderListStore((state) => state.selectedWarehouseId);
@@ -20,11 +21,9 @@ export const PurchaseOrdersPage = () => {
   const purchaseOrdersQuery = usePurchaseOrderSummariesQuery();
   const submitMutation = useSubmitPurchaseOrderMutation();
   const purchaseOrders = useMemo(() => {
-    const orders = purchaseOrdersQuery.data ?? [];
-    return orders.filter((order) => {
-      if (warehouseFilter.length > 0 && order.warehouseId !== warehouseFilter) return false;
-      if (showReadyToReserveOnly && (order.status !== 'Approved' || order.quantityRemaining <= 0)) return false;
-      return true;
+    return filterPurchaseOrders(purchaseOrdersQuery.data ?? [], {
+      warehouseId: warehouseFilter,
+      showReadyToReserveOnly
     });
   }, [purchaseOrdersQuery.data, showReadyToReserveOnly, warehouseFilter]);
   const isLoading = purchaseOrdersQuery.isLoading || warehousesQuery.isLoading;
