@@ -170,7 +170,7 @@ What I am confident in:
 - The domain model owns the important mutations: purchase order line reservation totals, reservation release behavior, and audit domain events.
 - Audit log entries are created from domain events and saved in the same transaction as the reservation/release.
 - Finance reporting uses the reservation-time cost snapshot, and tests cover the standard cost change scenario.
-- The code is intentionally boring: explicit services, repositories, DTOs, models, and mapper functions rather than clever abstractions. I wanted the implementation to be easy to explain in a walkthrough.
+- The code is intentionally boring: explicit services, repositories, DTOs, models, and mapper functions rather than clever abstractions.
 
 What I would flag in review:
 
