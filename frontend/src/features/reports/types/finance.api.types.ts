@@ -1,3 +1,5 @@
+import type { InventoryTrackingMode } from '@/features/catalog/types/catalog.types';
+
 export type WarehouseCommittedValueResponseDto = {
   warehouseId: string;
   warehouseCode: string;
@@ -16,7 +18,7 @@ export type WarehouseCommittedReservationResponseDto = {
   inventoryItemId: string;
   sku: string;
   itemName: string;
-  trackingMode: string;
+  trackingMode: InventoryTrackingMode;
   quantityReserved: number;
   unitCostSnapshot: number;
   committedValue: number;

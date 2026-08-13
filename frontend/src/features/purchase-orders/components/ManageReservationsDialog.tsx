@@ -6,6 +6,7 @@ import { AppInput } from '@/components/ui/AppInput';
 import { AppTable, AppTableBody, AppTableCell, AppTableContainer, AppTableHead, AppTableHeaderCell, AppTableHeaderRow, AppTableRow } from '@/components/ui/AppTable';
 import type { ReservationModel } from '@/features/reservations/types/reservation.types';
 import { formatMoney } from '@/lib/formatMoney';
+import type { InventoryTrackingMode } from '@/features/catalog/types/catalog.types';
 import type { PurchaseOrderLineModel } from '../types/purchaseOrder.types';
 
 const dateTime = new Intl.DateTimeFormat('en-AU', {
@@ -18,7 +19,7 @@ type ManageReservationsDialogProps = {
   isReleasing: boolean;
   isReserving: boolean;
   itemName: string;
-  trackingMode: string | undefined;
+  trackingMode: InventoryTrackingMode | undefined;
   line: PurchaseOrderLineModel;
   maxReserveQuantity: number;
   reservations: ReservationModel[];

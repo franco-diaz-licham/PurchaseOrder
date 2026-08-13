@@ -1,3 +1,5 @@
+import type { InventoryItemCategory, InventoryTrackingMode } from './catalog.types';
+
 export type WarehouseResponseDto = {
   warehouseId: string;
   code: string;
@@ -8,8 +10,8 @@ export type InventoryItemResponseDto = {
   inventoryItemId: string;
   sku: string;
   name: string;
-  category: string;
-  trackingMode: string;
+  category: InventoryItemCategory;
+  trackingMode: InventoryTrackingMode;
   standardCost: number;
 };
 

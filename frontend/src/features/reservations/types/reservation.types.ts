@@ -1,3 +1,5 @@
+export type ReservationStatus = 'Active' | 'Released';
+
 export type ReservationModel = {
   id: string;
   purchaseOrderLineId: string;
@@ -5,7 +7,7 @@ export type ReservationModel = {
   inventoryItemId: string;
   quantityReserved: number;
   unitCostSnapshot: number;
-  status: string;
+  status: ReservationStatus;
   reservedBy: string;
   reservedAt: Date;
 };

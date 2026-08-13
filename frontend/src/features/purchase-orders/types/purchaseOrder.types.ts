@@ -1,3 +1,5 @@
+export type PurchaseOrderStatus = 'Pending' | 'Approved' | 'Closed' | 'Cancelled';
+
 export type PurchaseOrderLineModel = {
   id: string;
   inventoryItemId: string;
@@ -12,7 +14,7 @@ export type PurchaseOrderModel = {
   id: string;
   number: string;
   warehouseId: string;
-  status: string;
+  status: PurchaseOrderStatus;
   subtotalAmount: number;
   gstAmount: number;
   totalAmount: number;
@@ -23,7 +25,7 @@ export type PurchaseOrderSummaryModel = {
   id: string;
   number: string;
   warehouseId: string;
-  status: string;
+  status: PurchaseOrderStatus;
   lineCount: number;
   quantityOrdered: number;
   quantityReserved: number;

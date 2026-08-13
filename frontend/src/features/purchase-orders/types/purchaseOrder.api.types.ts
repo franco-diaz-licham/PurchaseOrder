@@ -1,3 +1,5 @@
+import type { PurchaseOrderStatus } from './purchaseOrder.types';
+
 export type PurchaseOrderLineResponseDto = {
   purchaseOrderLineId: string;
   inventoryItemId: string;
@@ -12,7 +14,7 @@ export type PurchaseOrderResponseDto = {
   purchaseOrderId: string;
   purchaseOrderNumber: string;
   warehouseId: string;
-  status: string;
+  status: PurchaseOrderStatus;
   subtotalAmount: number;
   gstAmount: number;
   totalAmount: number;
@@ -23,7 +25,7 @@ export type PurchaseOrderSummaryResponseDto = {
   purchaseOrderId: string;
   purchaseOrderNumber: string;
   warehouseId: string;
-  status: string;
+  status: PurchaseOrderStatus;
   lineCount: number;
   quantityOrdered: number;
   quantityReserved: number;

@@ -1,6 +1,8 @@
+import type { AuditAction } from './audit.types';
+
 export type AuditLogEntryResponseDto = {
   auditLogEntryId: string;
-  action: string;
+  action: AuditAction;
   inventoryItemId: string;
   warehouseId: string;
   purchaseOrderLineId: string;

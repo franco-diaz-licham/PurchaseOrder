@@ -1,3 +1,7 @@
+export type InventoryItemCategory = 'General' | 'BulkGoods' | 'Perishable' | 'Hardware';
+
+export type InventoryTrackingMode = 'Unit' | 'Weight';
+
 export type WarehouseModel = {
   id: string;
   code: string;
@@ -9,8 +13,8 @@ export type InventoryItemModel = {
   id: string;
   sku: string;
   name: string;
-  category: string;
-  trackingMode: string;
+  category: InventoryItemCategory;
+  trackingMode: InventoryTrackingMode;
   standardCost: number;
   displayName: string;
 };

@@ -1,6 +1,8 @@
+export type AuditAction = 'Reserve' | 'Release';
+
 export type AuditLogEntryModel = {
   id: string;
-  action: string;
+  action: AuditAction;
   inventoryItemId: string;
   warehouseId: string;
   purchaseOrderLineId: string;

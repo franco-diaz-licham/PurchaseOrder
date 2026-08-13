@@ -1,3 +1,5 @@
+import type { ReservationStatus } from './reservation.types';
+
 export type ReservationResponseDto = {
   stockReservationId: string;
   purchaseOrderLineId: string;
@@ -5,7 +7,7 @@ export type ReservationResponseDto = {
   inventoryItemId: string;
   quantityReserved: number;
   unitCostSnapshot: number;
-  status: string;
+  status: ReservationStatus;
   reservedBy: string;
   reservedAt: string;
 };
