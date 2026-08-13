@@ -8,6 +8,9 @@ namespace PurchaseOrderApp.Domain.Services;
 /// </summary>
 public static class StockReservationDomainService
 {
+    /// <summary>
+    /// Reserves stock for a purchase order line after validating available warehouse stock.
+    /// </summary>
     public static StockReservation Reserve(
         PurchaseOrder purchaseOrder,
         PurchaseOrderLineId purchaseOrderLineId,
@@ -32,6 +35,9 @@ public static class StockReservationDomainService
             occurredAt);
     }
 
+    /// <summary>
+    /// Releases stock from an active reservation and updates the owning purchase order line.
+    /// </summary>
     public static void Release(
         PurchaseOrder purchaseOrder,
         StockReservation reservation,

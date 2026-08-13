@@ -5,6 +5,13 @@ namespace PurchaseOrderApp.Domain.Enums;
 /// </summary>
 public enum AuditAction
 {
+    /// <summary>
+    /// Stock was reserved against a purchase order line.
+    /// </summary>
     Reserve = 1,
+
+    /// <summary>
+    /// Stock was released from an active reservation.
+    /// </summary>
     Release = 2
 }

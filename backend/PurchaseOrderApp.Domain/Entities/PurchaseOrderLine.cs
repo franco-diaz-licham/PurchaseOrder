@@ -10,6 +10,9 @@ public sealed class PurchaseOrderLine : Entity<PurchaseOrderLineId>
 {
     private PurchaseOrderLine() { }
 
+    /// <summary>
+    /// Creates a purchase order line owned by the purchase order aggregate.
+    /// </summary>
     internal PurchaseOrderLine(
         PurchaseOrderLineId id,
         PurchaseOrderId purchaseOrderId,
@@ -67,6 +70,9 @@ public sealed class PurchaseOrderLine : Entity<PurchaseOrderLineId>
     /// </summary>
     public bool IsFullyReserved => QuantityReserved == QuantityOrdered;
 
+    /// <summary>
+    /// Increases reserved quantity while ensuring the line is not over-reserved.
+    /// </summary>
     internal void Reserve(Quantity quantity, string user, DateTimeOffset occurredAt)
     {
         if (quantity.IsZero) throw new DomainException("Reservation quantity must be greater than zero.");
@@ -76,6 +82,9 @@ public sealed class PurchaseOrderLine : Entity<PurchaseOrderLineId>
         SetUpdated(user, occurredAt);
     }
 
+    /// <summary>
+    /// Decreases reserved quantity when stock is released.
+    /// </summary>
     internal void Release(Quantity quantity, string user, DateTimeOffset occurredAt)
     {
         if (quantity.IsZero) throw new DomainException("Release quantity must be greater than zero.");
@@ -85,6 +94,9 @@ public sealed class PurchaseOrderLine : Entity<PurchaseOrderLineId>
         SetUpdated(user, occurredAt);
     }
 
+    /// <summary>
+    /// Changes ordered quantity while keeping existing reservations valid.
+    /// </summary>
     internal void UpdateQuantity(Quantity quantityOrdered, string user, DateTimeOffset occurredAt)
     {
         if (quantityOrdered.IsZero) throw new DomainException("Purchase order line quantity must be greater than zero.");

@@ -69,6 +69,9 @@ public sealed class StockReservation : Entity<StockReservationId>
     /// </summary>
     public Money CommittedValue => new(UnitCostSnapshot.Value * QuantityReserved.Value);
 
+    /// <summary>
+    /// Creates a new active stock reservation and raises the reserved event.
+    /// </summary>
     internal static StockReservation Create(
         PurchaseOrderLineId purchaseOrderLineId,
         WarehouseId warehouseId,
@@ -103,6 +106,9 @@ public sealed class StockReservation : Entity<StockReservationId>
         return reservation;
     }
 
+    /// <summary>
+    /// Releases part or all of the reservation and raises the released event.
+    /// </summary>
     internal void Release(Quantity quantity, Quantity resultingAvailableQuantity, string user, DateTimeOffset occurredAt)
     {
         if (Status != ReservationStatus.Active) throw new DomainException("Only active reservations can be released.");

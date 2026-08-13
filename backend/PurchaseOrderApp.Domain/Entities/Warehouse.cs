@@ -28,11 +28,17 @@ public sealed class Warehouse : Entity<WarehouseId>
     /// </summary>
     public string Name { get; private set; } = default!;
 
+    /// <summary>
+    /// Creates a new warehouse aggregate.
+    /// </summary>
     public static Warehouse Create(string code, string name, string user, DateTimeOffset occurredAt)
     {
         return new Warehouse(new WarehouseId(Guid.NewGuid()), code, name, user, occurredAt);
     }
 
+    /// <summary>
+    /// Changes the warehouse display name.
+    /// </summary>
     public void Rename(string name, string user, DateTimeOffset occurredAt)
     {
         Name = Required(name, nameof(name));

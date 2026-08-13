@@ -71,6 +71,9 @@ public sealed class AuditLogEntry : Entity<AuditLogEntryId>
     /// </summary>
     public Quantity ResultingAvailableQuantity { get; private set; }
 
+    /// <summary>
+    /// Creates an audit entry from a stock reserved domain event.
+    /// </summary>
     public static AuditLogEntry RecordReservation(StockReservedEvent domainEvent)
     {
         return new AuditLogEntry(
@@ -86,6 +89,9 @@ public sealed class AuditLogEntry : Entity<AuditLogEntryId>
             domainEvent.OccurredAt);
     }
 
+    /// <summary>
+    /// Creates an audit entry from a stock released domain event.
+    /// </summary>
     public static AuditLogEntry RecordRelease(StockReleasedEvent domainEvent)
     {
         return new AuditLogEntry(

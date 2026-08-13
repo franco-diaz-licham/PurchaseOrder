@@ -5,6 +5,13 @@ namespace PurchaseOrderApp.Domain.Enums;
 /// </summary>
 public enum InventoryTrackingMode
 {
+    /// <summary>
+    /// Quantity must be a whole number.
+    /// </summary>
     Unit = 1,
+
+    /// <summary>
+    /// Quantity can use up to 3 decimal places.
+    /// </summary>
     Weight = 2
 }

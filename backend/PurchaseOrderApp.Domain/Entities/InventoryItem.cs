@@ -55,6 +55,9 @@ public sealed class InventoryItem : Entity<InventoryItemId>
     /// </summary>
     public Money StandardCost { get; private set; }
 
+    /// <summary>
+    /// Creates a new inventory item aggregate.
+    /// </summary>
     public static InventoryItem Create(
         string sku,
         string name,
@@ -75,8 +78,14 @@ public sealed class InventoryItem : Entity<InventoryItemId>
             occurredAt);
     }
 
+    /// <summary>
+    /// Ensures a quantity matches this item's tracking precision.
+    /// </summary>
     public void EnsureValidQuantity(Quantity quantity) => quantity.EnsureValidFor(TrackingMode);
 
+    /// <summary>
+    /// Changes the current standard cost used by future reservations.
+    /// </summary>
     public void ChangeStandardCost(Money standardCost, string user, DateTimeOffset occurredAt)
     {
         StandardCost = standardCost;

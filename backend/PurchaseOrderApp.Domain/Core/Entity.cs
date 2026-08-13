@@ -32,22 +32,37 @@ public abstract class Entity
     /// </summary>
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
+    /// <summary>
+    /// Sets the initial lifecycle metadata for a newly created entity.
+    /// </summary>
     protected void SetCreated(string user, DateTimeOffset occurredAt)
     {
         CreatedBy = Required(user, nameof(user));
         CreatedAt = occurredAt;
     }
 
+    /// <summary>
+    /// Sets the lifecycle metadata for the most recent entity change.
+    /// </summary>
     protected void SetUpdated(string user, DateTimeOffset occurredAt)
     {
         UpdatedBy = Required(user, nameof(user));
         UpdatedAt = occurredAt;
     }
 
+    /// <summary>
+    /// Adds a domain event to be dispatched by the current unit of work.
+    /// </summary>
     protected void RaiseDomainEvent(IDomainEvent domainEvent) => _domainEvents.Add(domainEvent);
 
+    /// <summary>
+    /// Clears domain events after they have been dispatched.
+    /// </summary>
     public void ClearDomainEvents() => _domainEvents.Clear();
 
+    /// <summary>
+    /// Trims and validates required text values.
+    /// </summary>
     protected static string Required(string value, string name)
     {
         if (string.IsNullOrWhiteSpace(value)) throw new DomainException($"{name} is required.");
