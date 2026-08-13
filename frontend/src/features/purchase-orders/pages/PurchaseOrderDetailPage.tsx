@@ -207,6 +207,7 @@ export const PurchaseOrderDetailPage = () => {
           onSubmit={updateLine}
           quantityOrdered={editLine.quantityOrdered}
           quantityReserved={editLine.quantityReserved}
+          trackingMode={editLineItem?.trackingMode}
         />
       )}
       {manageReservationsLine && (

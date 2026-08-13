@@ -14,8 +14,8 @@ describe('AddPurchaseOrderLineDialog', () => {
 
     // Act
     await user.selectOptions(screen.getByLabelText('Inventory item'), 'item-1');
-    await user.clear(screen.getByLabelText('Quantity in units'));
-    await user.type(screen.getByLabelText('Quantity in units'), '12.5');
+    await user.clear(screen.getByLabelText('Quantity (units)'));
+    await user.type(screen.getByLabelText('Quantity (units)'), '12.5');
     await user.clear(screen.getByLabelText('User'));
     await user.type(screen.getByLabelText('User'), 'Tara Smith');
     await user.click(screen.getByRole('button', { name: 'Add line' }));
@@ -46,7 +46,7 @@ describe('AddPurchaseOrderLineDialog', () => {
     await user.selectOptions(screen.getByLabelText('Inventory item'), 'item-3');
 
     // Assert
-    expect(screen.getByLabelText('Quantity in kg')).toBeInTheDocument();
+    expect(screen.getByLabelText('Quantity (kg)')).toBeInTheDocument();
   });
 
   test('shows loading state while saving', () => {

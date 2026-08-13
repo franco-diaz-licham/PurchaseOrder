@@ -32,7 +32,7 @@ describe('ManageReservationsDialog', () => {
     );
 
     // Act
-    await user.type(screen.getByLabelText('Quantity to reserve'), '4');
+    await user.type(screen.getByLabelText('Quantity to reserve (units)'), '4');
     await user.click(screen.getByRole('button', { name: 'Reserve' }));
 
     // Assert
@@ -63,7 +63,7 @@ describe('ManageReservationsDialog', () => {
     );
 
     // Act
-    await user.type(screen.getByLabelText('Quantity to reserve'), '16');
+    await user.type(screen.getByLabelText('Quantity to reserve (units)'), '16');
 
     // Assert
     expect(screen.getByRole('button', { name: 'Reserve' })).toBeDisabled();
@@ -93,11 +93,36 @@ describe('ManageReservationsDialog', () => {
     );
 
     // Act
-    await user.type(screen.getByLabelText('Quantity to release'), '2');
+    await user.type(screen.getByLabelText('Quantity to release (units)'), '2');
     await user.click(screen.getByRole('button', { name: 'Release' }));
 
     // Assert
     expect(onRelease).toHaveBeenCalledTimes(1);
     expect(onRelease).toHaveBeenCalledWith(reservation, 2);
+  });
+
+  test('uses kilogram labels for weight tracked reservations', () => {
+    // Arrange / Act
+    render(
+      <ManageReservationsDialog
+        availableQuantity={15}
+        isReleasing={false}
+        isReserving={false}
+        itemName="GREASE-EP2 - EP2 Crane Grease [Weight]"
+        line={line}
+        maxReserveQuantity={15}
+        reservations={[reservation]}
+        trackingMode="Weight"
+        user="Franco Diaz"
+        onCancel={vi.fn()}
+        onRelease={vi.fn()}
+        onReserve={vi.fn()}
+        onUserChange={vi.fn()}
+      />
+    );
+
+    // Assert
+    expect(screen.getByLabelText('Quantity to reserve (kg)')).toBeInTheDocument();
+    expect(screen.getByLabelText('Quantity to release (kg)')).toBeInTheDocument();
   });
 });

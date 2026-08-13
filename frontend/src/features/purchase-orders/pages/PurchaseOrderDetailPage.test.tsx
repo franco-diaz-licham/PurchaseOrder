@@ -161,8 +161,8 @@ describe('PurchaseOrderDetailPage', () => {
     // Act
     await user.click(screen.getByRole('button', { name: 'Add item' }));
     await user.selectOptions(screen.getByLabelText('Inventory item'), 'item-2');
-    await user.clear(screen.getByLabelText('Quantity in units'));
-    await user.type(screen.getByLabelText('Quantity in units'), '3');
+    await user.clear(screen.getByLabelText('Quantity (units)'));
+    await user.type(screen.getByLabelText('Quantity (units)'), '3');
     await user.click(screen.getByRole('button', { name: 'Add line' }));
 
     // Assert
@@ -185,8 +185,8 @@ describe('PurchaseOrderDetailPage', () => {
 
     // Act
     await user.click(screen.getByRole('button', { name: 'Edit line' }));
-    await user.clear(screen.getByLabelText('Ordered quantity'));
-    await user.type(screen.getByLabelText('Ordered quantity'), '12');
+    await user.clear(screen.getByLabelText('Ordered quantity (units)'));
+    await user.type(screen.getByLabelText('Ordered quantity (units)'), '12');
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
     // Assert
@@ -210,9 +210,9 @@ describe('PurchaseOrderDetailPage', () => {
 
     // Act
     await user.click(screen.getByRole('button', { name: 'Manage reservations' }));
-    await user.type(screen.getByLabelText('Quantity to reserve'), '2');
+    await user.type(screen.getByLabelText('Quantity to reserve (units)'), '2');
     await user.click(screen.getByRole('button', { name: 'Reserve' }));
-    await user.type(screen.getByLabelText('Quantity to release'), '1');
+    await user.type(screen.getByLabelText('Quantity to release (units)'), '1');
     await user.click(screen.getByRole('button', { name: 'Release' }));
 
     // Assert

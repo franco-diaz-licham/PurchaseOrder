@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppField } from '@/components/ui/AppField';
 import { AppInput } from '@/components/ui/AppInput';
+import type { InventoryTrackingMode } from '@/features/catalog/types/catalog.types';
 
 export type EditPurchaseOrderLineFormValues = {
   quantityOrdered: number;
@@ -13,12 +14,16 @@ type EditPurchaseOrderLineDialogProps = {
   itemName: string;
   quantityOrdered: number;
   quantityReserved: number;
+  trackingMode?: InventoryTrackingMode;
   isSaving: boolean;
   onCancel: () => void;
   onSubmit: (values: EditPurchaseOrderLineFormValues) => Promise<void>;
 };
 
-export const EditPurchaseOrderLineDialog = ({ itemName, quantityOrdered, quantityReserved, isSaving, onCancel, onSubmit }: EditPurchaseOrderLineDialogProps) => {
+export const EditPurchaseOrderLineDialog = ({ itemName, quantityOrdered, quantityReserved, trackingMode, isSaving, onCancel, onSubmit }: EditPurchaseOrderLineDialogProps) => {
+  const quantityUnit = trackingMode === 'Weight' ? 'kg' : 'units';
+  const quantityLabel = `Ordered quantity (${quantityUnit})`;
+
   const form = useForm<EditPurchaseOrderLineFormValues>({
     defaultValues: {
       quantityOrdered,
@@ -45,10 +50,12 @@ export const EditPurchaseOrderLineDialog = ({ itemName, quantityOrdered, quantit
         <div className="grid gap-3 p-4">
           <div>
             <div className="font-medium">{itemName}</div>
-            <div className="mt-1 text-sm text-muted-foreground">Reserved quantity {quantityReserved}</div>
+            <div className="mt-1 text-sm text-muted-foreground">
+              Reserved quantity {quantityReserved} {quantityUnit}
+            </div>
           </div>
 
-          <AppField label="Ordered quantity">
+          <AppField label={quantityLabel}>
             <AppInput autoFocus min={quantityReserved} required step="0.001" type="number" {...form.register('quantityOrdered', { valueAsNumber: true })} />
           </AppField>
           <AppField label="User">

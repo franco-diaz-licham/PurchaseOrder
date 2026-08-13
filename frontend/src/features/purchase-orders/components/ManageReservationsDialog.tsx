@@ -32,9 +32,9 @@ type ManageReservationsDialogProps = {
 
 export const ManageReservationsDialog = ({ availableQuantity, isReleasing, isReserving, itemName, trackingMode, line, maxReserveQuantity, reservations, user, onCancel, onRelease, onReserve, onUserChange }: ManageReservationsDialogProps) => {
   const isWeightTracked = trackingMode === 'Weight';
-  const quantityLabel = isWeightTracked ? 'Weight to reserve (kg)' : 'Quantity to reserve';
-  const releaseLabel = isWeightTracked ? 'Weight to release (kg)' : 'Quantity to release';
   const quantityUnit = isWeightTracked ? 'kg' : 'units';
+  const quantityLabel = `Quantity to reserve (${quantityUnit})`;
+  const releaseLabel = `Quantity to release (${quantityUnit})`;
   const quantityStep = isWeightTracked ? '0.001' : '1';
   const minimumQuantity = isWeightTracked ? '0.001' : '1';
   const [quantity, setQuantity] = useState('');

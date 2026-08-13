@@ -35,7 +35,7 @@ export const AddPurchaseOrderLineDialog = ({ inventoryItems, isSaving, onCancel,
 
   const selectedInventoryItemId = form.watch('inventoryItemId');
   const selectedInventoryItem = inventoryItems.find((item) => item.id === selectedInventoryItemId);
-  const quantityLabel = selectedInventoryItem?.trackingMode === 'Unit' ? 'Quantity in units' : selectedInventoryItem?.trackingMode === 'Weight' ? 'Quantity in kg' : 'Quantity';
+  const quantityLabel = selectedInventoryItem?.trackingMode === 'Unit' ? 'Quantity (units)' : selectedInventoryItem?.trackingMode === 'Weight' ? 'Quantity (kg)' : 'Quantity';
 
   const submit = form.handleSubmit(async (values) => {
     await onSubmit(values);

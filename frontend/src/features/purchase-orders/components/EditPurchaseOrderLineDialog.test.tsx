@@ -9,11 +9,11 @@ describe('EditPurchaseOrderLineDialog', () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn().mockResolvedValue(undefined);
 
-    render(<EditPurchaseOrderLineDialog isSaving={false} itemName="BEAM-6M - 6m Spreader Beam [Unit]" quantityOrdered={10} quantityReserved={4} onCancel={vi.fn()} onSubmit={onSubmit} />);
+    render(<EditPurchaseOrderLineDialog isSaving={false} itemName="BEAM-6M - 6m Spreader Beam [Unit]" quantityOrdered={10} quantityReserved={4} trackingMode="Unit" onCancel={vi.fn()} onSubmit={onSubmit} />);
 
     // Act
-    await user.clear(screen.getByLabelText('Ordered quantity'));
-    await user.type(screen.getByLabelText('Ordered quantity'), '15');
+    await user.clear(screen.getByLabelText('Ordered quantity (units)'));
+    await user.type(screen.getByLabelText('Ordered quantity (units)'), '15');
     await user.clear(screen.getByLabelText('User'));
     await user.type(screen.getByLabelText('User'), 'Tara Smith');
     await user.click(screen.getByRole('button', { name: 'Save' }));
@@ -28,17 +28,26 @@ describe('EditPurchaseOrderLineDialog', () => {
 
   test('shows the reserved quantity and uses it as the minimum ordered quantity', () => {
     // Arrange / Act
-    render(<EditPurchaseOrderLineDialog isSaving={false} itemName="BEAM-6M - 6m Spreader Beam [Unit]" quantityOrdered={10} quantityReserved={4} onCancel={vi.fn()} onSubmit={vi.fn()} />);
+    render(<EditPurchaseOrderLineDialog isSaving={false} itemName="BEAM-6M - 6m Spreader Beam [Unit]" quantityOrdered={10} quantityReserved={4} trackingMode="Unit" onCancel={vi.fn()} onSubmit={vi.fn()} />);
 
     // Assert
     expect(screen.getByText('BEAM-6M - 6m Spreader Beam [Unit]')).toBeInTheDocument();
-    expect(screen.getByText('Reserved quantity 4')).toBeInTheDocument();
-    expect(screen.getByLabelText('Ordered quantity')).toHaveAttribute('min', '4');
+    expect(screen.getByText('Reserved quantity 4 units')).toBeInTheDocument();
+    expect(screen.getByLabelText('Ordered quantity (units)')).toHaveAttribute('min', '4');
+  });
+
+  test('uses a kilogram label for weight tracked items', () => {
+    // Arrange / Act
+    render(<EditPurchaseOrderLineDialog isSaving={false} itemName="GREASE-EP2 - EP2 Crane Grease [Weight]" quantityOrdered={10} quantityReserved={4} trackingMode="Weight" onCancel={vi.fn()} onSubmit={vi.fn()} />);
+
+    // Assert
+    expect(screen.getByLabelText('Ordered quantity (kg)')).toBeInTheDocument();
+    expect(screen.getByText('Reserved quantity 4 kg')).toBeInTheDocument();
   });
 
   test('shows loading state while saving', () => {
     // Arrange / Act
-    render(<EditPurchaseOrderLineDialog isSaving itemName="BEAM-6M - 6m Spreader Beam [Unit]" quantityOrdered={10} quantityReserved={4} onCancel={vi.fn()} onSubmit={vi.fn()} />);
+    render(<EditPurchaseOrderLineDialog isSaving itemName="BEAM-6M - 6m Spreader Beam [Unit]" quantityOrdered={10} quantityReserved={4} trackingMode="Unit" onCancel={vi.fn()} onSubmit={vi.fn()} />);
 
     // Assert
     expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
@@ -50,7 +59,7 @@ describe('EditPurchaseOrderLineDialog', () => {
     const user = userEvent.setup();
     const onCancel = vi.fn();
 
-    render(<EditPurchaseOrderLineDialog isSaving={false} itemName="BEAM-6M - 6m Spreader Beam [Unit]" quantityOrdered={10} quantityReserved={4} onCancel={onCancel} onSubmit={vi.fn()} />);
+    render(<EditPurchaseOrderLineDialog isSaving={false} itemName="BEAM-6M - 6m Spreader Beam [Unit]" quantityOrdered={10} quantityReserved={4} trackingMode="Unit" onCancel={onCancel} onSubmit={vi.fn()} />);
 
     // Act
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
