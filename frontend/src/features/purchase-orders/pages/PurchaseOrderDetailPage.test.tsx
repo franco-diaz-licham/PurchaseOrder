@@ -1,8 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import type { InventoryItemModel, WarehouseModel, WarehouseStockModel } from '@/features/catalog/types/catalog.types';
-import type { ReservationModel } from '@/features/reservations/types/reservation.types';
+import { mockInventoryItems, mockPurchaseOrder, mockReservations, mockWarehouses, mockWarehouseStock } from '@/testUtils/mockData';
 import type { PurchaseOrderModel } from '../types/purchaseOrder.types';
 import { PurchaseOrderDetailPage } from './PurchaseOrderDetailPage';
 
@@ -44,89 +43,7 @@ import { useAddPurchaseOrderLineMutation, usePurchaseOrderQuery, usePurchaseOrde
 
 const routeParams = (router as unknown as { routeParams: { purchaseOrderId: string } }).routeParams;
 
-const warehouses: WarehouseModel[] = [
-  {
-    id: 'warehouse-nsw',
-    code: 'NSW',
-    name: 'New South Wales',
-    displayName: 'NSW - New South Wales'
-  }
-];
-
-const inventoryItems: InventoryItemModel[] = [
-  {
-    id: 'item-1',
-    sku: 'BEAM-6M',
-    name: '6m Spreader Beam',
-    category: 'Hardware',
-    trackingMode: 'Unit',
-    standardCost: 1320,
-    displayName: 'BEAM-6M - 6m Spreader Beam [Unit]'
-  },
-  {
-    id: 'item-2',
-    sku: 'PAD-OUTRIG',
-    name: 'Outrigger Pad',
-    category: 'Hardware',
-    trackingMode: 'Unit',
-    standardCost: 92,
-    displayName: 'PAD-OUTRIG - Outrigger Pad [Unit]'
-  }
-];
-
-const purchaseOrder: PurchaseOrderModel = {
-  id: 'purchase-order-1',
-  number: 'PO-1021',
-  warehouseId: 'warehouse-nsw',
-  status: 'Approved',
-  subtotalAmount: 13200,
-  gstAmount: 1320,
-  totalAmount: 14520,
-  lines: [
-    {
-      id: 'line-1',
-      inventoryItemId: 'item-1',
-      quantityOrdered: 10,
-      quantityReserved: 4,
-      quantityRemaining: 6,
-      unitCost: 1320,
-      lineAmount: 13200
-    }
-  ]
-};
-
-const warehouseStock: WarehouseStockModel[] = [
-  {
-    warehouseId: 'warehouse-nsw',
-    inventoryItemId: 'item-1',
-    onHandQuantity: 20,
-    activeReservedQuantity: 4,
-    availableQuantity: 16
-  },
-  {
-    warehouseId: 'warehouse-nsw',
-    inventoryItemId: 'item-2',
-    onHandQuantity: 50,
-    activeReservedQuantity: 0,
-    availableQuantity: 50
-  }
-];
-
-const reservations: ReservationModel[] = [
-  {
-    id: 'reservation-1',
-    purchaseOrderLineId: 'line-1',
-    warehouseId: 'warehouse-nsw',
-    inventoryItemId: 'item-1',
-    quantityReserved: 4,
-    unitCostSnapshot: 1320,
-    status: 'Active',
-    reservedBy: 'Franco Diaz',
-    reservedAt: new Date('2026-08-12T10:15:00Z')
-  }
-];
-
-const setupQueries = (order: PurchaseOrderModel | null = purchaseOrder) => {
+const setupQueries = (order: PurchaseOrderModel | null = mockPurchaseOrder) => {
   vi.mocked(usePurchaseOrderQuery).mockReturnValue({
     data: order ?? undefined,
     error: null,
@@ -135,22 +52,22 @@ const setupQueries = (order: PurchaseOrderModel | null = purchaseOrder) => {
   } as ReturnType<typeof usePurchaseOrderQuery>);
 
   vi.mocked(useWarehousesQuery).mockReturnValue({
-    data: warehouses,
+    data: mockWarehouses,
     isLoading: false
   } as ReturnType<typeof useWarehousesQuery>);
 
   vi.mocked(useInventoryItemsQuery).mockReturnValue({
-    data: inventoryItems,
+    data: mockInventoryItems,
     isLoading: false
   } as ReturnType<typeof useInventoryItemsQuery>);
 
   vi.mocked(useWarehouseStockQuery).mockReturnValue({
-    data: warehouseStock,
+    data: mockWarehouseStock,
     isLoading: false
   } as ReturnType<typeof useWarehouseStockQuery>);
 
   vi.mocked(useReservationsQuery).mockReturnValue({
-    data: reservations,
+    data: mockReservations,
     isLoading: false
   } as ReturnType<typeof useReservationsQuery>);
 
@@ -186,7 +103,7 @@ const setupQueries = (order: PurchaseOrderModel | null = purchaseOrder) => {
     error: null,
     isError: false,
     isPending: false,
-    mutateAsync: vi.fn().mockResolvedValue(reservations[0])
+    mutateAsync: vi.fn().mockResolvedValue(mockReservations[0])
   } as unknown as ReturnType<typeof useCreateReservationMutation>);
 
   vi.mocked(useReleaseReservationMutation).mockReturnValue({
@@ -219,7 +136,7 @@ describe('PurchaseOrderDetailPage', () => {
     // Arrange
     const user = userEvent.setup();
     const pendingPurchaseOrder: PurchaseOrderModel = {
-      ...purchaseOrder,
+      ...mockPurchaseOrder,
       status: 'Pending'
     };
     setupQueries(pendingPurchaseOrder);

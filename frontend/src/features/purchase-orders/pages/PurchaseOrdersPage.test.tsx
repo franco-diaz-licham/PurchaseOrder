@@ -1,8 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import type { WarehouseModel } from '@/features/catalog/types/catalog.types';
-import type { PurchaseOrderModel, PurchaseOrderSummaryModel } from '../types/purchaseOrder.types';
+import { mockCreatedPurchaseOrder, mockPurchaseOrderSummaries, mockWarehouses } from '@/testUtils/mockData';
 import { usePurchaseOrderListStore } from '../stores/purchaseOrderList.store';
 import { PurchaseOrdersPage } from './PurchaseOrdersPage';
 
@@ -30,70 +29,15 @@ import { usePurchaseOrderSummariesQuery, useSubmitPurchaseOrderMutation } from '
 
 const navigate = (router as unknown as { navigate: ReturnType<typeof vi.fn> }).navigate;
 
-const warehouses: WarehouseModel[] = [
-  {
-    id: 'warehouse-nsw',
-    code: 'NSW',
-    name: 'New South Wales',
-    displayName: 'NSW - New South Wales'
-  },
-  {
-    id: 'warehouse-qld',
-    code: 'QLD',
-    name: 'Queensland',
-    displayName: 'QLD - Queensland'
-  }
-];
-
-const purchaseOrders: PurchaseOrderSummaryModel[] = [
-  {
-    id: 'purchase-order-1',
-    number: 'PO-1021',
-    warehouseId: 'warehouse-nsw',
-    status: 'Approved',
-    lineCount: 1,
-    quantityOrdered: 10,
-    quantityReserved: 4,
-    quantityRemaining: 6,
-    subtotalAmount: 100,
-    gstAmount: 10,
-    totalAmount: 110
-  },
-  {
-    id: 'purchase-order-2',
-    number: 'PO-1022',
-    warehouseId: 'warehouse-qld',
-    status: 'Pending',
-    lineCount: 1,
-    quantityOrdered: 5,
-    quantityReserved: 0,
-    quantityRemaining: 5,
-    subtotalAmount: 50,
-    gstAmount: 5,
-    totalAmount: 55
-  }
-];
-
-const createdPurchaseOrder: PurchaseOrderModel = {
-  id: 'purchase-order-new',
-  number: 'PO-1023',
-  warehouseId: 'warehouse-nsw',
-  status: 'Pending',
-  subtotalAmount: 0,
-  gstAmount: 0,
-  totalAmount: 0,
-  lines: []
-};
-
 const setupQueries = () => {
   vi.mocked(useWarehousesQuery).mockReturnValue({
-    data: warehouses,
+    data: mockWarehouses,
     isError: false,
     isLoading: false
   } as ReturnType<typeof useWarehousesQuery>);
 
   vi.mocked(usePurchaseOrderSummariesQuery).mockReturnValue({
-    data: purchaseOrders,
+    data: mockPurchaseOrderSummaries,
     isError: false,
     isLoading: false
   } as ReturnType<typeof usePurchaseOrderSummariesQuery>);
@@ -101,7 +45,7 @@ const setupQueries = () => {
   vi.mocked(useSubmitPurchaseOrderMutation).mockReturnValue({
     isError: false,
     isPending: false,
-    mutateAsync: vi.fn().mockResolvedValue(createdPurchaseOrder)
+    mutateAsync: vi.fn().mockResolvedValue(mockCreatedPurchaseOrder)
   } as unknown as ReturnType<typeof useSubmitPurchaseOrderMutation>);
 };
 
