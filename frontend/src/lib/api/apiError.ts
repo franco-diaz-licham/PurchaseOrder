@@ -1,5 +1,3 @@
-import type { AxiosError } from 'axios';
-
 /**
  * Error response shapes the API may return for domain, validation, or unexpected failures.
  */
@@ -9,6 +7,12 @@ type ApiErrorResponse = {
   errors?: string[] | Record<string, string[]>;
   validationErrors?: string[];
   details?: string;
+};
+
+type ErrorWithResponse = {
+  response?: {
+    data?: unknown;
+  };
 };
 
 const isObject = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
@@ -25,8 +29,10 @@ const flattenErrors = (errors: ApiErrorResponse['errors']) => {
 };
 
 const getAxiosResponseData = (error: unknown) => {
-  const axiosError = error as AxiosError;
-  return axiosError.response?.data;
+  if (!isObject(error)) return undefined;
+
+  const errorWithResponse = error as ErrorWithResponse;
+  return errorWithResponse.response?.data;
 };
 
 /**
