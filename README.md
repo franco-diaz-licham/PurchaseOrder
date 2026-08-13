@@ -217,5 +217,6 @@ I used AI tooling mainly as a planning and review assistant: to explore implemen
 - Add a real user context and warehouse assignment model.
 - Add database-level audit immutability protections.
 - Add an outbox if reservation/release events need to be published to other systems through a message broker.
+- Optimize TanStack Query mutations with targeted cache updates, optimistic updates where useful, and smaller refetch payloads.
 - Add browser-level end-to-end tests for the main operator workflows.
 - Add richer finance reporting, such as date filters, export support, and reconciliation views.
