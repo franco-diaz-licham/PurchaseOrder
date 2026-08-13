@@ -95,7 +95,7 @@ public sealed class WarehouseStockRepositoryTests : DatabaseFixture
         });
 
         await secondLockStarted.Task;
-        await Task.Delay(250);
+        await Task.Delay(1000);
 
         // Act
         var secondLockWasStillWaiting = !secondLockTask.IsCompleted;
