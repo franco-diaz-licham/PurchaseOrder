@@ -1,5 +1,5 @@
 import { UilTimes } from '@iconscout/react-unicons';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppField } from '@/components/ui/AppField';
 import { AppInput } from '@/components/ui/AppInput';
@@ -33,7 +33,10 @@ export const AddPurchaseOrderLineDialog = ({ inventoryItems, isSaving, onCancel,
     }
   });
 
-  const selectedInventoryItemId = form.watch('inventoryItemId');
+  const selectedInventoryItemId = useWatch({
+    control: form.control,
+    name: 'inventoryItemId'
+  });
   const selectedInventoryItem = inventoryItems.find((item) => item.id === selectedInventoryItemId);
   const quantityLabel = selectedInventoryItem?.trackingMode === 'Unit' ? 'Quantity (units)' : selectedInventoryItem?.trackingMode === 'Weight' ? 'Quantity (kg)' : 'Quantity';
 
