@@ -174,6 +174,7 @@ I chose pessimistic locking because available stock is calculated from active re
 - Failed reservation and release attempts are not written to the business audit log.
 - Audit entries are permanent records and are not editable or deletable through the application.
 - Weight-tracked items support up to 3 decimal places. Unit-tracked items require whole-number quantities.
+- Purchase order line unit costs and totals are calculated from the current inventory item standard cost when the PO is read. They are not snapshot values; reservation records are the point where unit cost is captured historically.
 - Finance reports active committed reservation value only.
 
 <a id="self-review"></a>
