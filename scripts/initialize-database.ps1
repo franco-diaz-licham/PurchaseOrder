@@ -10,7 +10,7 @@ Runs the seed SQL script.
 
 param(
     [string]$PostgresHost = "localhost",
-    [string]$PostgresPort = "55433",
+    [string]$PostgresPort = "56433",
     [string]$PostgresDatabase = "purchase_order",
     [string]$PostgresUser = "local-dev",
     [string]$PostgresPassword = "local-dev"

@@ -10,7 +10,7 @@ services:
       POSTGRES_USER: "local-dev"
       POSTGRES_PASSWORD: "local-dev"
     ports:
-      - "55433:5432"
+      - "56433:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:

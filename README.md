@@ -86,12 +86,12 @@ The compose setup exposes:
 - Frontend: `http://localhost:5173`
 - API: `http://localhost:5180`
 - Swagger: `http://localhost:5180/swagger`
-- PostgreSQL from host: `localhost:55433`
+- PostgreSQL from host: `localhost:56433`
 
 Database connection from the host:
 
 ```text
-Host=localhost;Port=55433;Database=purchase_order;Username=local-dev;Password=local-dev
+Host=localhost;Port=56433;Database=purchase_order;Username=local-dev;Password=local-dev
 ```
 
 The API runs EF Core migrations on startup. The `db-seeder` container waits for the API-migrated schema and then runs `scripts/Seeder.sql`.
@@ -121,7 +121,7 @@ npm --prefix frontend install
 npm --prefix frontend run dev
 ```
 
-The local API expects PostgreSQL at `localhost:55433`, which is the host port exposed by Docker Compose.
+The local API expects PostgreSQL at `localhost:56433`, which is the host port exposed by Docker Compose.
 
 <a id="tests"></a>
 
