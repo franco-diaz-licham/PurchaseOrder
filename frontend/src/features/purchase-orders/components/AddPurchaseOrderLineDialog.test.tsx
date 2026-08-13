@@ -14,8 +14,8 @@ describe('AddPurchaseOrderLineDialog', () => {
 
     // Act
     await user.selectOptions(screen.getByLabelText('Inventory item'), 'item-1');
-    await user.clear(screen.getByLabelText('Quantity'));
-    await user.type(screen.getByLabelText('Quantity'), '12.5');
+    await user.clear(screen.getByLabelText('Quantity in units'));
+    await user.type(screen.getByLabelText('Quantity in units'), '12.5');
     await user.clear(screen.getByLabelText('User'));
     await user.type(screen.getByLabelText('User'), 'Tara Smith');
     await user.click(screen.getByRole('button', { name: 'Add line' }));
@@ -35,6 +35,18 @@ describe('AddPurchaseOrderLineDialog', () => {
 
     // Assert
     expect(screen.getByRole('button', { name: 'Add line' })).toBeDisabled();
+  });
+
+  test('shows weight quantity label for weight tracked items', async () => {
+    // Arrange
+    const user = userEvent.setup();
+    render(<AddPurchaseOrderLineDialog inventoryItems={mockInventoryItems} isSaving={false} onCancel={vi.fn()} onSubmit={vi.fn()} />);
+
+    // Act
+    await user.selectOptions(screen.getByLabelText('Inventory item'), 'item-3');
+
+    // Assert
+    expect(screen.getByLabelText('Quantity in kg')).toBeInTheDocument();
   });
 
   test('shows loading state while saving', () => {

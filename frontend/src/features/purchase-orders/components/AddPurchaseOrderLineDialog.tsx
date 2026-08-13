@@ -33,6 +33,10 @@ export const AddPurchaseOrderLineDialog = ({ inventoryItems, isSaving, onCancel,
     }
   });
 
+  const selectedInventoryItemId = form.watch('inventoryItemId');
+  const selectedInventoryItem = inventoryItems.find((item) => item.id === selectedInventoryItemId);
+  const quantityLabel = selectedInventoryItem?.trackingMode === 'Unit' ? 'Quantity in units' : selectedInventoryItem?.trackingMode === 'Weight' ? 'Quantity in kg' : 'Quantity';
+
   const submit = form.handleSubmit(async (values) => {
     await onSubmit(values);
     form.reset({ inventoryItemId: '', quantityOrdered: 1, user: values.user });
@@ -54,7 +58,7 @@ export const AddPurchaseOrderLineDialog = ({ inventoryItems, isSaving, onCancel,
           <AppField label="Inventory item">
             <AppSelect autoFocus options={inventoryItemOptions} placeholder="Select item" required {...form.register('inventoryItemId')} />
           </AppField>
-          <AppField label="Quantity">
+          <AppField label={quantityLabel}>
             <AppInput min="0.001" required step="0.001" type="number" {...form.register('quantityOrdered', { valueAsNumber: true })} />
           </AppField>
           <AppField label="User">

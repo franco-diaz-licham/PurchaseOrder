@@ -13,6 +13,7 @@ try {
         app.UseSwaggerUI();
     }
 
+    app.UseApiExceptionHandling();
     app.UseHttpsRedirection();
     app.UseCors(CorsOptions.PolicyName);
     app.MapControllers();

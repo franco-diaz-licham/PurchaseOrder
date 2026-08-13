@@ -52,6 +52,7 @@ export const PurchaseOrderDetailPage = () => {
 
   const [isAddLineOpen, setIsAddLineOpen] = useState(false);
   const [editLineId, setEditLineId] = useState<string | null>(null);
+  const [dismissedErrorKey, setDismissedErrorKey] = useState('');
   const [manageReservationsLineId, setManageReservationsLineId] = useState<string | null>(null);
   const [reservationUser, setReservationUser] = useState('Franco Diaz');
 
@@ -72,11 +73,23 @@ export const PurchaseOrderDetailPage = () => {
     createReservationMutation,
     releaseReservationMutation
   });
+  const errorKey = errorMessages.join('\n');
+  const visibleErrorMessages = errorKey === dismissedErrorKey ? [] : errorMessages;
 
   const isPageLoading = purchaseOrderQuery.isLoading || warehousesQuery.isLoading || itemsQuery.isLoading || warehouseStockQuery.isLoading || reservationsQuery.isLoading;
 
   const closeAddLineDialog = () => {
     setIsAddLineOpen(false);
+  };
+
+  const dismissErrors = () => {
+    setDismissedErrorKey(errorKey);
+    statusMutation.reset();
+    addLineMutation.reset();
+    removeLineMutation.reset();
+    updateLineMutation.reset();
+    createReservationMutation.reset();
+    releaseReservationMutation.reset();
   };
 
   const approvePurchaseOrder = () => {
@@ -153,7 +166,7 @@ export const PurchaseOrderDetailPage = () => {
     <section>
       <PageHeader description="Review the full purchase order aggregate and manage its lifecycle." title="Purchase Order Details" />
       <div className="grid gap-4 p-6">
-        <ErrorSummary messages={errorMessages} />
+        <ErrorSummary messages={visibleErrorMessages} onDismiss={dismissErrors} />
         {!purchaseOrder && !purchaseOrderQuery.isLoading && !purchaseOrderQuery.isError && <EmptyState title="Purchase order was not found." />}
         {purchaseOrder && (
           <PurchaseOrderHeaderCard

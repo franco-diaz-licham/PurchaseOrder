@@ -55,6 +55,15 @@ export const mockInventoryItems: InventoryItemModel[] = [
     trackingMode: 'Unit',
     standardCost: 92,
     displayName: 'PAD-OUTRIG - Outrigger Pad [Unit]'
+  },
+  {
+    id: 'item-3',
+    sku: 'GREASE-EP2',
+    name: 'EP2 Crane Grease',
+    category: 'BulkGoods',
+    trackingMode: 'Weight',
+    standardCost: 18,
+    displayName: 'GREASE-EP2 - EP2 Crane Grease [Weight]'
   }
 ];
 

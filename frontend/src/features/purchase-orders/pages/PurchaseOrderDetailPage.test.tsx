@@ -161,8 +161,8 @@ describe('PurchaseOrderDetailPage', () => {
     // Act
     await user.click(screen.getByRole('button', { name: 'Add item' }));
     await user.selectOptions(screen.getByLabelText('Inventory item'), 'item-2');
-    await user.clear(screen.getByLabelText('Quantity'));
-    await user.type(screen.getByLabelText('Quantity'), '3');
+    await user.clear(screen.getByLabelText('Quantity in units'));
+    await user.type(screen.getByLabelText('Quantity in units'), '3');
     await user.click(screen.getByRole('button', { name: 'Add line' }));
 
     // Assert
