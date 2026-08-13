@@ -4,7 +4,7 @@ Internal purchase order stock reservation module focused on safe reservations, r
 
 ## 🧭 Table of Contents
 
-- [✨ Requirements](#Requirements)
+- [✨ Requirements](#requirements)
 - [🧰 Tech Stack](#tech-stack)
 - [🚀 Running Locally](#running-locally)
 - [⚙️ Running Without Docker](#running-without-docker)
@@ -15,7 +15,7 @@ Internal purchase order stock reservation module focused on safe reservations, r
 - [🤖 AI Usage Note](#ai-usage-note)
 - [⏭️ What I Would Do With More Time](#what-i-would-do-with-more-time)
 
-<a id="features"></a>
+<a id="requirements"></a>
 
 ## ✨ Requirements
 
