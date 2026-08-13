@@ -7,6 +7,7 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { useInventoryItemsQuery, useWarehousesQuery, useWarehouseStockQuery } from '@/features/catalog/queries/catalog.queries';
 import { findInventoryItem, findWarehouse } from '@/features/catalog/utils/catalogLookup';
 import { useCreateReservationMutation, useReleaseReservationMutation, useReservationsQuery } from '@/features/reservations/queries/reservation.queries';
+import type { ReservationModel } from '@/features/reservations/types/reservation.types';
 import { AddPurchaseOrderLineDialog, type AddPurchaseOrderLineFormValues } from '../components/AddPurchaseOrderLineDialog';
 import { EditPurchaseOrderLineDialog, type EditPurchaseOrderLineFormValues } from '../components/EditPurchaseOrderLineDialog';
 import { ManageReservationsDialog } from '../components/ManageReservationsDialog';
@@ -74,17 +75,27 @@ export const PurchaseOrderDetailPage = () => {
 
   const isPageLoading = purchaseOrderQuery.isLoading || warehousesQuery.isLoading || itemsQuery.isLoading || warehouseStockQuery.isLoading || reservationsQuery.isLoading;
 
-  const openAddLineDialog = () => {
-    setIsAddLineOpen(true);
-  };
-
   const closeAddLineDialog = () => {
     setIsAddLineOpen(false);
   };
 
+  const approvePurchaseOrder = () => {
+    if (!purchaseOrder) return;
+    statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'approve', user: 'Franco Diaz' });
+  };
+
+  const closePurchaseOrder = () => {
+    if (!purchaseOrder) return;
+    statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'close', user: 'Franco Diaz' });
+  };
+
+  const cancelPurchaseOrder = () => {
+    if (!purchaseOrder) return;
+    statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'cancel', user: 'Franco Diaz' });
+  };
+
   const addLine = async (values: AddPurchaseOrderLineFormValues) => {
     if (!purchaseOrder) return;
-
     await addLineMutation.mutateAsync({
       purchaseOrderId: purchaseOrder.id,
       inventoryItemId: values.inventoryItemId,
@@ -98,7 +109,6 @@ export const PurchaseOrderDetailPage = () => {
   const updateLine = async (values: EditPurchaseOrderLineFormValues) => {
     if (!purchaseOrder) return;
     if (!editLine) return;
-
     await updateLineMutation.mutateAsync({
       purchaseOrderId: purchaseOrder.id,
       purchaseOrderLineId: editLine.id,
@@ -109,19 +119,31 @@ export const PurchaseOrderDetailPage = () => {
     setEditLineId(null);
   };
 
-  const closeManageReservationsDialog = () => {
-    setManageReservationsLineId(null);
+  const removeLine = (purchaseOrderLineId: string, user: string) => {
+    if (!purchaseOrder) return;
+    removeLineMutation.mutate({
+      purchaseOrderId: purchaseOrder.id,
+      purchaseOrderLineId,
+      user
+    });
   };
 
   const reserveLine = async (quantity: number, user: string) => {
     if (!purchaseOrder) return;
     if (!manageReservationsLineId) return;
-
     await createReservationMutation.mutateAsync({
       purchaseOrderLineId: manageReservationsLineId,
       warehouseId: purchaseOrder.warehouseId,
       quantity,
       user
+    });
+  };
+
+  const releaseReservation = (reservation: ReservationModel, quantity: number) => {
+    releaseReservationMutation.mutate({
+      stockReservationId: reservation.id,
+      quantity,
+      user: reservationUser
     });
   };
 
@@ -136,9 +158,9 @@ export const PurchaseOrderDetailPage = () => {
         {purchaseOrder && (
           <PurchaseOrderHeaderCard
             isChangingStatus={statusMutation.isPending}
-            onApprove={() => statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'approve', user: 'Franco Diaz' })}
-            onCancel={() => statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'cancel', user: 'Franco Diaz' })}
-            onClose={() => statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'close', user: 'Franco Diaz' })}
+            onApprove={approvePurchaseOrder}
+            onCancel={cancelPurchaseOrder}
+            onClose={closePurchaseOrder}
             purchaseOrder={purchaseOrder}
             warehouseDisplayName={warehouse?.displayName ?? purchaseOrder.warehouseId}
           />
@@ -153,16 +175,10 @@ export const PurchaseOrderDetailPage = () => {
             inventoryItems={itemsQuery.data}
             isAddingLine={addLineMutation.isPending}
             isRemovingLine={removeLineMutation.isPending}
-            onAddLine={openAddLineDialog}
+            onAddLine={() => setIsAddLineOpen(true)}
             onEditLine={setEditLineId}
             onManageReservations={setManageReservationsLineId}
-            onRemoveLine={(purchaseOrderLineId, user) =>
-              removeLineMutation.mutate({
-                purchaseOrderId: purchaseOrder.id,
-                purchaseOrderLineId,
-                user
-              })
-            }
+            onRemoveLine={removeLine}
             purchaseOrder={purchaseOrder}
             reservationUser={reservationUser}
             stockByItemId={stockByItemId}
@@ -189,8 +205,8 @@ export const PurchaseOrderDetailPage = () => {
           trackingMode={manageReservationsItem?.trackingMode}
           line={manageReservationsLine}
           maxReserveQuantity={manageReservationsMaxQuantity}
-          onCancel={closeManageReservationsDialog}
-          onRelease={(reservation, quantity) => releaseReservationMutation.mutate({ stockReservationId: reservation.id, quantity, user: reservationUser })}
+          onCancel={() => setManageReservationsLineId(null)}
+          onRelease={releaseReservation}
           onReserve={reserveLine}
           onUserChange={setReservationUser}
           reservations={manageReservations}
