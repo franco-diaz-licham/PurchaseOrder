@@ -35,6 +35,16 @@ describe('PurchaseOrderHeaderCard', () => {
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
   });
 
+  test('shows a spinner on the lifecycle action currently being saved', () => {
+    // Arrange / Act
+    render(<PurchaseOrderHeaderCard changingStatusAction="close" isChangingStatus purchaseOrder={mockPurchaseOrder} warehouseDisplayName="NSW - New South Wales" onApprove={vi.fn()} onCancel={vi.fn()} onClose={vi.fn()} />);
+
+    // Assert
+    expect(screen.getByRole('button', { name: 'Close' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Close' }).querySelector('.animate-spin')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Cancel' }).querySelector('.animate-spin')).not.toBeInTheDocument();
+  });
+
   test('hides lifecycle actions when the purchase order is closed', () => {
     // Arrange / Act
     render(<PurchaseOrderHeaderCard isChangingStatus={false} purchaseOrder={mockClosedPurchaseOrder} warehouseDisplayName="NSW - New South Wales" onApprove={vi.fn()} onCancel={vi.fn()} onClose={vi.fn()} />);

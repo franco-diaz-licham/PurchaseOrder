@@ -53,7 +53,9 @@ export const PurchaseOrderDetailPage = () => {
   const [isAddLineOpen, setIsAddLineOpen] = useState(false);
   const [editLineId, setEditLineId] = useState<string | null>(null);
   const [dismissedErrorKey, setDismissedErrorKey] = useState('');
+  const [changingStatusAction, setChangingStatusAction] = useState<'approve' | 'close' | 'cancel' | null>(null);
   const [manageReservationsLineId, setManageReservationsLineId] = useState<string | null>(null);
+  const [removingLineId, setRemovingLineId] = useState<string | null>(null);
   const [reservationUser, setReservationUser] = useState('Franco Diaz');
 
   const editLine = purchaseOrder?.lines.find((line) => line.id === editLineId);
@@ -94,17 +96,35 @@ export const PurchaseOrderDetailPage = () => {
 
   const approvePurchaseOrder = () => {
     if (!purchaseOrder) return;
-    statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'approve', user: 'Franco Diaz' });
+    setChangingStatusAction('approve');
+    statusMutation.mutate(
+      { purchaseOrderId: purchaseOrder.id, status: 'approve', user: 'Franco Diaz' },
+      {
+        onSettled: () => setChangingStatusAction(null)
+      }
+    );
   };
 
   const closePurchaseOrder = () => {
     if (!purchaseOrder) return;
-    statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'close', user: 'Franco Diaz' });
+    setChangingStatusAction('close');
+    statusMutation.mutate(
+      { purchaseOrderId: purchaseOrder.id, status: 'close', user: 'Franco Diaz' },
+      {
+        onSettled: () => setChangingStatusAction(null)
+      }
+    );
   };
 
   const cancelPurchaseOrder = () => {
     if (!purchaseOrder) return;
-    statusMutation.mutate({ purchaseOrderId: purchaseOrder.id, status: 'cancel', user: 'Franco Diaz' });
+    setChangingStatusAction('cancel');
+    statusMutation.mutate(
+      { purchaseOrderId: purchaseOrder.id, status: 'cancel', user: 'Franco Diaz' },
+      {
+        onSettled: () => setChangingStatusAction(null)
+      }
+    );
   };
 
   const addLine = async (values: AddPurchaseOrderLineFormValues) => {
@@ -134,11 +154,17 @@ export const PurchaseOrderDetailPage = () => {
 
   const removeLine = (purchaseOrderLineId: string, user: string) => {
     if (!purchaseOrder) return;
-    removeLineMutation.mutate({
-      purchaseOrderId: purchaseOrder.id,
-      purchaseOrderLineId,
-      user
-    });
+    setRemovingLineId(purchaseOrderLineId);
+    removeLineMutation.mutate(
+      {
+        purchaseOrderId: purchaseOrder.id,
+        purchaseOrderLineId,
+        user
+      },
+      {
+        onSettled: () => setRemovingLineId(null)
+      }
+    );
   };
 
   const reserveLine = async (quantity: number, user: string) => {
@@ -170,6 +196,7 @@ export const PurchaseOrderDetailPage = () => {
         {!purchaseOrder && !purchaseOrderQuery.isLoading && !purchaseOrderQuery.isError && <EmptyState title="Purchase order was not found." />}
         {purchaseOrder && (
           <PurchaseOrderHeaderCard
+            changingStatusAction={changingStatusAction}
             isChangingStatus={statusMutation.isPending}
             onApprove={approvePurchaseOrder}
             onCancel={cancelPurchaseOrder}
@@ -194,6 +221,7 @@ export const PurchaseOrderDetailPage = () => {
             onRemoveLine={removeLine}
             purchaseOrder={purchaseOrder}
             reservationUser={reservationUser}
+            removingLineId={removingLineId}
             stockByItemId={stockByItemId}
           />
         )}

@@ -15,6 +15,7 @@ type PurchaseOrderLinesTableProps = {
   inventoryItems?: InventoryItemModel[];
   isAddingLine: boolean;
   isRemovingLine: boolean;
+  removingLineId: string | null;
   purchaseOrder: PurchaseOrderModel;
   reservationUser: string;
   stockByItemId: Map<string, WarehouseStockModel>;
@@ -32,6 +33,7 @@ export const PurchaseOrderLinesTable = ({
   inventoryItems,
   isAddingLine,
   isRemovingLine,
+  removingLineId,
   purchaseOrder,
   reservationUser,
   stockByItemId,
@@ -42,10 +44,7 @@ export const PurchaseOrderLinesTable = ({
 }: PurchaseOrderLinesTableProps) => {
   const isReadOnly = purchaseOrder.status === 'Closed' || purchaseOrder.status === 'Cancelled';
   const showReservationActions = !isReadOnly;
-  const reservationMessage =
-    purchaseOrder.status === 'Pending'
-      ? 'Reservations are available after the purchase order is approved.'
-      : 'This purchase order is read-only. Lines and reservations can no longer be changed.';
+  const reservationMessage = purchaseOrder.status === 'Pending' ? 'Reservations are available after the purchase order is approved.' : 'This purchase order is read-only. Lines and reservations can no longer be changed.';
 
   return (
     <article className="rounded-md border bg-card">
@@ -90,6 +89,7 @@ export const PurchaseOrderLinesTable = ({
                 const item = findInventoryItem(inventoryItems, line.inventoryItemId);
                 const stock = stockByItemId.get(line.inventoryItemId);
                 const lineReservations = activeReservations.filter((reservation) => reservation.purchaseOrderLineId === line.id);
+                const isLineRemoving = isRemovingLine && removingLineId === line.id;
                 return (
                   <AppTableRow key={line.id}>
                     <AppTableCell className="font-medium">{item?.displayName ?? line.inventoryItemId}</AppTableCell>
@@ -104,7 +104,7 @@ export const PurchaseOrderLinesTable = ({
                           <AppButton aria-label="Edit line" appearance="secondary" className="h-8 w-8 px-0" onClick={() => onEditLine(line.id)} title="Edit line">
                             <UilPen className="h-4 w-4 text-blue-700" />
                           </AppButton>
-                          <AppButton aria-label="Remove line" appearance="secondary" className="h-8 w-8 px-0" disabled={isRemovingLine} onClick={() => onRemoveLine(line.id, reservationUser)} title="Remove line">
+                          <AppButton aria-label="Remove line" appearance="secondary" className="h-8 w-8 px-0" disabled={isRemovingLine} isLoading={isLineRemoving} onClick={() => onRemoveLine(line.id, reservationUser)} title="Remove line">
                             <UilTrash className="h-4 w-4 text-red-700" />
                           </AppButton>
                         </div>

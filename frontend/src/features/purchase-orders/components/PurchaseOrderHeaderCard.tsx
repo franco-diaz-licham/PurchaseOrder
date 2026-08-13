@@ -4,6 +4,7 @@ import { AppButton } from '@/components/ui/AppButton';
 import type { PurchaseOrderModel } from '../types/purchaseOrder.types';
 
 type PurchaseOrderHeaderCardProps = {
+  changingStatusAction?: 'approve' | 'close' | 'cancel' | null;
   isChangingStatus: boolean;
   purchaseOrder: PurchaseOrderModel;
   warehouseDisplayName: string;
@@ -12,7 +13,7 @@ type PurchaseOrderHeaderCardProps = {
   onClose: () => void;
 };
 
-export const PurchaseOrderHeaderCard = ({ isChangingStatus, purchaseOrder, warehouseDisplayName, onApprove, onCancel, onClose }: PurchaseOrderHeaderCardProps) => {
+export const PurchaseOrderHeaderCard = ({ changingStatusAction = null, isChangingStatus, purchaseOrder, warehouseDisplayName, onApprove, onCancel, onClose }: PurchaseOrderHeaderCardProps) => {
   const isReadOnly = purchaseOrder.status === 'Closed' || purchaseOrder.status === 'Cancelled';
 
   return (
@@ -27,15 +28,15 @@ export const PurchaseOrderHeaderCard = ({ isChangingStatus, purchaseOrder, wareh
         </div>
         {!isReadOnly && (
           <div className="flex flex-wrap gap-2">
-            <AppButton appearance="secondary" disabled={purchaseOrder.status !== 'Pending' || isChangingStatus} onClick={onApprove}>
+            <AppButton appearance="secondary" disabled={purchaseOrder.status !== 'Pending' || isChangingStatus} isLoading={isChangingStatus && changingStatusAction === 'approve'} onClick={onApprove}>
               <UilCheck className="h-4 w-4" />
               Approve
             </AppButton>
-            <AppButton appearance="secondary" disabled={isChangingStatus} onClick={onClose}>
+            <AppButton appearance="secondary" disabled={isChangingStatus} isLoading={isChangingStatus && changingStatusAction === 'close'} onClick={onClose}>
               <UilSync className="h-4 w-4" />
               Close
             </AppButton>
-            <AppButton appearance="danger" disabled={isChangingStatus} onClick={onCancel}>
+            <AppButton appearance="danger" disabled={isChangingStatus} isLoading={isChangingStatus && changingStatusAction === 'cancel'} onClick={onCancel}>
               <UilTimes className="h-4 w-4" />
               Cancel
             </AppButton>

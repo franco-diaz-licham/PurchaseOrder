@@ -16,6 +16,7 @@ const renderTable = (overrides: Partial<Parameters<typeof PurchaseOrderLinesTabl
     inventoryItems: mockInventoryItems,
     isAddingLine: false,
     isRemovingLine: false,
+    removingLineId: null,
     purchaseOrder: mockPurchaseOrder,
     reservationUser: 'Franco Diaz',
     stockByItemId,
@@ -93,5 +94,18 @@ describe('PurchaseOrderLinesTable', () => {
     expect(screen.queryByRole('button', { name: 'Edit line' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Manage reservations' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Remove line' })).not.toBeInTheDocument();
+  });
+
+  test('shows a spinner on the line currently being removed', () => {
+    // Arrange / Act
+    renderTable({
+      isRemovingLine: true,
+      removingLineId: 'line-1'
+    });
+
+    // Assert
+    const removeButton = screen.getByRole('button', { name: 'Remove line' });
+    expect(removeButton).toBeDisabled();
+    expect(removeButton.querySelector('.animate-spin')).toBeInTheDocument();
   });
 });

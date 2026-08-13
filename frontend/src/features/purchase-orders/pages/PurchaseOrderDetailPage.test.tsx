@@ -144,11 +144,16 @@ describe('PurchaseOrderDetailPage', () => {
     await user.click(screen.getByRole('button', { name: 'Approve' }));
 
     // Assert
-    expect(statusMutation.mutate).toHaveBeenCalledWith({
-      purchaseOrderId: 'purchase-order-1',
-      status: 'approve',
-      user: 'Franco Diaz'
-    });
+    expect(statusMutation.mutate).toHaveBeenCalledWith(
+      {
+        purchaseOrderId: 'purchase-order-1',
+        status: 'approve',
+        user: 'Franco Diaz'
+      },
+      expect.objectContaining({
+        onSettled: expect.any(Function)
+      })
+    );
   });
 
   test('adds a purchase order line from the page dialog', async () => {
