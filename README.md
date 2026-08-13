@@ -1,19 +1,11 @@
 # 📦 PurchaseOrderApp
 
-![.NET](https://img.shields.io/badge/.NET-8-512BD4?logo=dotnet&logoColor=white)
-![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=111111)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?logo=postgresql&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)
-
-Internal purchase order stock reservation module built with .NET 8, ASP.NET Core Web API, EF Core 8, PostgreSQL, React, and TypeScript. The main focus of this solution is the concurrency-safe reservation workflow: operators reserve available stock against approved purchase order lines, releases return stock to availability, audit entries are permanent, and finance reporting uses the reservation-time cost snapshot.
+Internal purchase order stock reservation module focused on safe reservations, releases, audit history, and finance committed-value reporting.
 
 ## 🧭 Table of Contents
 
-- [✨ Features](#features)
+- [✨ Requirements](#Requirements)
 - [🧰 Tech Stack](#tech-stack)
-- [🏗️ Project Structure](#project-structure)
 - [🚀 Running Locally](#running-locally)
 - [⚙️ Running Without Docker](#running-without-docker)
 - [🧪 Tests](#tests)
@@ -25,51 +17,35 @@ Internal purchase order stock reservation module built with .NET 8, ASP.NET Core
 
 <a id="features"></a>
 
-## ✨ Features
+## ✨ Requirements
 
-| Requirement                                                                   | Implementation                                                                                                                                                                                                                                            |
-| ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Operators can view approved purchase orders with outstanding stock needs      | Purchase order summary page with client-side warehouse and ready-to-reserve filtering, plus a detail page for managing the full purchase order aggregate. Real user-to-warehouse scoping is listed as future work because authentication is out of scope. |
-| Operators can reserve stock fully or partially against a purchase order line  | Reservation workflow is available after approval and validates against both line remaining quantity and warehouse availability.                                                                                                                           |
-| Available stock must be on-hand minus active reservations                     | Warehouse availability is calculated from `WarehouseStock` on-hand quantity minus active `StockReservation` records.                                                                                                                                      |
-| Reserved stock must never exceed on-hand stock, including concurrent requests | Reservation uses PostgreSQL pessimistic row-level locking on the warehouse/item stock row inside an explicit transaction.                                                                                                                                 |
-| Operators can release reservations fully or partially                         | Reservation management supports partial release and updates the purchase order line reserved/remaining quantities.                                                                                                                                        |
-| Every successful reservation and release must be audited                      | Domain events create append-only audit log entries with timestamp, user, item, warehouse, quantity, and resulting available balance.                                                                                                                      |
-| Finance can view committed reserved stock value per warehouse                 | Finance report summarizes active reservation value by warehouse using the unit cost captured when each reservation was created.                                                                                                                           |
-| Unit and weight tracked items must behave differently                         | Unit-tracked items require whole quantities; weight-tracked items support decimal quantities up to 3 decimal places.                                                                                                                                      |
-| The app should be runnable and reviewable locally                             | Docker Compose starts PostgreSQL, API, frontend, and automatic database seeding with realistic warehouses, stock, purchase orders, reservations, and audit entries.                                                                                       |
+| Requirement                                                                   | Implementation                                                                                                                                                      |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Operators can view approved purchase orders with outstanding stock needs      | Summary and detail views support warehouse and ready-to-reserve filtering.                                                                                          |
+| Operators can reserve stock fully or partially against a purchase order line  | Reservation workflow is available after approval and validates against both line remaining quantity and warehouse availability.                                     |
+| Available stock must be on-hand minus active reservations                     | Warehouse availability is calculated from `WarehouseStock` on-hand quantity minus active `StockReservation` records.                                                |
+| Reserved stock must never exceed on-hand stock, including concurrent requests | Reservation uses PostgreSQL pessimistic row-level locking on the warehouse/item stock row inside an explicit transaction.                                           |
+| Operators can release reservations fully or partially                         | Reservation management supports partial release and updates the purchase order line reserved/remaining quantities.                                                  |
+| Every successful reservation and release must be audited                      | Domain events create append-only audit log entries with timestamp, user, item, warehouse, quantity, and resulting available balance.                                |
+| Finance can view committed reserved stock value per warehouse                 | Finance report summarizes active reservation value by warehouse using the unit cost captured when each reservation was created.                                     |
+| Unit and weight tracked items must behave differently                         | Unit-tracked items require whole quantities; weight-tracked items support decimal quantities up to 3 decimal places.                                                |
+| The app should be runnable and reviewable locally                             | Docker Compose starts PostgreSQL, API, frontend, and automatic database seeding with realistic warehouses, stock, purchase orders, reservations, and audit entries. |
 
 <a id="tech-stack"></a>
 
 ## 🧰 Tech Stack
 
-- Backend: .NET 8, ASP.NET Core Web API, EF Core 8, PostgreSQL
-- Frontend: React, TypeScript, Vite, TanStack Query, Tailwind CSS
-- Tests: NUnit, Shouldly, Moq, Testcontainers, real PostgreSQL integration tests
-- Local environment: Docker Compose
+![.NET](https://img.shields.io/badge/.NET-8-512BD4?logo=dotnet&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=111111)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)
 
-<a id="project-structure"></a>
-
-## 🏗️ Project Structure
-
-```text
-backend/
-  PurchaseOrderApp.Domain
-  PurchaseOrderApp.Application
-  PurchaseOrderApp.Infrastructure
-  PurchaseOrderApp.Api
-  PurchaseOrderApp.Tests
-
-frontend/
-  src/app
-  src/components
-  src/features
-  src/lib
-
-docker/
-scripts/
-docs/
-```
+- Backend: .NET 8, EF Core, PostgreSQL
+- Frontend: React, TypeScript
+- Tests: NUnit, Testcontainers
+- Local setup: Docker Compose
 
 <a id="running-locally"></a>
 
@@ -175,7 +151,7 @@ I chose pessimistic locking because available stock is calculated from active re
 - Audit entries are permanent records and are not editable or deletable through the application.
 - Weight-tracked items support up to 3 decimal places. Unit-tracked items require whole-number quantities.
 - Purchase order line unit costs and totals are calculated from the current inventory item standard cost when the PO is read. They are not snapshot values; reservation records are the point where unit cost is captured historically.
-- Finance reports active committed reservation value only.
+- Finance reports only include active reservations because released reservations are no longer committed stock.
 
 <a id="self-review"></a>
 
@@ -184,6 +160,7 @@ I chose pessimistic locking because available stock is calculated from active re
 What I am confident in:
 
 - The reservation workflow is protected at the database level, not only by an application-layer check.
+- Integration tests exercise the row-level locking behavior against a real PostgreSQL database.
 - The domain model owns the important mutations: purchase order line reservation totals, reservation release behavior, and audit domain events.
 - Audit log entries are created from domain events and saved in the same transaction as the reservation/release.
 - Finance reporting uses the reservation-time cost snapshot, and tests cover the standard cost change scenario.
@@ -199,9 +176,7 @@ What I would flag in review:
 
 Riskiest part:
 
-The riskiest part is reservation lifecycle correctness. A reservation affects available stock, purchase order line reserved/remaining quantities, finance value, and audit history. These changes need to remain ACID compliant so the system never commits only part of the workflow.
-
-The concurrency issue is the most dangerous version of that risk. That is why the solution uses PostgreSQL row-level locking, explicit transactions, and real database tests. The implementation deliberately serializes reservation attempts for the same warehouse/item row so the second request recalculates availability after the first transaction commits.
+The riskiest part is reservation lifecycle correctness. A reservation affects available stock, purchase order line reserved/remaining quantities, finance value, and audit history. These changes need to remain ACID compliant so the system never commits only part of the workflow. The concurrency issue is the most dangerous version of that risk. That is why the solution uses PostgreSQL row-level locking, explicit transactions, and real database tests. The implementation deliberately serializes reservation attempts for the same warehouse/item row so the second request recalculates availability after the first transaction commits.
 
 <a id="ai-usage-note"></a>
 
@@ -220,3 +195,4 @@ I used AI tooling mainly as a planning and review assistant: to explore implemen
 - Optimize TanStack Query mutations with targeted cache updates, optimistic updates where useful, and smaller refetch payloads.
 - Add browser-level end-to-end tests for the main operator workflows.
 - Add richer finance reporting, such as date filters, export support, and reconciliation views.
+- Add server-sent events for live stock availability updates, so operators see changes from competing reservations without manually refreshing the page.
