@@ -10,8 +10,8 @@ namespace PurchaseOrderApp.Api.Controllers;
 [ApiController]
 public sealed class FinanceController(IFinanceService financeService) : ControllerBase
 {
-    [HttpGet("warehouse-committed-values")]
-    public async Task<ActionResult<ApiResponse<List<WarehouseCommittedStockValueResponse>>>> GetWarehouseCommittedValues(CancellationToken cancellationToken)
+    [HttpGet("report")]
+    public async Task<ActionResult<ApiResponse<List<WarehouseCommittedStockValueResponse>>>> GetReport(CancellationToken cancellationToken)
     {
         var result = await financeService.ListWarehouseCommittedStockValuesAsync(cancellationToken);
         return result.ToActionResult();

@@ -56,6 +56,9 @@ public sealed class PurchaseOrder : Entity<PurchaseOrderId>
     /// </summary>
     public bool HasOutstandingLines => _lines.Any(line => line.HasOutstandingQuantity);
 
+    /// <summary>
+    /// Creates a new purchase order in the pending state.
+    /// </summary>
     public static PurchaseOrder CreatePending(WarehouseId warehouseId, string user, DateTimeOffset occurredAt)
     {
         return new PurchaseOrder(
@@ -66,6 +69,9 @@ public sealed class PurchaseOrder : Entity<PurchaseOrderId>
             occurredAt);
     }
 
+    /// <summary>
+    /// Adds a new inventory item line to a purchase order that is still open for changes.
+    /// </summary>
     public PurchaseOrderLine AddLine(InventoryItem item, Quantity quantityOrdered, string user, DateTimeOffset occurredAt)
     {
         if (Status == PurchaseOrderStatus.Cancelled) throw new DomainException("Cancelled purchase orders cannot be changed.");
@@ -81,6 +87,9 @@ public sealed class PurchaseOrder : Entity<PurchaseOrderId>
         return line;
     }
 
+    /// <summary>
+    /// Records reserved quantity against an approved purchase order line.
+    /// </summary>
     public void ReserveLine(PurchaseOrderLineId lineId, Quantity quantity, string user, DateTimeOffset occurredAt)
     {
         EnsureApproved();
@@ -89,6 +98,9 @@ public sealed class PurchaseOrder : Entity<PurchaseOrderId>
         SetUpdated(user, occurredAt);
     }
 
+    /// <summary>
+    /// Releases reserved quantity from a purchase order line.
+    /// </summary>
     public void ReleaseLine(PurchaseOrderLineId lineId, Quantity quantity, string user, DateTimeOffset occurredAt)
     {
         var line = GetLine(lineId);
@@ -96,6 +108,9 @@ public sealed class PurchaseOrder : Entity<PurchaseOrderId>
         SetUpdated(user, occurredAt);
     }
 
+    /// <summary>
+    /// Removes a purchase order line after its reservations have been released.
+    /// </summary>
     public void RemoveLine(PurchaseOrderLineId lineId, string user, DateTimeOffset occurredAt)
     {
         if (Status == PurchaseOrderStatus.Cancelled) throw new DomainException("Cancelled purchase orders cannot be changed.");
@@ -108,6 +123,9 @@ public sealed class PurchaseOrder : Entity<PurchaseOrderId>
         SetUpdated(user, occurredAt);
     }
 
+    /// <summary>
+    /// Updates ordered quantity while preserving the invariant that ordered quantity cannot be less than reserved quantity.
+    /// </summary>
     public void UpdateLineQuantity(PurchaseOrderLineId lineId, Quantity quantityOrdered, string user, DateTimeOffset occurredAt)
     {
         if (Status == PurchaseOrderStatus.Cancelled) throw new DomainException("Cancelled purchase orders cannot be changed.");
@@ -118,6 +136,9 @@ public sealed class PurchaseOrder : Entity<PurchaseOrderId>
         SetUpdated(user, occurredAt);
     }
 
+    /// <summary>
+    /// Approves the purchase order so stock can be reserved against its lines.
+    /// </summary>
     public void Approve(string user, DateTimeOffset occurredAt)
     {
         if (Status == PurchaseOrderStatus.Cancelled) throw new DomainException("Cancelled purchase orders cannot be approved.");
@@ -127,12 +148,18 @@ public sealed class PurchaseOrder : Entity<PurchaseOrderId>
         SetUpdated(user, occurredAt);
     }
 
+    /// <summary>
+    /// Closes the purchase order as operationally complete. Closed purchase orders are read-only.
+    /// </summary>
     public void Close(string user, DateTimeOffset occurredAt)
     {
         Status = PurchaseOrderStatus.Closed;
         SetUpdated(user, occurredAt);
     }
 
+    /// <summary>
+    /// Cancels a purchase order that has no reserved stock.
+    /// </summary>
     public void Cancel(string user, DateTimeOffset occurredAt)
     {
         if (_lines.Any(line => !line.QuantityReserved.IsZero)) throw new DomainException("Purchase orders with active reservations cannot be cancelled.");

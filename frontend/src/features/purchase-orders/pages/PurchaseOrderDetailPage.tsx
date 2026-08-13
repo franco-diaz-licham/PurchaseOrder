@@ -151,7 +151,7 @@ export const PurchaseOrderDetailPage = () => {
 
   return (
     <section>
-      <PageHeader description="Review the full purchase order aggregate and manage its lifecycle." title={purchaseOrder?.number ?? 'Purchase Order'} />
+      <PageHeader description="Review the full purchase order aggregate and manage its lifecycle." title="Purchase Order Details" />
       <div className="grid gap-4 p-6">
         <ErrorSummary messages={errorMessages} />
         {!purchaseOrder && !purchaseOrderQuery.isLoading && !purchaseOrderQuery.isError && <EmptyState title="Purchase order was not found." />}

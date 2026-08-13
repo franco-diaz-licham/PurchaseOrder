@@ -33,7 +33,7 @@ export const FinancePage = () => {
 
   return (
     <section>
-      <PageHeader description="Committed value is calculated from active reservations using the standard cost captured at reservation time." title="Finance" />
+      <PageHeader description="Committed value is calculated from active reservations using the standard cost captured at reservation time." title="Finance Reports" />
       <div className="grid gap-4 p-6">
         <FinanceStatsHeader reportLoadedAt={reportLoadedAt} totalCommittedValue={totalCommittedValue} totalReservationCount={totalReservationCount} totalReservedQuantity={totalReservedQuantity} />
         <WarehouseCommittedValueTable isError={financeQuery.isError} isLoading={financeQuery.isLoading} onViewWarehouse={setSelectedWarehouseId} rows={financeQuery.data ?? []} />

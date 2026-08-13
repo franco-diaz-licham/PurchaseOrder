@@ -12,30 +12,36 @@ type PurchaseOrderHeaderCardProps = {
   onClose: () => void;
 };
 
-export const PurchaseOrderHeaderCard = ({ isChangingStatus, purchaseOrder, warehouseDisplayName, onApprove, onCancel, onClose }: PurchaseOrderHeaderCardProps) => (
-  <article className="rounded-md border bg-card">
-    <div className="flex flex-col gap-3 p-4 md:flex-row md:items-center md:justify-between">
-      <div>
-        <div className="flex items-center gap-3">
-          <h2 className="text-base font-semibold">{purchaseOrder.number}</h2>
-          <StatusBadge status={purchaseOrder.status} />
+export const PurchaseOrderHeaderCard = ({ isChangingStatus, purchaseOrder, warehouseDisplayName, onApprove, onCancel, onClose }: PurchaseOrderHeaderCardProps) => {
+  const isReadOnly = purchaseOrder.status === 'Closed' || purchaseOrder.status === 'Cancelled';
+
+  return (
+    <article className="rounded-md border bg-card">
+      <div className="flex flex-col gap-3 p-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <div className="flex items-center gap-3">
+            <h2 className="text-base font-semibold">{purchaseOrder.number}</h2>
+            <StatusBadge status={purchaseOrder.status} />
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">{warehouseDisplayName}</p>
         </div>
-        <p className="mt-1 text-sm text-muted-foreground">{warehouseDisplayName}</p>
+        {!isReadOnly && (
+          <div className="flex flex-wrap gap-2">
+            <AppButton appearance="secondary" disabled={purchaseOrder.status !== 'Pending' || isChangingStatus} onClick={onApprove}>
+              <UilCheck className="h-4 w-4" />
+              Approve
+            </AppButton>
+            <AppButton appearance="secondary" disabled={isChangingStatus} onClick={onClose}>
+              <UilSync className="h-4 w-4" />
+              Close
+            </AppButton>
+            <AppButton appearance="danger" disabled={isChangingStatus} onClick={onCancel}>
+              <UilTimes className="h-4 w-4" />
+              Cancel
+            </AppButton>
+          </div>
+        )}
       </div>
-      <div className="flex flex-wrap gap-2">
-        <AppButton appearance="secondary" disabled={purchaseOrder.status !== 'Pending' || isChangingStatus} onClick={onApprove}>
-          <UilCheck className="h-4 w-4" />
-          Approve
-        </AppButton>
-        <AppButton appearance="secondary" disabled={purchaseOrder.status === 'Closed' || purchaseOrder.status === 'Cancelled' || isChangingStatus} onClick={onClose}>
-          <UilSync className="h-4 w-4" />
-          Close
-        </AppButton>
-        <AppButton appearance="danger" disabled={purchaseOrder.status === 'Closed' || purchaseOrder.status === 'Cancelled' || isChangingStatus} onClick={onCancel}>
-          <UilTimes className="h-4 w-4" />
-          Cancel
-        </AppButton>
-      </div>
-    </div>
-  </article>
-);
+    </article>
+  );
+};

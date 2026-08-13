@@ -89,7 +89,7 @@ public sealed class PurchaseOrderEndpointTests : ApiEndpointTestFixture
         var releasedReservation = await ReadDataAsync<ReservationResponse>(releaseResponse);
         releasedReservation.QuantityReserved.ShouldBe(6.250m);
 
-        var financeResponse = await Client.GetAsync("/api/finance/warehouse-committed-values");
+        var financeResponse = await Client.GetAsync("/api/finance/report");
         financeResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var financeValues = await ReadDataAsync<List<WarehouseCommittedStockValueResponse>>(financeResponse);
         var warehouseValue = financeValues.Single(value => value.WarehouseId == seed.WarehouseId.Value);

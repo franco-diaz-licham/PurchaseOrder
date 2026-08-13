@@ -4,6 +4,6 @@ import { listWarehouseCommittedValues } from '../services/finance.services';
 
 export const useWarehouseCommittedValuesQuery = () =>
   useQuery({
-    queryKey: ['finance', 'warehouse-committed-values'],
+    queryKey: ['finance', 'report'],
     queryFn: async () => toWarehouseCommittedValues(await listWarehouseCommittedValues())
   });
