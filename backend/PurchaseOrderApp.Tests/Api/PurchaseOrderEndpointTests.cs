@@ -121,7 +121,7 @@ public sealed class PurchaseOrderEndpointTests : ApiEndpointTestFixture
         responses.Count(response => response.StatusCode == HttpStatusCode.BadRequest).ShouldBe(1);
         var failedResponse = responses.Single(response => response.StatusCode == HttpStatusCode.BadRequest);
         var failedBody = await ReadMessageAsync(failedResponse);
-        failedBody.ShouldBe("Reservation quantity exceeds available stock.");
+        failedBody.ShouldBe("Reservation quantity exceeds available stock. Please refresh the page and try again.");
 
         Db.ChangeTracker.Clear();
         var activeReservations = await Db.StockReservations

@@ -31,7 +31,7 @@ public sealed class WarehouseStock : Entity<WarehouseStockId>
     public void EnsureCanReserve(Quantity activeReservedQuantity, Quantity requestedQuantity)
     {
         var availableQuantity = OnHandQuantity.Subtract(activeReservedQuantity);
-        if (requestedQuantity.Value > availableQuantity.Value) throw new DomainException("Reservation quantity exceeds available stock.");
+        if (requestedQuantity.Value > availableQuantity.Value) throw new DomainException("Reservation quantity exceeds available stock. Please refresh the page and try again.");
     }
 
     /// <summary>

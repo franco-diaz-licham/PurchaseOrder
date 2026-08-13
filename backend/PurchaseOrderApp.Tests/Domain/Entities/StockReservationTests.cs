@@ -63,7 +63,7 @@ public sealed class StockReservationTests
             TestData.OccurredAt));
 
         // Assert
-        exception.Message.ShouldBe("Reservation quantity exceeds available stock.");
+        exception.Message.ShouldBe("Reservation quantity exceeds available stock. Please refresh the page and try again.");
     }
 
     [Test]

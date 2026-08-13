@@ -31,7 +31,7 @@ public sealed class WarehouseStockTests
         var exception = Should.Throw<DomainException>(() => stock.EnsureCanReserve(new Quantity(25), new Quantity(76)));
 
         // Assert
-        exception.Message.ShouldBe("Reservation quantity exceeds available stock.");
+        exception.Message.ShouldBe("Reservation quantity exceeds available stock. Please refresh the page and try again.");
     }
 
     [Test]
