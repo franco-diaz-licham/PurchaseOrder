@@ -1,6 +1,6 @@
 import { cn } from '@/lib/cn';
 import { cva, type VariantProps } from 'class-variance-authority';
-import type { ButtonHTMLAttributes } from 'react';
+import { Children, isValidElement, type ButtonHTMLAttributes } from 'react';
 
 const buttonVariants = cva(
   'inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-60',
@@ -30,9 +30,14 @@ type AppButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
     isLoading?: boolean;
   };
 
-export const AppButton = ({ children, className, appearance, disabled, isLoading = false, size, type = 'button', ...props }: AppButtonProps) => (
-  <button className={cn(buttonVariants({ appearance, size }), className)} disabled={disabled || isLoading} type={type} {...props}>
-    {isLoading && <span className="h-4 w-4 animate-spin rounded-full border-2 border-current/30 border-t-current" />}
-    {children}
-  </button>
-);
+export const AppButton = ({ children, className, appearance, disabled, isLoading = false, size, type = 'button', ...props }: AppButtonProps) => {
+  const childNodes = Children.toArray(children);
+  const isIconOnly = Boolean(props['aria-label']) && childNodes.length === 1 && isValidElement(childNodes[0]);
+
+  return (
+    <button className={cn(buttonVariants({ appearance, size }), className)} disabled={disabled || isLoading} type={type} {...props}>
+      {isLoading && <span className="h-4 w-4 animate-spin rounded-full border-2 border-current/30 border-t-current" />}
+      {(!isLoading || !isIconOnly) && children}
+    </button>
+  );
+};
