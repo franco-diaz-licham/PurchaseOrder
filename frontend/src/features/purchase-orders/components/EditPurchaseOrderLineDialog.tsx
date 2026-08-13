@@ -26,7 +26,9 @@ export const EditPurchaseOrderLineDialog = ({ itemName, quantityOrdered, quantit
     }
   });
 
-  const submit = form.handleSubmit(onSubmit);
+  const submit = form.handleSubmit(async (values) => {
+    await onSubmit(values);
+  });
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby="edit-line-title">
