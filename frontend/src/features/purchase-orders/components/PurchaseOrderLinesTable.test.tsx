@@ -1,79 +1,22 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, test, vi } from 'vitest';
-import type { InventoryItemModel, WarehouseStockModel } from '@/features/catalog/types/catalog.types';
-import type { ReservationModel } from '@/features/reservations/types/reservation.types';
-import type { PurchaseOrderModel } from '../types/purchaseOrder.types';
+import type { WarehouseStockModel } from '@/features/catalog/types/catalog.types';
+import { mockInventoryItems, mockPurchaseOrder, mockReservations, mockWarehouseStock } from '@/testUtils/mockData';
 import { PurchaseOrderLinesTable } from './PurchaseOrderLinesTable';
 
-const inventoryItems: InventoryItemModel[] = [
-  {
-    id: 'item-1',
-    sku: 'BEAM-6M',
-    name: '6m Spreader Beam',
-    category: 'Hardware',
-    trackingMode: 'Unit',
-    standardCost: 1320,
-    displayName: 'BEAM-6M - 6m Spreader Beam [Unit]'
-  }
-];
-
-const purchaseOrder: PurchaseOrderModel = {
-  id: 'purchase-order-1',
-  number: 'PO-1021',
-  warehouseId: 'warehouse-nsw',
-  status: 'Approved',
-  subtotalAmount: 13200,
-  gstAmount: 1320,
-  totalAmount: 14520,
-  lines: [
-    {
-      id: 'line-1',
-      inventoryItemId: 'item-1',
-      quantityOrdered: 10,
-      quantityReserved: 4,
-      quantityRemaining: 6,
-      unitCost: 1320,
-      lineAmount: 13200
-    }
-  ]
-};
-
-const reservation: ReservationModel = {
-  id: 'reservation-1',
-  purchaseOrderLineId: 'line-1',
-  warehouseId: 'warehouse-nsw',
-  inventoryItemId: 'item-1',
-  quantityReserved: 4,
-  unitCostSnapshot: 1320,
-  status: 'Active',
-  reservedBy: 'Franco Diaz',
-  reservedAt: new Date('2026-08-12T10:15:00Z')
-};
-
-const stockByItemId = new Map<string, WarehouseStockModel>([
-  [
-    'item-1',
-    {
-      warehouseId: 'warehouse-nsw',
-      inventoryItemId: 'item-1',
-      onHandQuantity: 20,
-      activeReservedQuantity: 4,
-      availableQuantity: 16
-    }
-  ]
-]);
+const stockByItemId = new Map<string, WarehouseStockModel>(mockWarehouseStock.map((stock) => [stock.inventoryItemId, stock]));
 
 const renderTable = (overrides: Partial<Parameters<typeof PurchaseOrderLinesTable>[0]> = {}) => {
   const props: Parameters<typeof PurchaseOrderLinesTable>[0] = {
-    activeReservations: [reservation],
+    activeReservations: mockReservations,
     availableItemCount: 1,
     canChangeLines: true,
     canReserveStock: true,
-    inventoryItems,
+    inventoryItems: mockInventoryItems,
     isAddingLine: false,
     isRemovingLine: false,
-    purchaseOrder,
+    purchaseOrder: mockPurchaseOrder,
     reservationUser: 'Franco Diaz',
     stockByItemId,
     onAddLine: vi.fn(),
@@ -123,7 +66,7 @@ describe('PurchaseOrderLinesTable', () => {
     renderTable({
       canReserveStock: false,
       purchaseOrder: {
-        ...purchaseOrder,
+        ...mockPurchaseOrder,
         status: 'Pending'
       }
     });
@@ -139,7 +82,7 @@ describe('PurchaseOrderLinesTable', () => {
       canChangeLines: false,
       canReserveStock: false,
       purchaseOrder: {
-        ...purchaseOrder,
+        ...mockPurchaseOrder,
         status: 'Closed'
       }
     });

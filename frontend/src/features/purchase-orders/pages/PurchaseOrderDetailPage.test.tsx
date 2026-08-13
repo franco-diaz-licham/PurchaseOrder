@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { mockInventoryItems, mockPurchaseOrder, mockReservations, mockWarehouses, mockWarehouseStock } from '@/testUtils/mockData';
+import { mockInventoryItems, mockPendingPurchaseOrder, mockPurchaseOrder, mockReservations, mockWarehouses, mockWarehouseStock } from '@/testUtils/mockData';
 import type { PurchaseOrderModel } from '../types/purchaseOrder.types';
 import { PurchaseOrderDetailPage } from './PurchaseOrderDetailPage';
 
@@ -135,11 +135,7 @@ describe('PurchaseOrderDetailPage', () => {
   test('approves a pending purchase order from the page header', async () => {
     // Arrange
     const user = userEvent.setup();
-    const pendingPurchaseOrder: PurchaseOrderModel = {
-      ...mockPurchaseOrder,
-      status: 'Pending'
-    };
-    setupQueries(pendingPurchaseOrder);
+    setupQueries(mockPendingPurchaseOrder);
     const statusMutation = usePurchaseOrderStatusMutation();
 
     render(<PurchaseOrderDetailPage />);

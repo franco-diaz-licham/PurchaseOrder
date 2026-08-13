@@ -1,6 +1,14 @@
 import { describe, expect, test } from 'vitest';
-import type { PurchaseOrderResponseDto, PurchaseOrderSummaryResponseDto } from '../types/purchaseOrder.api.types';
-import type { AddPurchaseOrderLineModel, ChangePurchaseOrderStatusModel, RemovePurchaseOrderLineModel, SubmitPurchaseOrderModel, UpdatePurchaseOrderLineModel } from '../types/purchaseOrder.types';
+import {
+  mockAddPurchaseOrderLineModel,
+  mockChangePurchaseOrderStatusModel,
+  mockPurchaseOrderSummaryResponseDto,
+  mockPurchaseOrderSummaryResponseDtos,
+  mockPurchaseOrderWithLinesResponseDto,
+  mockRemovePurchaseOrderLineModel,
+  mockSubmitPurchaseOrderModel,
+  mockUpdatePurchaseOrderLineModel
+} from '@/testUtils/mockData';
 import {
   toAddPurchaseOrderLineRequestDto,
   toChangePurchaseOrderStatusRequestDto,
@@ -14,30 +22,8 @@ import {
 
 describe('purchase order mapper', () => {
   test('maps a purchase order response to a purchase order model', () => {
-    // Arrange
-    const dto: PurchaseOrderResponseDto = {
-      purchaseOrderId: 'purchase-order-1',
-      purchaseOrderNumber: 'PO-1021',
-      warehouseId: 'warehouse-1',
-      status: 'Approved',
-      subtotalAmount: 120,
-      gstAmount: 12,
-      totalAmount: 132,
-      lines: [
-        {
-          purchaseOrderLineId: 'line-1',
-          inventoryItemId: 'item-1',
-          quantityOrdered: 10,
-          quantityReserved: 4,
-          quantityRemaining: 6,
-          unitCost: 12,
-          lineAmount: 120
-        }
-      ]
-    };
-
     // Act
-    const model = toPurchaseOrder(dto);
+    const model = toPurchaseOrder(mockPurchaseOrderWithLinesResponseDto);
 
     // Assert
     expect(model).toEqual({
@@ -63,23 +49,8 @@ describe('purchase order mapper', () => {
   });
 
   test('maps a purchase order summary response to a purchase order summary model', () => {
-    // Arrange
-    const dto: PurchaseOrderSummaryResponseDto = {
-      purchaseOrderId: 'purchase-order-1',
-      purchaseOrderNumber: 'PO-1021',
-      warehouseId: 'warehouse-1',
-      status: 'Pending',
-      lineCount: 2,
-      quantityOrdered: 15,
-      quantityReserved: 5,
-      quantityRemaining: 10,
-      subtotalAmount: 200,
-      gstAmount: 20,
-      totalAmount: 220
-    };
-
     // Act
-    const model = toPurchaseOrderSummary(dto);
+    const model = toPurchaseOrderSummary(mockPurchaseOrderSummaryResponseDto);
 
     // Assert
     expect(model).toEqual({
@@ -87,49 +58,19 @@ describe('purchase order mapper', () => {
       number: 'PO-1021',
       warehouseId: 'warehouse-1',
       status: 'Pending',
-      lineCount: 2,
-      quantityOrdered: 15,
-      quantityReserved: 5,
+      lineCount: 1,
+      quantityOrdered: 10,
+      quantityReserved: 0,
       quantityRemaining: 10,
-      subtotalAmount: 200,
-      gstAmount: 20,
-      totalAmount: 220
+      subtotalAmount: 100,
+      gstAmount: 10,
+      totalAmount: 110
     });
   });
 
   test('maps purchase order summary responses to purchase order summary models', () => {
-    // Arrange
-    const dtos: PurchaseOrderSummaryResponseDto[] = [
-      {
-        purchaseOrderId: 'purchase-order-1',
-        purchaseOrderNumber: 'PO-1021',
-        warehouseId: 'warehouse-1',
-        status: 'Pending',
-        lineCount: 1,
-        quantityOrdered: 10,
-        quantityReserved: 0,
-        quantityRemaining: 10,
-        subtotalAmount: 100,
-        gstAmount: 10,
-        totalAmount: 110
-      },
-      {
-        purchaseOrderId: 'purchase-order-2',
-        purchaseOrderNumber: 'PO-1022',
-        warehouseId: 'warehouse-2',
-        status: 'Approved',
-        lineCount: 2,
-        quantityOrdered: 20,
-        quantityReserved: 5,
-        quantityRemaining: 15,
-        subtotalAmount: 200,
-        gstAmount: 20,
-        totalAmount: 220
-      }
-    ];
-
     // Act
-    const models = toPurchaseOrderSummaries(dtos);
+    const models = toPurchaseOrderSummaries(mockPurchaseOrderSummaryResponseDtos);
 
     // Assert
     expect(models).toHaveLength(2);
@@ -138,20 +79,8 @@ describe('purchase order mapper', () => {
   });
 
   test('maps submit purchase order model to request dto', () => {
-    // Arrange
-    const model: SubmitPurchaseOrderModel = {
-      warehouseId: 'warehouse-1',
-      user: 'Franco Diaz',
-      lines: [
-        {
-          inventoryItemId: 'item-1',
-          quantityOrdered: 10
-        }
-      ]
-    };
-
     // Act
-    const dto = toSubmitPurchaseOrderRequestDto(model);
+    const dto = toSubmitPurchaseOrderRequestDto(mockSubmitPurchaseOrderModel);
 
     // Assert
     expect(dto).toEqual({
@@ -167,16 +96,8 @@ describe('purchase order mapper', () => {
   });
 
   test('maps add line model to request dto', () => {
-    // Arrange
-    const model: AddPurchaseOrderLineModel = {
-      purchaseOrderId: 'purchase-order-1',
-      inventoryItemId: 'item-1',
-      quantityOrdered: 12.5,
-      user: 'Franco Diaz'
-    };
-
     // Act
-    const dto = toAddPurchaseOrderLineRequestDto(model);
+    const dto = toAddPurchaseOrderLineRequestDto(mockAddPurchaseOrderLineModel);
 
     // Assert
     expect(dto).toEqual({
@@ -187,15 +108,8 @@ describe('purchase order mapper', () => {
   });
 
   test('maps remove line model to request dto', () => {
-    // Arrange
-    const model: RemovePurchaseOrderLineModel = {
-      purchaseOrderId: 'purchase-order-1',
-      purchaseOrderLineId: 'line-1',
-      user: 'Franco Diaz'
-    };
-
     // Act
-    const dto = toRemovePurchaseOrderLineRequestDto(model);
+    const dto = toRemovePurchaseOrderLineRequestDto(mockRemovePurchaseOrderLineModel);
 
     // Assert
     expect(dto).toEqual({
@@ -204,16 +118,8 @@ describe('purchase order mapper', () => {
   });
 
   test('maps update line model to request dto', () => {
-    // Arrange
-    const model: UpdatePurchaseOrderLineModel = {
-      purchaseOrderId: 'purchase-order-1',
-      purchaseOrderLineId: 'line-1',
-      quantityOrdered: 20,
-      user: 'Franco Diaz'
-    };
-
     // Act
-    const dto = toUpdatePurchaseOrderLineRequestDto(model);
+    const dto = toUpdatePurchaseOrderLineRequestDto(mockUpdatePurchaseOrderLineModel);
 
     // Assert
     expect(dto).toEqual({
@@ -223,15 +129,8 @@ describe('purchase order mapper', () => {
   });
 
   test('maps status change model to request dto', () => {
-    // Arrange
-    const model: ChangePurchaseOrderStatusModel = {
-      purchaseOrderId: 'purchase-order-1',
-      status: 'approve',
-      user: 'Franco Diaz'
-    };
-
     // Act
-    const dto = toChangePurchaseOrderStatusRequestDto(model);
+    const dto = toChangePurchaseOrderStatusRequestDto(mockChangePurchaseOrderStatusModel);
 
     // Assert
     expect(dto).toEqual({

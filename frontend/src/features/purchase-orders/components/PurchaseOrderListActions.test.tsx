@@ -1,23 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, test, vi } from 'vitest';
-import type { WarehouseModel } from '@/features/catalog/types/catalog.types';
+import { mockWarehouses } from '@/testUtils/mockData';
 import { PurchaseOrderListActions } from './PurchaseOrderListActions';
-
-const warehouses: WarehouseModel[] = [
-  {
-    id: 'warehouse-nsw',
-    code: 'NSW',
-    name: 'New South Wales',
-    displayName: 'NSW - New South Wales'
-  },
-  {
-    id: 'warehouse-qld',
-    code: 'QLD',
-    name: 'Queensland',
-    displayName: 'QLD - Queensland'
-  }
-];
 
 describe('PurchaseOrderListActions', () => {
   test('raises filter and add actions', async () => {
@@ -27,7 +12,7 @@ describe('PurchaseOrderListActions', () => {
     const onShowReadyToReserveOnlyChange = vi.fn();
     const onWarehouseFilterChange = vi.fn();
 
-    render(<PurchaseOrderListActions showReadyToReserveOnly={false} warehouseFilter="" warehouses={warehouses} onAdd={onAdd} onShowReadyToReserveOnlyChange={onShowReadyToReserveOnlyChange} onWarehouseFilterChange={onWarehouseFilterChange} />);
+    render(<PurchaseOrderListActions showReadyToReserveOnly={false} warehouseFilter="" warehouses={mockWarehouses} onAdd={onAdd} onShowReadyToReserveOnlyChange={onShowReadyToReserveOnlyChange} onWarehouseFilterChange={onWarehouseFilterChange} />);
 
     // Act
     await user.click(screen.getByLabelText('Ready to reserve'));
@@ -42,7 +27,7 @@ describe('PurchaseOrderListActions', () => {
 
   test('renders the selected warehouse filter', () => {
     // Arrange / Act
-    render(<PurchaseOrderListActions showReadyToReserveOnly warehouseFilter="warehouse-nsw" warehouses={warehouses} onAdd={vi.fn()} onShowReadyToReserveOnlyChange={vi.fn()} onWarehouseFilterChange={vi.fn()} />);
+    render(<PurchaseOrderListActions showReadyToReserveOnly warehouseFilter="warehouse-nsw" warehouses={mockWarehouses} onAdd={vi.fn()} onShowReadyToReserveOnlyChange={vi.fn()} onWarehouseFilterChange={vi.fn()} />);
 
     // Assert
     expect(screen.getByLabelText('Ready to reserve')).toBeChecked();

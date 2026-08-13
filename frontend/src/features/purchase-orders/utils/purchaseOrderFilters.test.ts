@@ -1,48 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import type { PurchaseOrderSummaryModel } from '../types/purchaseOrder.types';
+import { mockPurchaseOrderSummariesForFiltering } from '@/testUtils/mockData';
 import { filterPurchaseOrders } from './purchaseOrderFilters';
-
-const purchaseOrders: PurchaseOrderSummaryModel[] = [
-  {
-    id: 'purchase-order-1',
-    number: 'PO-1001',
-    warehouseId: 'warehouse-nsw',
-    status: 'Approved',
-    lineCount: 1,
-    quantityOrdered: 10,
-    quantityReserved: 4,
-    quantityRemaining: 6,
-    subtotalAmount: 100,
-    gstAmount: 10,
-    totalAmount: 110
-  },
-  {
-    id: 'purchase-order-2',
-    number: 'PO-1002',
-    warehouseId: 'warehouse-nsw',
-    status: 'Approved',
-    lineCount: 1,
-    quantityOrdered: 10,
-    quantityReserved: 10,
-    quantityRemaining: 0,
-    subtotalAmount: 100,
-    gstAmount: 10,
-    totalAmount: 110
-  },
-  {
-    id: 'purchase-order-3',
-    number: 'PO-1003',
-    warehouseId: 'warehouse-qld',
-    status: 'Pending',
-    lineCount: 1,
-    quantityOrdered: 10,
-    quantityReserved: 0,
-    quantityRemaining: 10,
-    subtotalAmount: 100,
-    gstAmount: 10,
-    totalAmount: 110
-  }
-];
 
 describe('purchase order filters', () => {
   test('filters purchase orders by warehouse', () => {
@@ -53,7 +11,7 @@ describe('purchase order filters', () => {
     };
 
     // Act
-    const filtered = filterPurchaseOrders(purchaseOrders, filter);
+    const filtered = filterPurchaseOrders(mockPurchaseOrderSummariesForFiltering, filter);
 
     // Assert
     expect(filtered.map((order) => order.id)).toEqual(['purchase-order-1', 'purchase-order-2']);
@@ -67,7 +25,7 @@ describe('purchase order filters', () => {
     };
 
     // Act
-    const filtered = filterPurchaseOrders(purchaseOrders, filter);
+    const filtered = filterPurchaseOrders(mockPurchaseOrderSummariesForFiltering, filter);
 
     // Assert
     expect(filtered.map((order) => order.id)).toEqual(['purchase-order-1']);
@@ -81,7 +39,7 @@ describe('purchase order filters', () => {
     };
 
     // Act
-    const filtered = filterPurchaseOrders(purchaseOrders, filter);
+    const filtered = filterPurchaseOrders(mockPurchaseOrderSummariesForFiltering, filter);
 
     // Assert
     expect(filtered.map((order) => order.id)).toEqual(['purchase-order-1']);
@@ -95,9 +53,9 @@ describe('purchase order filters', () => {
     };
 
     // Act
-    const filtered = filterPurchaseOrders(purchaseOrders, filter);
+    const filtered = filterPurchaseOrders(mockPurchaseOrderSummariesForFiltering, filter);
 
     // Assert
-    expect(filtered).toEqual(purchaseOrders);
+    expect(filtered).toEqual(mockPurchaseOrderSummariesForFiltering);
   });
 });

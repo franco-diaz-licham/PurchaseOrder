@@ -1,36 +1,11 @@
 import { describe, expect, test } from 'vitest';
-import type { WarehouseCommittedValueResponseDto } from '../types/finance.api.types';
+import { mockWarehouseCommittedValueResponseDto } from '@/testUtils/mockData';
 import { toWarehouseCommittedValue } from './finance.mapper';
 
 describe('finance mapper', () => {
   test('maps committed value response to the finance report model', () => {
-    // Arrange
-    const dto: WarehouseCommittedValueResponseDto = {
-      warehouseId: 'warehouse-nsw',
-      warehouseCode: 'NSW',
-      warehouseName: 'New South Wales',
-      reservedQuantity: 25,
-      reservationCount: 1,
-      committedValue: 1200,
-      reservations: [
-        {
-          stockReservationId: 'reservation-1',
-          purchaseOrderId: 'purchase-order-1',
-          purchaseOrderNumber: 'PO-1001',
-          purchaseOrderLineId: 'line-1',
-          inventoryItemId: 'item-1',
-          sku: 'BEAM-6M',
-          itemName: '6m Spreader Beam',
-          trackingMode: 'Unit',
-          quantityReserved: 25,
-          unitCostSnapshot: 48,
-          committedValue: 1200
-        }
-      ]
-    };
-
     // Act
-    const model = toWarehouseCommittedValue(dto);
+    const model = toWarehouseCommittedValue(mockWarehouseCommittedValueResponseDto);
 
     // Assert
     expect(model).toEqual({

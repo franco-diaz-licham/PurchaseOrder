@@ -1,31 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, test, vi } from 'vitest';
-import type { ReservationModel } from '@/features/reservations/types/reservation.types';
-import type { PurchaseOrderLineModel } from '../types/purchaseOrder.types';
+import { mockPurchaseOrder, mockReservations } from '@/testUtils/mockData';
 import { ManageReservationsDialog } from './ManageReservationsDialog';
 
-const line: PurchaseOrderLineModel = {
-  id: 'line-1',
-  inventoryItemId: 'item-1',
-  quantityOrdered: 20,
-  quantityReserved: 5,
-  quantityRemaining: 15,
-  unitCost: 10,
-  lineAmount: 200
-};
-
-const reservation: ReservationModel = {
-  id: 'reservation-1',
-  purchaseOrderLineId: 'line-1',
-  warehouseId: 'warehouse-1',
-  inventoryItemId: 'item-1',
-  quantityReserved: 5,
-  unitCostSnapshot: 10,
-  status: 'Active',
-  reservedBy: 'Franco Diaz',
-  reservedAt: new Date('2026-08-12T10:15:00Z')
-};
+const line = mockPurchaseOrder.lines[0];
+const reservation = mockReservations[0];
 
 describe('ManageReservationsDialog', () => {
   test('submits a valid reservation quantity', async () => {

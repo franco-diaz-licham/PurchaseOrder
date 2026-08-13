@@ -3,8 +3,16 @@ import { renderHook, waitFor } from '@testing-library/react';
 import type { PropsWithChildren } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { catalogKeys } from '@/features/catalog/queries/catalog.queries';
+import {
+  mockAddPurchaseOrderLineModel,
+  mockChangePurchaseOrderStatusModel,
+  mockPurchaseOrderSummaryWithReservationsResponseDto,
+  mockPurchaseOrderWithLinesResponseDto,
+  mockRemovePurchaseOrderLineModel,
+  mockSubmitPurchaseOrderModel,
+  mockUpdatePurchaseOrderLineModel
+} from '@/testUtils/mockData';
 import * as purchaseOrderServices from '../services/purchaseOrder.services';
-import type { PurchaseOrderResponseDto, PurchaseOrderSummaryResponseDto } from '../types/purchaseOrder.api.types';
 import {
   purchaseOrderKeys,
   useAddPurchaseOrderLineMutation,
@@ -28,41 +36,6 @@ vi.mock('../services/purchaseOrder.services', () => ({
 
 const serviceMock = vi.mocked(purchaseOrderServices);
 
-const purchaseOrderDto: PurchaseOrderResponseDto = {
-  purchaseOrderId: 'purchase-order-1',
-  purchaseOrderNumber: 'PO-1021',
-  warehouseId: 'warehouse-1',
-  status: 'Pending',
-  subtotalAmount: 120,
-  gstAmount: 12,
-  totalAmount: 132,
-  lines: [
-    {
-      purchaseOrderLineId: 'line-1',
-      inventoryItemId: 'item-1',
-      quantityOrdered: 10,
-      quantityReserved: 4,
-      quantityRemaining: 6,
-      unitCost: 12,
-      lineAmount: 120
-    }
-  ]
-};
-
-const purchaseOrderSummaryDto: PurchaseOrderSummaryResponseDto = {
-  purchaseOrderId: 'purchase-order-1',
-  purchaseOrderNumber: 'PO-1021',
-  warehouseId: 'warehouse-1',
-  status: 'Pending',
-  lineCount: 1,
-  quantityOrdered: 10,
-  quantityReserved: 4,
-  quantityRemaining: 6,
-  subtotalAmount: 120,
-  gstAmount: 12,
-  totalAmount: 132
-};
-
 const createQueryClient = () =>
   new QueryClient({
     defaultOptions: {
@@ -83,7 +56,7 @@ describe('purchase order queries', () => {
   test('maps purchase order summaries from the service response', async () => {
     // Arrange
     const queryClient = createQueryClient();
-    serviceMock.listPurchaseOrderSummaries.mockResolvedValue([purchaseOrderSummaryDto]);
+    serviceMock.listPurchaseOrderSummaries.mockResolvedValue([mockPurchaseOrderSummaryWithReservationsResponseDto]);
 
     // Act
     const { result } = renderHook(() => usePurchaseOrderSummariesQuery(), {
@@ -126,7 +99,7 @@ describe('purchase order queries', () => {
   test('maps a purchase order aggregate from the service response', async () => {
     // Arrange
     const queryClient = createQueryClient();
-    serviceMock.getPurchaseOrder.mockResolvedValue(purchaseOrderDto);
+    serviceMock.getPurchaseOrder.mockResolvedValue(mockPurchaseOrderWithLinesResponseDto);
 
     // Act
     const { result } = renderHook(() => usePurchaseOrderQuery('purchase-order-1'), {
@@ -152,25 +125,17 @@ describe('purchase order queries', () => {
     // Arrange
     const queryClient = createQueryClient();
     const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries').mockResolvedValue();
-    serviceMock.submitPurchaseOrder.mockResolvedValue(purchaseOrderDto);
+    serviceMock.submitPurchaseOrder.mockResolvedValue(mockPurchaseOrderWithLinesResponseDto);
 
     const { result } = renderHook(() => useSubmitPurchaseOrderMutation(), {
       wrapper: createWrapper(queryClient)
     });
 
     // Act
-    const purchaseOrder = await result.current.mutateAsync({
-      warehouseId: 'warehouse-1',
-      user: 'Franco Diaz',
-      lines: [{ inventoryItemId: 'item-1', quantityOrdered: 10 }]
-    });
+    const purchaseOrder = await result.current.mutateAsync(mockSubmitPurchaseOrderModel);
 
     // Assert
-    expect(serviceMock.submitPurchaseOrder).toHaveBeenCalledWith({
-      warehouseId: 'warehouse-1',
-      user: 'Franco Diaz',
-      lines: [{ inventoryItemId: 'item-1', quantityOrdered: 10 }]
-    });
+    expect(serviceMock.submitPurchaseOrder).toHaveBeenCalledWith(mockSubmitPurchaseOrderModel);
     expect(purchaseOrder.id).toBe('purchase-order-1');
     expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: purchaseOrderKeys.all });
   });
@@ -179,19 +144,14 @@ describe('purchase order queries', () => {
     // Arrange
     const queryClient = createQueryClient();
     const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries').mockResolvedValue();
-    serviceMock.addPurchaseOrderLine.mockResolvedValue(purchaseOrderDto);
+    serviceMock.addPurchaseOrderLine.mockResolvedValue(mockPurchaseOrderWithLinesResponseDto);
 
     const { result } = renderHook(() => useAddPurchaseOrderLineMutation(), {
       wrapper: createWrapper(queryClient)
     });
 
     // Act
-    const purchaseOrder = await result.current.mutateAsync({
-      purchaseOrderId: 'purchase-order-1',
-      inventoryItemId: 'item-1',
-      quantityOrdered: 12.5,
-      user: 'Franco Diaz'
-    });
+    const purchaseOrder = await result.current.mutateAsync(mockAddPurchaseOrderLineModel);
 
     // Assert
     expect(serviceMock.addPurchaseOrderLine).toHaveBeenCalledWith('purchase-order-1', {
@@ -208,18 +168,14 @@ describe('purchase order queries', () => {
     // Arrange
     const queryClient = createQueryClient();
     const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries').mockResolvedValue();
-    serviceMock.removePurchaseOrderLine.mockResolvedValue(purchaseOrderDto);
+    serviceMock.removePurchaseOrderLine.mockResolvedValue(mockPurchaseOrderWithLinesResponseDto);
 
     const { result } = renderHook(() => useRemovePurchaseOrderLineMutation(), {
       wrapper: createWrapper(queryClient)
     });
 
     // Act
-    await result.current.mutateAsync({
-      purchaseOrderId: 'purchase-order-1',
-      purchaseOrderLineId: 'line-1',
-      user: 'Franco Diaz'
-    });
+    await result.current.mutateAsync(mockRemovePurchaseOrderLineModel);
 
     // Assert
     expect(serviceMock.removePurchaseOrderLine).toHaveBeenCalledWith('purchase-order-1', 'line-1', {
@@ -237,19 +193,14 @@ describe('purchase order queries', () => {
     // Arrange
     const queryClient = createQueryClient();
     const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries').mockResolvedValue();
-    serviceMock.updatePurchaseOrderLine.mockResolvedValue(purchaseOrderDto);
+    serviceMock.updatePurchaseOrderLine.mockResolvedValue(mockPurchaseOrderWithLinesResponseDto);
 
     const { result } = renderHook(() => useUpdatePurchaseOrderLineMutation(), {
       wrapper: createWrapper(queryClient)
     });
 
     // Act
-    await result.current.mutateAsync({
-      purchaseOrderId: 'purchase-order-1',
-      purchaseOrderLineId: 'line-1',
-      quantityOrdered: 20,
-      user: 'Franco Diaz'
-    });
+    await result.current.mutateAsync(mockUpdatePurchaseOrderLineModel);
 
     // Assert
     expect(serviceMock.updatePurchaseOrderLine).toHaveBeenCalledWith('purchase-order-1', 'line-1', {
@@ -264,18 +215,14 @@ describe('purchase order queries', () => {
     // Arrange
     const queryClient = createQueryClient();
     const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries').mockResolvedValue();
-    serviceMock.changePurchaseOrderStatus.mockResolvedValue(purchaseOrderDto);
+    serviceMock.changePurchaseOrderStatus.mockResolvedValue(mockPurchaseOrderWithLinesResponseDto);
 
     const { result } = renderHook(() => usePurchaseOrderStatusMutation(), {
       wrapper: createWrapper(queryClient)
     });
 
     // Act
-    await result.current.mutateAsync({
-      purchaseOrderId: 'purchase-order-1',
-      status: 'approve',
-      user: 'Franco Diaz'
-    });
+    await result.current.mutateAsync(mockChangePurchaseOrderStatusModel);
 
     // Assert
     expect(serviceMock.changePurchaseOrderStatus).toHaveBeenCalledWith('purchase-order-1', 'approve', {
