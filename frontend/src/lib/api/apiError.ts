@@ -1,5 +1,8 @@
 import type { AxiosError } from 'axios';
 
+/**
+ * Error response shapes the API may return for domain, validation, or unexpected failures.
+ */
 type ApiErrorResponse = {
   statusCode?: number;
   message?: string;
@@ -26,6 +29,14 @@ const getAxiosResponseData = (error: unknown) => {
   return axiosError.response?.data;
 };
 
+/**
+ * Extracts the best user-facing error message from an API or JavaScript error.
+ *
+ * The backend normally returns a message in its API envelope, but validation and
+ * framework errors can arrive as arrays or field dictionaries. This helper keeps
+ * that normalization in one place so components do not need to understand every
+ * response shape.
+ */
 export const getApiErrorMessage = (error: unknown, fallbackMessage: string): string => {
   const responseData = getAxiosResponseData(error);
   const apiError = isApiErrorResponse(responseData) ? responseData : isApiErrorResponse(error) ? error : null;

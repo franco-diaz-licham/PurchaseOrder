@@ -15,17 +15,22 @@ export const PurchaseOrdersPage = () => {
   const showReadyToReserveOnly = usePurchaseOrderListStore((state) => state.showReadyToReserveOnly);
   const setWarehouseFilter = usePurchaseOrderListStore((state) => state.setSelectedWarehouseId);
   const setShowReadyToReserveOnly = usePurchaseOrderListStore((state) => state.setShowReadyToReserveOnly);
+
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+
   const navigate = useNavigate();
+
   const warehousesQuery = useWarehousesQuery();
   const purchaseOrdersQuery = usePurchaseOrderSummariesQuery();
   const submitMutation = useSubmitPurchaseOrderMutation();
+
   const purchaseOrders = useMemo(() => {
     return filterPurchaseOrders(purchaseOrdersQuery.data ?? [], {
       warehouseId: warehouseFilter,
       showReadyToReserveOnly
     });
   }, [purchaseOrdersQuery.data, showReadyToReserveOnly, warehouseFilter]);
+
   const isLoading = purchaseOrdersQuery.isLoading || warehousesQuery.isLoading;
 
   const closeCreateDialog = () => {

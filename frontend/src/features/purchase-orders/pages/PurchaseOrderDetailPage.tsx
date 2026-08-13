@@ -18,37 +18,45 @@ import { getPurchaseOrderDetailErrorMessages } from '../utils/purchaseOrderDetai
 
 export const PurchaseOrderDetailPage = () => {
   const { purchaseOrderId } = useParams();
+
   const purchaseOrderQuery = usePurchaseOrderQuery(purchaseOrderId);
+  const warehousesQuery = useWarehousesQuery();
+  const itemsQuery = useInventoryItemsQuery();
+
   const statusMutation = usePurchaseOrderStatusMutation();
   const addLineMutation = useAddPurchaseOrderLineMutation();
   const removeLineMutation = useRemovePurchaseOrderLineMutation();
   const updateLineMutation = useUpdatePurchaseOrderLineMutation();
   const createReservationMutation = useCreateReservationMutation();
   const releaseReservationMutation = useReleaseReservationMutation();
-  const warehousesQuery = useWarehousesQuery();
-  const itemsQuery = useInventoryItemsQuery();
+
   const purchaseOrder = purchaseOrderQuery.data;
   const warehouseStockQuery = useWarehouseStockQuery(purchaseOrder?.warehouseId);
+  const reservationsQuery = useReservationsQuery(purchaseOrder?.status === 'Approved');
+
   const warehouse = purchaseOrder ? findWarehouse(warehousesQuery.data, purchaseOrder.warehouseId) : undefined;
+
   const canChangeLines = purchaseOrder !== undefined && purchaseOrder.status !== 'Closed' && purchaseOrder.status !== 'Cancelled';
   const canReserveStock = purchaseOrder?.status === 'Approved';
-  const reservationsQuery = useReservationsQuery(canReserveStock);
+
   const activeReservations = useMemo(() => {
     const reservations = reservationsQuery.data ?? [];
     if (!purchaseOrder) return [];
+
     return reservations.filter((reservation) => reservation.warehouseId === purchaseOrder.warehouseId && reservation.status === 'Active');
   }, [purchaseOrder, reservationsQuery.data]);
   const stockByItemId = useMemo(() => new Map((warehouseStockQuery.data ?? []).map((stock) => [stock.inventoryItemId, stock])), [warehouseStockQuery.data]);
   const existingLineItemIds = useMemo(() => new Set((purchaseOrder?.lines ?? []).map((line) => line.inventoryItemId)), [purchaseOrder?.lines]);
   const availableItemsToAdd = useMemo(() => (itemsQuery.data ?? []).filter((item) => !existingLineItemIds.has(item.id)), [existingLineItemIds, itemsQuery.data]);
+
   const [isAddLineOpen, setIsAddLineOpen] = useState(false);
   const [editLineId, setEditLineId] = useState<string | null>(null);
   const [manageReservationsLineId, setManageReservationsLineId] = useState<string | null>(null);
   const [reservationUser, setReservationUser] = useState('Franco Diaz');
 
-  const manageReservationsLine = purchaseOrder?.lines.find((line) => line.id === manageReservationsLineId);
   const editLine = purchaseOrder?.lines.find((line) => line.id === editLineId);
   const editLineItem = editLine ? findInventoryItem(itemsQuery.data, editLine.inventoryItemId) : undefined;
+  const manageReservationsLine = purchaseOrder?.lines.find((line) => line.id === manageReservationsLineId);
   const manageReservationsItem = manageReservationsLine ? findInventoryItem(itemsQuery.data, manageReservationsLine.inventoryItemId) : undefined;
   const manageReservationsStock = manageReservationsLine ? stockByItemId.get(manageReservationsLine.inventoryItemId) : undefined;
   const manageReservationsAvailableQuantity = manageReservationsStock?.availableQuantity ?? 0;
@@ -63,12 +71,8 @@ export const PurchaseOrderDetailPage = () => {
     createReservationMutation,
     releaseReservationMutation
   });
-  const isPageLoading =
-    purchaseOrderQuery.isLoading ||
-    warehousesQuery.isLoading ||
-    itemsQuery.isLoading ||
-    warehouseStockQuery.isLoading ||
-    reservationsQuery.isLoading;
+
+  const isPageLoading = purchaseOrderQuery.isLoading || warehousesQuery.isLoading || itemsQuery.isLoading || warehouseStockQuery.isLoading || reservationsQuery.isLoading;
 
   const openAddLineDialog = () => {
     setIsAddLineOpen(true);

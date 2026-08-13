@@ -16,7 +16,7 @@ export const WorkspaceLayout = () => (
         <UilLayerGroup className="h-6 w-6 text-teal-300" />
         <div>
           <div className="text-sm font-semibold">PurchaseOrderApp</div>
-          <div className="text-xs text-slate-400">Stock reservations</div>
+          <div className="text-xs text-slate-400">Borger Cranes</div>
         </div>
       </div>
       <nav className="grid gap-1 p-3">

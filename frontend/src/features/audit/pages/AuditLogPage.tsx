@@ -10,14 +10,18 @@ import { useAuditLogStore } from '../stores/auditLog.store';
 export const AuditLogPage = () => {
   const warehouseId = useAuditLogStore((state) => state.selectedWarehouseId);
   const setWarehouseId = useAuditLogStore((state) => state.setSelectedWarehouseId);
+
   const warehousesQuery = useWarehousesQuery();
   const itemsQuery = useInventoryItemsQuery();
   const auditQuery = useAuditLogQuery();
+
   const auditEntries = useMemo(() => {
     const entries = auditQuery.data ?? [];
     if (!warehouseId) return entries;
+
     return entries.filter((entry) => entry.warehouseId === warehouseId);
   }, [auditQuery.data, warehouseId]);
+
   const isLoading = auditQuery.isLoading || warehousesQuery.isLoading || itemsQuery.isLoading;
 
   if (isLoading) return <PageLoadingIndicator />;

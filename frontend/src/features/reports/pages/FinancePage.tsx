@@ -10,11 +10,15 @@ import { useFinanceNavigationStore } from '../stores/financeNavigation.store';
 
 export const FinancePage = () => {
   const navigate = useNavigate();
-  const financeQuery = useWarehouseCommittedValuesQuery();
+
   const selectedWarehouseId = useFinanceNavigationStore((state) => state.selectedWarehouseId);
   const setSelectedWarehouseId = useFinanceNavigationStore((state) => state.setSelectedWarehouseId);
   const openPurchaseOrder = useFinanceNavigationStore((state) => state.openPurchaseOrder);
+
+  const financeQuery = useWarehouseCommittedValuesQuery();
+
   const reportLoadedAt = useMemo(() => new Date().toLocaleString(), []);
+
   const totalCommittedValue = (financeQuery.data ?? []).reduce((total, row) => total + row.committedValue, 0);
   const totalReservedQuantity = (financeQuery.data ?? []).reduce((total, row) => total + row.reservedQuantity, 0);
   const totalReservationCount = (financeQuery.data ?? []).reduce((total, row) => total + row.reservationCount, 0);

@@ -1,5 +1,4 @@
-import { useInventoryItemsQuery } from '../queries/catalog.queries';
-import { useChangeInventoryItemStandardCostMutation } from '../queries/inventoryItem.mutations';
+import type { FormEvent } from 'react';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { PageLoadingIndicator } from '@/components/common/PageLoadingIndicator';
@@ -8,12 +7,15 @@ import { AppButton } from '@/components/ui/AppButton';
 import { AppInput } from '@/components/ui/AppInput';
 import { AppTable, AppTableBody, AppTableCell, AppTableContainer, AppTableHead, AppTableHeaderCell, AppTableHeaderRow, AppTableRow } from '@/components/ui/AppTable';
 import { formatMoney } from '@/lib/formatMoney';
+import { useInventoryItemsQuery } from '../queries/catalog.queries';
+import { useChangeInventoryItemStandardCostMutation } from '../queries/inventoryItem.mutations';
 
 export const InventoryItemsPage = () => {
   const itemsQuery = useInventoryItemsQuery();
+
   const changeStandardCostMutation = useChangeInventoryItemStandardCostMutation();
 
-  const changeStandardCost = async (event: React.FormEvent<HTMLFormElement>, inventoryItemId: string) => {
+  const changeStandardCost = async (event: FormEvent<HTMLFormElement>, inventoryItemId: string) => {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
