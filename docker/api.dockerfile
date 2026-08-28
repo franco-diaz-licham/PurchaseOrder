@@ -3,17 +3,17 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy project files first so Docker can cache package restore.
-COPY backend/PurchaseOrderApp.Domain/PurchaseOrderApp.Domain.csproj backend/PurchaseOrderApp.Domain/
-COPY backend/PurchaseOrderApp.Application/PurchaseOrderApp.Application.csproj backend/PurchaseOrderApp.Application/
-COPY backend/PurchaseOrderApp.Infrastructure/PurchaseOrderApp.Infrastructure.csproj backend/PurchaseOrderApp.Infrastructure/
-COPY backend/PurchaseOrderApp.Api/PurchaseOrderApp.Api.csproj backend/PurchaseOrderApp.Api/
+COPY backend/clean/PurchaseOrderApp.Domain/PurchaseOrderApp.Domain.csproj backend/clean/PurchaseOrderApp.Domain/
+COPY backend/clean/PurchaseOrderApp.Application/PurchaseOrderApp.Application.csproj backend/clean/PurchaseOrderApp.Application/
+COPY backend/clean/PurchaseOrderApp.Infrastructure/PurchaseOrderApp.Infrastructure.csproj backend/clean/PurchaseOrderApp.Infrastructure/
+COPY backend/clean/PurchaseOrderApp.Api/PurchaseOrderApp.Api.csproj backend/clean/PurchaseOrderApp.Api/
 
-RUN dotnet restore backend/PurchaseOrderApp.Api/PurchaseOrderApp.Api.csproj
+RUN dotnet restore backend/clean/PurchaseOrderApp.Api/PurchaseOrderApp.Api.csproj
 
 # Copy the source code after restore and publish the API.
 COPY backend/ backend/
 
-RUN dotnet publish backend/PurchaseOrderApp.Api/PurchaseOrderApp.Api.csproj -c Release -o /app/publish --no-restore
+RUN dotnet publish backend/clean/PurchaseOrderApp.Api/PurchaseOrderApp.Api.csproj -c Release -o /app/publish --no-restore
 
 # Run the published output on the smaller ASP.NET runtime image.
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime

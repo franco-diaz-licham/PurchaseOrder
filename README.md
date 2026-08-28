@@ -86,8 +86,8 @@ Manual database commands:
 Backend:
 
 ```powershell
-dotnet build backend/PurchaseOrderApp.Api/PurchaseOrderApp.Api.csproj
-dotnet run --project backend/PurchaseOrderApp.Api/PurchaseOrderApp.Api.csproj
+dotnet build backend/clean/PurchaseOrderApp.Api/PurchaseOrderApp.Api.csproj
+dotnet run --project backend/clean/PurchaseOrderApp.Api/PurchaseOrderApp.Api.csproj
 ```
 
 Frontend:
@@ -106,7 +106,7 @@ The local API expects PostgreSQL at `localhost:56433`, which is the host port ex
 Run all backend tests:
 
 ```powershell
-dotnet test backend/PurchaseOrderApp.Tests/PurchaseOrderApp.Tests.csproj
+dotnet test backend/clean/PurchaseOrderApp.Tests/PurchaseOrderApp.Tests.csproj
 ```
 
 Run frontend checks:

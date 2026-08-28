@@ -11,8 +11,8 @@ Applies EF Core migrations to the PurchaseOrder database.
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$apiProject = Join-Path $PSScriptRoot "../backend/PurchaseOrderApp.Api/PurchaseOrderApp.Api.csproj"
-$infrastructureProject = Join-Path $PSScriptRoot "../backend/PurchaseOrderApp.Infrastructure/PurchaseOrderApp.Infrastructure.csproj"
+$apiProject = Join-Path $PSScriptRoot "../backend/clean/PurchaseOrderApp.Api/PurchaseOrderApp.Api.csproj"
+$infrastructureProject = Join-Path $PSScriptRoot "../backend/clean/PurchaseOrderApp.Infrastructure/PurchaseOrderApp.Infrastructure.csproj"
 $env:Database__PurchaseOrderDb = "Host=localhost;Port=56433;Database=purchase_order;Username=local-dev;Password=local-dev"
 
 dotnet ef database update --project $infrastructureProject --startup-project $apiProject
