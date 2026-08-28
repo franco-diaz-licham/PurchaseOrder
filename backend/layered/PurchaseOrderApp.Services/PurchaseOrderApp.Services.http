@@ -1,6 +1,15 @@
 @PurchaseOrderApp.Services_HostAddress = http://localhost:5131
 
-GET {{PurchaseOrderApp.Services_HostAddress}}/weatherforecast/
+GET {{PurchaseOrderApp.Services_HostAddress}}/api/health
 Accept: application/json
+
+###
+
+POST {{PurchaseOrderApp.Services_HostAddress}}/api/purchase-orders/00000000-0000-0000-0000-000000000000/approve
+Content-Type: application/json
+
+{
+  "user": "Franco Diaz"
+}
 
 ###

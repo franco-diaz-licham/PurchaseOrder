@@ -4,4 +4,7 @@
   <Project Path="clean/PurchaseOrderApp.Domain/PurchaseOrderApp.Domain.csproj" />
   <Project Path="clean/PurchaseOrderApp.Infrastructure/PurchaseOrderApp.Infrastructure.csproj" />
   <Project Path="clean/PurchaseOrderApp.Tests/PurchaseOrderApp.Tests.csproj" />
+  <Project Path="layered/PurchaseOrderApp.Services/PurchaseOrderApp.Services.csproj" />
+  <Project Path="layered/PurchaseOrderApp.BL/PurchaseOrderApp.BL.csproj" />
+  <Project Path="layered/PurchaseOrderApp.DAL/PurchaseOrderApp.DAL.csproj" />
 </Solution>
