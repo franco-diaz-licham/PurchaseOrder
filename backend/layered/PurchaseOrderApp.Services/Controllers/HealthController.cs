@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using PurchaseOrderApp.Services.Models;
 
 namespace PurchaseOrderApp.Services.Controllers;
 
@@ -7,8 +8,8 @@ namespace PurchaseOrderApp.Services.Controllers;
 public sealed class HealthController : ControllerBase
 {
     [HttpGet]
-    public IActionResult Get()
+    public ActionResult<ApiResponse> Get()
     {
-        return Ok(new { status = "ok" });
+        return Ok(new ApiResponse(StatusCodes.Status200OK, "Healthy"));
     }
 }

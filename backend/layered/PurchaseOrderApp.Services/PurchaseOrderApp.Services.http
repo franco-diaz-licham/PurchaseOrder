@@ -5,7 +5,7 @@ Accept: application/json
 
 ###
 
-POST {{PurchaseOrderApp.Services_HostAddress}}/api/purchase-orders/00000000-0000-0000-0000-000000000000/approve
+PUT {{PurchaseOrderApp.Services_HostAddress}}/api/purchase-order/00000000-0000-0000-0000-000000000000/approve
 Content-Type: application/json
 
 {

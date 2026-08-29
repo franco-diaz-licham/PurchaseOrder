@@ -2,8 +2,8 @@ namespace PurchaseOrderApp.BL.Enums;
 
 public enum InventoryItemCategory
 {
-    Hardware,
-    Consumables,
-    RawMaterials,
-    Packaging
+    General = 1,
+    BulkGoods = 2,
+    Perishable = 3,
+    Hardware = 4
 }

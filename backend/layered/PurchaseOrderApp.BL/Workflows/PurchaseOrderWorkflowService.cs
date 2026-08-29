@@ -25,7 +25,13 @@ public sealed class PurchaseOrderWorkflowService(
     {
         if (command.WarehouseId == Guid.Empty) return Result.Fail<PurchaseOrderResponse>("Warehouse id is required.");
         if (string.IsNullOrWhiteSpace(command.User)) return Result.Fail<PurchaseOrderResponse>("User is required.");
-        if (command.Lines.Count == 0) return Result.Fail<PurchaseOrderResponse>("At least one purchase order line is required.");
+
+        foreach (var line in command.Lines) {
+            if (line.InventoryItemId == Guid.Empty) return Result.Fail<PurchaseOrderResponse>("Inventory item id is required.");
+            if (line.QuantityOrdered < 0) return Result.Fail<PurchaseOrderResponse>("Quantity cannot be negative.");
+            if (decimal.Round(line.QuantityOrdered, 3) != line.QuantityOrdered) return Result.Fail<PurchaseOrderResponse>("Quantity cannot have more than 3 decimal places.");
+            if (line.QuantityOrdered == 0) return Result.Fail<PurchaseOrderResponse>("Line quantity must be greater than zero.");
+        }
 
         await unitOfWork.BeginTransactionAsync(cancellationToken);
         try {
@@ -90,6 +96,9 @@ public sealed class PurchaseOrderWorkflowService(
     {
         if (command.PurchaseOrderId == Guid.Empty) return Result.Fail<PurchaseOrderResponse>("Purchase order id is required.");
         if (command.InventoryItemId == Guid.Empty) return Result.Fail<PurchaseOrderResponse>("Inventory item id is required.");
+        if (command.QuantityOrdered < 0) return Result.Fail<PurchaseOrderResponse>("Quantity cannot be negative.");
+        if (decimal.Round(command.QuantityOrdered, 3) != command.QuantityOrdered) return Result.Fail<PurchaseOrderResponse>("Quantity cannot have more than 3 decimal places.");
+        if (command.QuantityOrdered == 0) return Result.Fail<PurchaseOrderResponse>("Line quantity must be greater than zero.");
         if (string.IsNullOrWhiteSpace(command.User)) return Result.Fail<PurchaseOrderResponse>("User is required.");
 
         return await MutatePurchaseOrder(command.PurchaseOrderId, command.User, command.OccurredAt, cancellationToken, async purchaseOrder => {
@@ -125,6 +134,9 @@ public sealed class PurchaseOrderWorkflowService(
     {
         if (command.PurchaseOrderId == Guid.Empty) return Task.FromResult(Result.Fail<PurchaseOrderResponse>("Purchase order id is required."));
         if (command.PurchaseOrderLineId == Guid.Empty) return Task.FromResult(Result.Fail<PurchaseOrderResponse>("Purchase order line id is required."));
+        if (command.QuantityOrdered < 0) return Task.FromResult(Result.Fail<PurchaseOrderResponse>("Quantity cannot be negative."));
+        if (decimal.Round(command.QuantityOrdered, 3) != command.QuantityOrdered) return Task.FromResult(Result.Fail<PurchaseOrderResponse>("Quantity cannot have more than 3 decimal places."));
+        if (command.QuantityOrdered == 0) return Task.FromResult(Result.Fail<PurchaseOrderResponse>("Line quantity must be greater than zero."));
         if (string.IsNullOrWhiteSpace(command.User)) return Task.FromResult(Result.Fail<PurchaseOrderResponse>("User is required."));
 
         return MutatePurchaseOrder(command.PurchaseOrderId, command.User, command.OccurredAt, cancellationToken, purchaseOrder => {
