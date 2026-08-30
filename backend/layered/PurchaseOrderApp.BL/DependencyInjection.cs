@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using PurchaseOrderApp.BL.Policies;
 using PurchaseOrderApp.BL.Workflows;
+using PurchaseOrderApp.BL.Workflows.PurchaseOrders;
+using PurchaseOrderApp.BL.Workflows.Reservations;
 
 namespace PurchaseOrderApp.BL;
 
@@ -13,6 +15,15 @@ public static class DependencyInjection
         services.AddScoped<PurchaseOrderPolicy>();
         services.AddScoped<ReservationPolicy>();
         services.AddScoped<StockAvailabilityPolicy>();
+        services.AddScoped<TransactionRunner>();
+        services.AddScoped<PurchaseOrderMutationRunner>();
+        services.AddScoped<SubmitPurchaseOrderWorkflow>();
+        services.AddScoped<AddPurchaseOrderLineWorkflow>();
+        services.AddScoped<UpdatePurchaseOrderLineWorkflow>();
+        services.AddScoped<RemovePurchaseOrderLineWorkflow>();
+        services.AddScoped<ChangePurchaseOrderStatusWorkflow>();
+        services.AddScoped<ReserveStockWorkflow>();
+        services.AddScoped<ReleaseReservationWorkflow>();
         services.AddScoped<IAuditLogService, AuditLogService>();
         services.AddScoped<IFinanceService, FinanceService>();
         services.AddScoped<IInventoryItemService, InventoryItemService>();
