@@ -1,0 +1,41 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "eastus2"
+    },
+    "staticWebAppLocation": {
+      "value": "eastus2"
+    },
+    "workloadName": {
+      "value": "purchase-order"
+    },
+    "environmentName": {
+      "value": "dev"
+    },
+    "postgresAdminLogin": {
+      "value": "purchaseadmin"
+    },
+    "postgresAdminPassword": {
+      "value": "REPLACE_WITH_A_STRONG_PASSWORD"
+    },
+    "postgresAllowAzureServices": {
+      "value": true
+    },
+    "postgresFirewallRules": {
+      "value": [
+        {
+          "name": "DeveloperWorkstation",
+          "startIpAddress": "203.0.113.10",
+          "endIpAddress": "203.0.113.10"
+        }
+      ]
+    },
+    "tags": {
+      "value": {
+        "owner": "purchase-order"
+      }
+    }
+  }
+}
