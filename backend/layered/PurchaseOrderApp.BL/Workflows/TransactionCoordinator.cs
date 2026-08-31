@@ -5,7 +5,7 @@ namespace PurchaseOrderApp.BL.Workflows;
 
 public sealed class TransactionCoordinator(IUnitOfWork unitOfWork)
 {
-    public async Task<Result<T>> RunAsync<T>(
+    public async Task<Result<T>> ExecuteAsync<T>(
         Func<CancellationToken, Task<Result<T>>> operation,
         CancellationToken cancellationToken)
     {

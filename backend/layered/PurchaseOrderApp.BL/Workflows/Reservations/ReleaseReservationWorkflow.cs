@@ -29,7 +29,7 @@ public sealed class ReleaseReservationWorkflow(
             CommandValidation.User(command.User));
         if (!validation.IsSuccess) return Task.FromResult(Result.Fail<ReservationResponse>(validation.Error!, validation.Status));
 
-        return transactionCoordinator.RunAsync(async ct => {
+        return transactionCoordinator.ExecuteAsync(async ct => {
             var reservation = await stockReservationRepository.GetAsync(command.StockReservationId, ct);
             if (reservation is null) return Result.Fail<ReservationResponse>("Stock reservation was not found.", ResultStatus.NotFound);
 

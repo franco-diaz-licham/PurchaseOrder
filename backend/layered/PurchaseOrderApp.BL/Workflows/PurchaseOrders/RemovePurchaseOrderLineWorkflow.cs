@@ -1,6 +1,7 @@
 using PurchaseOrderApp.BL.Commands;
 using PurchaseOrderApp.BL.Common;
 using PurchaseOrderApp.BL.Enums;
+using PurchaseOrderApp.BL.Models;
 using PurchaseOrderApp.BL.Policies;
 using PurchaseOrderApp.BL.Ports;
 using PurchaseOrderApp.BL.Responses;
@@ -24,7 +25,7 @@ public sealed class RemovePurchaseOrderLineWorkflow(
             CommandValidation.User(command.User));
         if (!validation.IsSuccess) return Task.FromResult(Result.Fail<PurchaseOrderResponse>(validation.Error!, validation.Status));
 
-        return purchaseOrderMutationCoordinator.RunAsync(
+        return purchaseOrderMutationCoordinator.ExecuteAsync(
             command.PurchaseOrderId,
             command.User,
             command.OccurredAt,
@@ -45,7 +46,7 @@ public sealed class RemovePurchaseOrderLineWorkflow(
     }
 
     private async Task<Result> ReleaseActiveReservationsAsync(
-        Models.PurchaseOrderLine line,
+        PurchaseOrderLine line,
         RemovePurchaseOrderLineCommand command,
         CancellationToken cancellationToken)
     {

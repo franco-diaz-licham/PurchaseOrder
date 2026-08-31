@@ -23,7 +23,7 @@ public sealed class AddPurchaseOrderLineWorkflow(
             CommandValidation.User(command.User));
         if (!validation.IsSuccess) return Task.FromResult(Result.Fail<PurchaseOrderResponse>(validation.Error!, validation.Status));
 
-        return purchaseOrderMutationCoordinator.RunAsync(
+        return purchaseOrderMutationCoordinator.ExecuteAsync(
             command.PurchaseOrderId,
             command.User,
             command.OccurredAt,

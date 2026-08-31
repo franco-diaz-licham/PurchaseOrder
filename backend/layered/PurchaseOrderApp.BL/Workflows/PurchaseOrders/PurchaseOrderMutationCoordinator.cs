@@ -10,14 +10,14 @@ public sealed class PurchaseOrderMutationCoordinator(
     IPurchaseOrderRepository purchaseOrderRepository,
     TransactionCoordinator transactionCoordinator)
 {
-    public Task<Result<PurchaseOrderResponse>> RunAsync(
+    public Task<Result<PurchaseOrderResponse>> ExecuteAsync(
         Guid purchaseOrderId,
         string user,
         DateTimeOffset occurredAt,
         Func<PurchaseOrder, CancellationToken, Task<Result>> mutate,
         CancellationToken cancellationToken)
     {
-        return transactionCoordinator.RunAsync(async ct => {
+        return transactionCoordinator.ExecuteAsync(async ct => {
             var purchaseOrder = await purchaseOrderRepository.GetAsync(purchaseOrderId, ct);
             if (purchaseOrder is null) return Result.Fail<PurchaseOrderResponse>("Purchase order was not found.", ResultStatus.NotFound);
 

@@ -23,7 +23,7 @@ public sealed class SubmitPurchaseOrderWorkflow(
         var validation = Validate(command);
         if (!validation.IsSuccess) return Task.FromResult(Result.Fail<PurchaseOrderResponse>(validation.Error!, validation.Status));
 
-        return transactionCoordinator.RunAsync(async ct => {
+        return transactionCoordinator.ExecuteAsync(async ct => {
             var warehouse = await warehouseRepository.GetAsync(command.WarehouseId, ct);
             if (warehouse is null) return Result.Fail<PurchaseOrderResponse>("Warehouse was not found.", ResultStatus.NotFound);
 
