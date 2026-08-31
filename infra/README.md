@@ -16,18 +16,96 @@ The template is additive infrastructure. It does not redirect Docker, GitHub Act
 
 ## Deploy
 
-Create or choose a resource group:
+Review `.env` at the repository root:
 
-```powershell
-az group create --name rg-purchase-order-prod --location eastus2
+```dotenv
+AZURE_SUBSCRIPTION=<subscription-id-or-name>
+AZURE_RESOURCE_GROUP_NAME=rg-purchase-order-prod
+AZURE_RESOURCE_GROUP_LOCATION=eastus2
+AZURE_DEPLOYMENT_NAME=purchase-order-infra
+AZURE_TEMPLATE_FILE=infra/main.bicep
+AZURE_PARAMETERS_FILE=infra/main.parameters.prod.json
+POSTGRES_ADMIN_PASSWORD=<strong-postgresql-admin-password>
+AZURE_SKIP_WHAT_IF=false
+AZURE_WHAT_IF_ONLY=false
 ```
 
-Deploy the template:
+Run the provisioning script from the repository root:
+
+```powershell
+./scripts/provision-infra.ps1
+```
+
+To target a specific subscription:
+
+```powershell
+./scripts/provision-infra.ps1 -Subscription "<subscription-id-or-name>"
+```
+
+To preview without provisioning:
+
+```powershell
+./scripts/provision-infra.ps1 -WhatIfOnly
+```
+
+To skip the preview:
+
+```powershell
+./scripts/provision-infra.ps1 -SkipWhatIf
+```
+
+The script creates the resource group, merges the committed parameters with the PostgreSQL password from `.env`, deploys `main.bicep`, and prints the GitHub secrets needed by the existing workflows.
+
+To add your workstation to PostgreSQL firewall rules, add your public IP range to `postgresFirewallRules` in `main.parameters.prod.json` before running the script.
+
+Use `.env` for normal value changes. Command-line arguments are now reserved for the common runtime controls:
+
+```powershell
+./scripts/provision-infra.ps1 `
+  -Subscription "<subscription-id-or-name>" `
+  -SkipWhatIf
+```
+
+## Manual Deploy
+
+The script is just a wrapper around these Azure CLI steps.
+
+Log in and choose the subscription:
+
+```powershell
+az login
+az account set --subscription "<subscription-id-or-name>"
+```
+
+Create or update the resource group:
+
+```powershell
+az group create `
+  --name rg-purchase-order-prod `
+  --location eastus2
+```
+
+Read the PostgreSQL password without committing it:
 
 ```powershell
 $postgresPassword = Read-Host "PostgreSQL admin password" -AsSecureString
 $postgresPasswordPlain = ConvertFrom-SecureString $postgresPassword -AsPlainText
+```
 
+Preview the deployment:
+
+```powershell
+az deployment group what-if `
+  --name purchase-order-infra `
+  --resource-group rg-purchase-order-prod `
+  --template-file infra/main.bicep `
+  --parameters "@infra/main.parameters.prod.json" `
+    postgresAdminPassword=$postgresPasswordPlain
+```
+
+Provision the resources:
+
+```powershell
 az deployment group create `
   --name purchase-order-infra `
   --resource-group rg-purchase-order-prod `
@@ -36,7 +114,14 @@ az deployment group create `
     postgresAdminPassword=$postgresPasswordPlain
 ```
 
-To add your workstation to PostgreSQL firewall rules, add your public IP range to `postgresFirewallRules` in `main.parameters.prod.json`.
+Read the workflow outputs:
+
+```powershell
+az deployment group show `
+  --resource-group rg-purchase-order-prod `
+  --name purchase-order-infra `
+  --query properties.outputs.githubSecrets.value
+```
 
 ## Parameters And Secrets
 
@@ -44,49 +129,37 @@ Normal environment values live in `main.parameters.prod.json`:
 
 ```json
 {
-  "parameters": {
-    "environmentName": {
-      "value": "prod"
-    },
-    "location": {
-      "value": "eastus2"
+    "parameters": {
+        "environmentName": {
+            "value": "prod"
+        },
+        "location": {
+            "value": "eastus2"
+        }
     }
-  }
 }
 ```
 
-Secret values should not be committed. Pass them after the parameters file:
+Secret values should not be committed. `.env` is ignored by Git, so set `POSTGRES_ADMIN_PASSWORD` locally:
 
-```powershell
-az deployment group create `
-  --name purchase-order-infra `
-  --resource-group rg-purchase-order-prod `
-  --template-file infra/main.bicep `
-  --parameters "@infra/main.parameters.prod.json" `
-    postgresAdminPassword=$postgresPasswordPlain
+```dotenv
+POSTGRES_ADMIN_PASSWORD=replace-with-a-strong-local-secret
 ```
 
-In GitHub Actions, the same pattern uses GitHub Secrets:
+The script injects that password into a temporary parameters file that is deleted after deployment. If `POSTGRES_ADMIN_PASSWORD` is empty, the script fails and tells you which key is missing.
+
+In GitHub Actions, the same script can read the password from a GitHub Secret mapped to an environment variable:
 
 ```powershell
-az deployment group create `
-  --name purchase-order-infra `
-  --resource-group $env:RESOURCE_GROUP `
-  --template-file infra/main.bicep `
-  --parameters "@infra/main.parameters.prod.json" `
-    postgresAdminPassword="$env:POSTGRES_ADMIN_PASSWORD"
+$env:POSTGRES_ADMIN_PASSWORD = "${{ secrets.POSTGRES_ADMIN_PASSWORD }}"
+./scripts/provision-infra.ps1 -SkipWhatIf
 ```
 
-If you need to override a normal value temporarily, pass it after the file:
+If you need to override normal values temporarily, create another `.env` file and pass it to the script:
 
 ```powershell
-az deployment group create `
-  --name purchase-order-infra `
-  --resource-group rg-purchase-order-prod `
-  --template-file infra/main.bicep `
-  --parameters "@infra/main.parameters.prod.json" `
-    postgresAdminPassword=$postgresPasswordPlain `
-    location=australiaeast
+./scripts/provision-infra.ps1 `
+  -EnvFile .env.prod
 ```
 
 ## GitHub Secrets
