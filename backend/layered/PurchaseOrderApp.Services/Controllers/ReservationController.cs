@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using PurchaseOrderApp.BL.Commands;
+using PurchaseOrderApp.BL.Commands.Reservations;
+using PurchaseOrderApp.BL.Queries.Reservations;
 using PurchaseOrderApp.BL.Responses;
-using PurchaseOrderApp.BL.Workflows.Reservations;
 using PurchaseOrderApp.Services.Helpers;
 using PurchaseOrderApp.Services.Models;
 
@@ -10,14 +11,14 @@ namespace PurchaseOrderApp.Services.Controllers;
 [ApiController]
 [Route("api/reservation")]
 public sealed class ReservationController(
-    ReservationQueryService reservationQueries,
-    ReserveStockWorkflow reserveStock,
-    ReleaseReservationWorkflow releaseReservation) : ControllerBase
+    ListReservationsQueryHandler listReservations,
+    ReserveStockCommandHandler reserveStock,
+    ReleaseReservationCommandHandler releaseReservation) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<ApiResponse<List<ReservationResponse>>>> GetAll(CancellationToken cancellationToken)
     {
-        var result = await reservationQueries.ListAsync(cancellationToken);
+        var result = await listReservations.ExecuteAsync(new ListReservationsQuery(), cancellationToken);
         return result.ToActionResult();
     }
 

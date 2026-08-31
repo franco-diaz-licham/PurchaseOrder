@@ -4,7 +4,7 @@ using PurchaseOrderApp.BL.Models;
 using PurchaseOrderApp.BL.Ports;
 using PurchaseOrderApp.BL.Responses;
 
-namespace PurchaseOrderApp.BL.Workflows.PurchaseOrders;
+namespace PurchaseOrderApp.BL.Commands.PurchaseOrders;
 
 public sealed class PurchaseOrderMutationCoordinator(
     IPurchaseOrderRepository purchaseOrderRepository,

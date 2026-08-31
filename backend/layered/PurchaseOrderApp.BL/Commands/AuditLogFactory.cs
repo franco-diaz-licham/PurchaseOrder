@@ -1,7 +1,7 @@
 using PurchaseOrderApp.BL.Enums;
 using PurchaseOrderApp.BL.Models;
 
-namespace PurchaseOrderApp.BL.Workflows;
+namespace PurchaseOrderApp.BL.Commands;
 
 internal static class AuditLogFactory
 {

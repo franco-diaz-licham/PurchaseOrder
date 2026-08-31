@@ -6,9 +6,9 @@ using PurchaseOrderApp.BL.Policies;
 using PurchaseOrderApp.BL.Ports;
 using PurchaseOrderApp.BL.Responses;
 
-namespace PurchaseOrderApp.BL.Workflows.PurchaseOrders;
+namespace PurchaseOrderApp.BL.Commands.PurchaseOrders;
 
-public sealed class RemovePurchaseOrderLineWorkflow(
+public sealed class RemovePurchaseOrderLineCommandHandler(
     PurchaseOrderMutationCoordinator purchaseOrderMutationCoordinator,
     IWarehouseStockRepository warehouseStockRepository,
     IStockReservationRepository stockReservationRepository,

@@ -7,9 +7,9 @@ using PurchaseOrderApp.BL.Policies;
 using PurchaseOrderApp.BL.Ports;
 using PurchaseOrderApp.BL.Responses;
 
-namespace PurchaseOrderApp.BL.Workflows.Reservations;
+namespace PurchaseOrderApp.BL.Commands.Reservations;
 
-public sealed class ReserveStockWorkflow(
+public sealed class ReserveStockCommandHandler(
     IPurchaseOrderRepository purchaseOrderRepository,
     IInventoryItemRepository inventoryItemRepository,
     IWarehouseStockRepository warehouseStockRepository,

@@ -1,6 +1,16 @@
 namespace PurchaseOrderApp.BL.Commands;
 
-public sealed record ChangePurchaseOrderStatusCommand(
+public sealed record ApprovePurchaseOrderCommand(
+    Guid PurchaseOrderId,
+    string User,
+    DateTimeOffset OccurredAt);
+
+public sealed record ClosePurchaseOrderCommand(
+    Guid PurchaseOrderId,
+    string User,
+    DateTimeOffset OccurredAt);
+
+public sealed record CancelPurchaseOrderCommand(
     Guid PurchaseOrderId,
     string User,
     DateTimeOffset OccurredAt);

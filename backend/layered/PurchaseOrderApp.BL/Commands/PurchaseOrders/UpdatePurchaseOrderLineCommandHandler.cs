@@ -3,9 +3,9 @@ using PurchaseOrderApp.BL.Common;
 using PurchaseOrderApp.BL.Policies;
 using PurchaseOrderApp.BL.Responses;
 
-namespace PurchaseOrderApp.BL.Workflows.PurchaseOrders;
+namespace PurchaseOrderApp.BL.Commands.PurchaseOrders;
 
-public sealed class UpdatePurchaseOrderLineWorkflow(
+public sealed class UpdatePurchaseOrderLineCommandHandler(
     PurchaseOrderMutationCoordinator purchaseOrderMutationCoordinator,
     PurchaseOrderPolicy purchaseOrderPolicy,
     PurchaseOrderLinePolicy purchaseOrderLinePolicy,

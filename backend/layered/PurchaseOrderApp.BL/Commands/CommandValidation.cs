@@ -1,6 +1,6 @@
 using PurchaseOrderApp.BL.Common;
 
-namespace PurchaseOrderApp.BL.Workflows;
+namespace PurchaseOrderApp.BL.Commands;
 
 internal static class CommandValidation
 {

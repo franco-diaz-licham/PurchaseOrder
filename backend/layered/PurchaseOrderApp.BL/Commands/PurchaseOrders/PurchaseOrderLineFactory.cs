@@ -1,6 +1,6 @@
 using PurchaseOrderApp.BL.Models;
 
-namespace PurchaseOrderApp.BL.Workflows.PurchaseOrders;
+namespace PurchaseOrderApp.BL.Commands.PurchaseOrders;
 
 internal static class PurchaseOrderLineFactory
 {
