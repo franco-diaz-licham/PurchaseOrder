@@ -3,7 +3,7 @@ using PurchaseOrderApp.BL.Ports;
 
 namespace PurchaseOrderApp.BL.Workflows;
 
-public sealed class TransactionRunner(IUnitOfWork unitOfWork)
+public sealed class TransactionCoordinator(IUnitOfWork unitOfWork)
 {
     public async Task<Result<T>> RunAsync<T>(
         Func<CancellationToken, Task<Result<T>>> operation,

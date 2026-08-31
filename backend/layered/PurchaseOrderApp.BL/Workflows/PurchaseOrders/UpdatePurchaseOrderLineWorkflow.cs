@@ -6,7 +6,7 @@ using PurchaseOrderApp.BL.Responses;
 namespace PurchaseOrderApp.BL.Workflows.PurchaseOrders;
 
 public sealed class UpdatePurchaseOrderLineWorkflow(
-    PurchaseOrderMutationRunner purchaseOrderMutationRunner,
+    PurchaseOrderMutationCoordinator purchaseOrderMutationCoordinator,
     PurchaseOrderPolicy purchaseOrderPolicy,
     PurchaseOrderLinePolicy purchaseOrderLinePolicy,
     InventoryQuantityPolicy inventoryQuantityPolicy)
@@ -22,7 +22,7 @@ public sealed class UpdatePurchaseOrderLineWorkflow(
             CommandValidation.User(command.User));
         if (!validation.IsSuccess) return Task.FromResult(Result.Fail<PurchaseOrderResponse>(validation.Error!, validation.Status));
 
-        return purchaseOrderMutationRunner.RunAsync(
+        return purchaseOrderMutationCoordinator.RunAsync(
             command.PurchaseOrderId,
             command.User,
             command.OccurredAt,

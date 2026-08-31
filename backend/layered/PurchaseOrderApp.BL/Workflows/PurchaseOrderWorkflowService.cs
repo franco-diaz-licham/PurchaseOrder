@@ -32,21 +32,15 @@ public sealed class PurchaseOrderWorkflowService(
         return Result.Success(await purchaseOrderRepository.ListSummariesAsync(cancellationToken));
     }
 
-    public Task<Result<PurchaseOrderResponse>> AddLineAsync(AddPurchaseOrderLineCommand command, CancellationToken cancellationToken) =>
-        addPurchaseOrderLine.ExecuteAsync(command, cancellationToken);
+    public Task<Result<PurchaseOrderResponse>> AddLineAsync(AddPurchaseOrderLineCommand command, CancellationToken cancellationToken) => addPurchaseOrderLine.ExecuteAsync(command, cancellationToken);
 
-    public Task<Result<PurchaseOrderResponse>> UpdateLineAsync(UpdatePurchaseOrderLineCommand command, CancellationToken cancellationToken) =>
-        updatePurchaseOrderLine.ExecuteAsync(command, cancellationToken);
+    public Task<Result<PurchaseOrderResponse>> UpdateLineAsync(UpdatePurchaseOrderLineCommand command, CancellationToken cancellationToken) => updatePurchaseOrderLine.ExecuteAsync(command, cancellationToken);
 
-    public Task<Result<PurchaseOrderResponse>> RemoveLineAsync(RemovePurchaseOrderLineCommand command, CancellationToken cancellationToken) =>
-        removePurchaseOrderLine.ExecuteAsync(command, cancellationToken);
+    public Task<Result<PurchaseOrderResponse>> RemoveLineAsync(RemovePurchaseOrderLineCommand command, CancellationToken cancellationToken) => removePurchaseOrderLine.ExecuteAsync(command, cancellationToken);
 
-    public Task<Result<PurchaseOrderResponse>> ApproveAsync(ChangePurchaseOrderStatusCommand command, CancellationToken cancellationToken) =>
-        changePurchaseOrderStatus.ApproveAsync(command, cancellationToken);
+    public Task<Result<PurchaseOrderResponse>> ApproveAsync(ChangePurchaseOrderStatusCommand command, CancellationToken cancellationToken) => changePurchaseOrderStatus.ApproveAsync(command, cancellationToken);
 
-    public Task<Result<PurchaseOrderResponse>> CloseAsync(ChangePurchaseOrderStatusCommand command, CancellationToken cancellationToken) =>
-        changePurchaseOrderStatus.CloseAsync(command, cancellationToken);
+    public Task<Result<PurchaseOrderResponse>> CloseAsync(ChangePurchaseOrderStatusCommand command, CancellationToken cancellationToken) => changePurchaseOrderStatus.CloseAsync(command, cancellationToken);
 
-    public Task<Result<PurchaseOrderResponse>> CancelAsync(ChangePurchaseOrderStatusCommand command, CancellationToken cancellationToken) =>
-        changePurchaseOrderStatus.CancelAsync(command, cancellationToken);
+    public Task<Result<PurchaseOrderResponse>> CancelAsync(ChangePurchaseOrderStatusCommand command, CancellationToken cancellationToken) => changePurchaseOrderStatus.CancelAsync(command, cancellationToken);
 }

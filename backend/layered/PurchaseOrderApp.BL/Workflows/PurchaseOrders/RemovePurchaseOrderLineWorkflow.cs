@@ -8,7 +8,7 @@ using PurchaseOrderApp.BL.Responses;
 namespace PurchaseOrderApp.BL.Workflows.PurchaseOrders;
 
 public sealed class RemovePurchaseOrderLineWorkflow(
-    PurchaseOrderMutationRunner purchaseOrderMutationRunner,
+    PurchaseOrderMutationCoordinator purchaseOrderMutationCoordinator,
     IWarehouseStockRepository warehouseStockRepository,
     IStockReservationRepository stockReservationRepository,
     IAuditLogRepository auditLogRepository,
@@ -24,7 +24,7 @@ public sealed class RemovePurchaseOrderLineWorkflow(
             CommandValidation.User(command.User));
         if (!validation.IsSuccess) return Task.FromResult(Result.Fail<PurchaseOrderResponse>(validation.Error!, validation.Status));
 
-        return purchaseOrderMutationRunner.RunAsync(
+        return purchaseOrderMutationCoordinator.RunAsync(
             command.PurchaseOrderId,
             command.User,
             command.OccurredAt,

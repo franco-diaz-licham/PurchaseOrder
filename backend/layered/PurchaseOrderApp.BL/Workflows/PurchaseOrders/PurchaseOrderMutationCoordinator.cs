@@ -6,9 +6,9 @@ using PurchaseOrderApp.BL.Responses;
 
 namespace PurchaseOrderApp.BL.Workflows.PurchaseOrders;
 
-public sealed class PurchaseOrderMutationRunner(
+public sealed class PurchaseOrderMutationCoordinator(
     IPurchaseOrderRepository purchaseOrderRepository,
-    TransactionRunner transactionRunner)
+    TransactionCoordinator transactionCoordinator)
 {
     public Task<Result<PurchaseOrderResponse>> RunAsync(
         Guid purchaseOrderId,
@@ -17,7 +17,7 @@ public sealed class PurchaseOrderMutationRunner(
         Func<PurchaseOrder, CancellationToken, Task<Result>> mutate,
         CancellationToken cancellationToken)
     {
-        return transactionRunner.RunAsync(async ct => {
+        return transactionCoordinator.RunAsync(async ct => {
             var purchaseOrder = await purchaseOrderRepository.GetAsync(purchaseOrderId, ct);
             if (purchaseOrder is null) return Result.Fail<PurchaseOrderResponse>("Purchase order was not found.", ResultStatus.NotFound);
 

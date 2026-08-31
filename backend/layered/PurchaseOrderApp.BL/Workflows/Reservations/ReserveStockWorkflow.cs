@@ -19,7 +19,7 @@ public sealed class ReserveStockWorkflow(
     PurchaseOrderLinePolicy purchaseOrderLinePolicy,
     InventoryQuantityPolicy inventoryQuantityPolicy,
     StockAvailabilityPolicy stockAvailabilityPolicy,
-    TransactionRunner transactionRunner)
+    TransactionCoordinator transactionCoordinator)
 {
     public Task<Result<ReservationResponse>> ExecuteAsync(
         CreateReservationCommand command,
@@ -32,7 +32,7 @@ public sealed class ReserveStockWorkflow(
             CommandValidation.User(command.User));
         if (!validation.IsSuccess) return Task.FromResult(Result.Fail<ReservationResponse>(validation.Error!, validation.Status));
 
-        return transactionRunner.RunAsync(async ct => {
+        return transactionCoordinator.RunAsync(async ct => {
             var purchaseOrder = await purchaseOrderRepository.GetByLineIdAsync(command.PurchaseOrderLineId, ct);
             if (purchaseOrder is null) return Result.Fail<ReservationResponse>("Purchase order line was not found.", ResultStatus.NotFound);
 

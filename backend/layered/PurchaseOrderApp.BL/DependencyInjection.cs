@@ -15,8 +15,8 @@ public static class DependencyInjection
         services.AddScoped<PurchaseOrderPolicy>();
         services.AddScoped<ReservationPolicy>();
         services.AddScoped<StockAvailabilityPolicy>();
-        services.AddScoped<TransactionRunner>();
-        services.AddScoped<PurchaseOrderMutationRunner>();
+        services.AddScoped<TransactionCoordinator>();
+        services.AddScoped<PurchaseOrderMutationCoordinator>();
         services.AddScoped<SubmitPurchaseOrderWorkflow>();
         services.AddScoped<AddPurchaseOrderLineWorkflow>();
         services.AddScoped<UpdatePurchaseOrderLineWorkflow>();
