@@ -12,9 +12,7 @@ public sealed class AddPurchaseOrderLineWorkflow(
     PurchaseOrderPolicy purchaseOrderPolicy,
     InventoryQuantityPolicy inventoryQuantityPolicy)
 {
-    public Task<Result<PurchaseOrderResponse>> ExecuteAsync(
-        AddPurchaseOrderLineCommand command,
-        CancellationToken cancellationToken)
+    public Task<Result<PurchaseOrderResponse>> ExecuteAsync(AddPurchaseOrderLineCommand command, CancellationToken cancellationToken)
     {
         var validation = CommandValidation.All(
             CommandValidation.Required(command.PurchaseOrderId, "Purchase order id is required."),

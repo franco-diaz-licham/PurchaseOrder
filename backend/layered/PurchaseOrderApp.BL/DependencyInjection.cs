@@ -17,18 +17,18 @@ public static class DependencyInjection
         services.AddScoped<StockAvailabilityPolicy>();
         services.AddScoped<TransactionCoordinator>();
         services.AddScoped<PurchaseOrderMutationCoordinator>();
+        services.AddScoped<PurchaseOrderQueryService>();
         services.AddScoped<SubmitPurchaseOrderWorkflow>();
         services.AddScoped<AddPurchaseOrderLineWorkflow>();
         services.AddScoped<UpdatePurchaseOrderLineWorkflow>();
         services.AddScoped<RemovePurchaseOrderLineWorkflow>();
         services.AddScoped<ChangePurchaseOrderStatusWorkflow>();
+        services.AddScoped<ReservationQueryService>();
         services.AddScoped<ReserveStockWorkflow>();
         services.AddScoped<ReleaseReservationWorkflow>();
         services.AddScoped<IAuditLogService, AuditLogService>();
         services.AddScoped<IFinanceService, FinanceService>();
         services.AddScoped<IInventoryItemService, InventoryItemService>();
-        services.AddScoped<IPurchaseOrderWorkflowService, PurchaseOrderWorkflowService>();
-        services.AddScoped<IReservationService, ReservationService>();
         services.AddScoped<IWarehouseService, WarehouseService>();
         services.AddScoped<IWarehouseStockService, WarehouseStockService>();
 

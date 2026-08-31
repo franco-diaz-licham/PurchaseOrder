@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PurchaseOrderApp.BL.Commands;
 using PurchaseOrderApp.BL.Responses;
-using PurchaseOrderApp.BL.Workflows;
+using PurchaseOrderApp.BL.Workflows.PurchaseOrders;
 using PurchaseOrderApp.Services.Helpers;
 using PurchaseOrderApp.Services.Models;
 
@@ -9,19 +9,25 @@ namespace PurchaseOrderApp.Services.Controllers;
 
 [ApiController]
 [Route("api/purchase-order")]
-public sealed class PurchaseOrderController(IPurchaseOrderWorkflowService purchaseOrderService) : ControllerBase
+public sealed class PurchaseOrderController(
+    PurchaseOrderQueryService purchaseOrderQueries,
+    SubmitPurchaseOrderWorkflow submitPurchaseOrder,
+    AddPurchaseOrderLineWorkflow addPurchaseOrderLine,
+    UpdatePurchaseOrderLineWorkflow updatePurchaseOrderLine,
+    RemovePurchaseOrderLineWorkflow removePurchaseOrderLine,
+    ChangePurchaseOrderStatusWorkflow changePurchaseOrderStatus) : ControllerBase
 {
     [HttpGet("summary")]
     public async Task<ActionResult<ApiResponse<List<PurchaseOrderSummaryResponse>>>> GetSummary(CancellationToken cancellationToken)
     {
-        var result = await purchaseOrderService.ListSummariesAsync(cancellationToken);
+        var result = await purchaseOrderQueries.ListSummariesAsync(cancellationToken);
         return result.ToActionResult();
     }
 
     [HttpGet("{purchaseOrderId:guid}")]
     public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> Get(Guid purchaseOrderId, CancellationToken cancellationToken)
     {
-        var result = await purchaseOrderService.GetAsync(purchaseOrderId, cancellationToken);
+        var result = await purchaseOrderQueries.GetAsync(purchaseOrderId, cancellationToken);
         return result.ToActionResult();
     }
 
@@ -30,7 +36,7 @@ public sealed class PurchaseOrderController(IPurchaseOrderWorkflowService purcha
     {
         var lines = request.Lines?.Select(line => new SubmitPurchaseOrderLineCommand(line.InventoryItemId, line.QuantityOrdered)).ToList() ?? [];
         var command = new SubmitPurchaseOrderCommand(request.WarehouseId, lines, request.User, DateTimeOffset.UtcNow);
-        var result = await purchaseOrderService.SubmitAsync(command, cancellationToken);
+        var result = await submitPurchaseOrder.ExecuteAsync(command, cancellationToken);
         return result.ToActionResult($"/api/purchase-order/{result.Value?.PurchaseOrderId}");
     }
 
@@ -38,7 +44,7 @@ public sealed class PurchaseOrderController(IPurchaseOrderWorkflowService purcha
     public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> AddLine(Guid purchaseOrderId, [FromBody] AddPurchaseOrderLineRequest request, CancellationToken cancellationToken)
     {
         var command = new AddPurchaseOrderLineCommand(purchaseOrderId, request.InventoryItemId, request.QuantityOrdered, request.User, DateTimeOffset.UtcNow);
-        var result = await purchaseOrderService.AddLineAsync(command, cancellationToken);
+        var result = await addPurchaseOrderLine.ExecuteAsync(command, cancellationToken);
         return result.ToActionResult();
     }
 
@@ -46,7 +52,7 @@ public sealed class PurchaseOrderController(IPurchaseOrderWorkflowService purcha
     public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> RemoveLine(Guid purchaseOrderId, Guid purchaseOrderLineId, [FromBody] RemovePurchaseOrderLineRequest request, CancellationToken cancellationToken)
     {
         var command = new RemovePurchaseOrderLineCommand(purchaseOrderId, purchaseOrderLineId, request.User, DateTimeOffset.UtcNow);
-        var result = await purchaseOrderService.RemoveLineAsync(command, cancellationToken);
+        var result = await removePurchaseOrderLine.ExecuteAsync(command, cancellationToken);
         return result.ToActionResult();
     }
 
@@ -54,28 +60,28 @@ public sealed class PurchaseOrderController(IPurchaseOrderWorkflowService purcha
     public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> UpdateLine(Guid purchaseOrderId, Guid purchaseOrderLineId, [FromBody] UpdatePurchaseOrderLineRequest request, CancellationToken cancellationToken)
     {
         var command = new UpdatePurchaseOrderLineCommand(purchaseOrderId, purchaseOrderLineId, request.QuantityOrdered, request.User, DateTimeOffset.UtcNow);
-        var result = await purchaseOrderService.UpdateLineAsync(command, cancellationToken);
+        var result = await updatePurchaseOrderLine.ExecuteAsync(command, cancellationToken);
         return result.ToActionResult();
     }
 
     [HttpPut("{purchaseOrderId:guid}/approve")]
     public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> Approve(Guid purchaseOrderId, [FromBody] ChangePurchaseOrderStatusRequest request, CancellationToken cancellationToken)
     {
-        var result = await purchaseOrderService.ApproveAsync(new ChangePurchaseOrderStatusCommand(purchaseOrderId, request.User, DateTimeOffset.UtcNow), cancellationToken);
+        var result = await changePurchaseOrderStatus.ApproveAsync(new ChangePurchaseOrderStatusCommand(purchaseOrderId, request.User, DateTimeOffset.UtcNow), cancellationToken);
         return result.ToActionResult();
     }
 
     [HttpPut("{purchaseOrderId:guid}/close")]
     public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> Close(Guid purchaseOrderId, [FromBody] ChangePurchaseOrderStatusRequest request, CancellationToken cancellationToken)
     {
-        var result = await purchaseOrderService.CloseAsync(new ChangePurchaseOrderStatusCommand(purchaseOrderId, request.User, DateTimeOffset.UtcNow), cancellationToken);
+        var result = await changePurchaseOrderStatus.CloseAsync(new ChangePurchaseOrderStatusCommand(purchaseOrderId, request.User, DateTimeOffset.UtcNow), cancellationToken);
         return result.ToActionResult();
     }
 
     [HttpPut("{purchaseOrderId:guid}/cancel")]
     public async Task<ActionResult<ApiResponse<PurchaseOrderResponse>>> Cancel(Guid purchaseOrderId, [FromBody] ChangePurchaseOrderStatusRequest request, CancellationToken cancellationToken)
     {
-        var result = await purchaseOrderService.CancelAsync(new ChangePurchaseOrderStatusCommand(purchaseOrderId, request.User, DateTimeOffset.UtcNow), cancellationToken);
+        var result = await changePurchaseOrderStatus.CancelAsync(new ChangePurchaseOrderStatusCommand(purchaseOrderId, request.User, DateTimeOffset.UtcNow), cancellationToken);
         return result.ToActionResult();
     }
 }

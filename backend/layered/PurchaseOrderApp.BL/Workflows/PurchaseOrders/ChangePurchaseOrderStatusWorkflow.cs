@@ -9,23 +9,17 @@ namespace PurchaseOrderApp.BL.Workflows.PurchaseOrders;
 
 public sealed class ChangePurchaseOrderStatusWorkflow(PurchaseOrderMutationCoordinator purchaseOrderMutationCoordinator, PurchaseOrderPolicy purchaseOrderPolicy)
 {
-    public Task<Result<PurchaseOrderResponse>> ApproveAsync(
-        ChangePurchaseOrderStatusCommand command,
-        CancellationToken cancellationToken)
+    public Task<Result<PurchaseOrderResponse>> ApproveAsync(ChangePurchaseOrderStatusCommand command, CancellationToken cancellationToken)
     {
         return ChangeStatusAsync(command, PurchaseOrderStatus.Approved, purchaseOrderPolicy.CanApprove, cancellationToken);
     }
 
-    public Task<Result<PurchaseOrderResponse>> CloseAsync(
-        ChangePurchaseOrderStatusCommand command,
-        CancellationToken cancellationToken)
+    public Task<Result<PurchaseOrderResponse>> CloseAsync(ChangePurchaseOrderStatusCommand command, CancellationToken cancellationToken)
     {
         return ChangeStatusAsync(command, PurchaseOrderStatus.Closed, _ => Result.Success(), cancellationToken);
     }
 
-    public Task<Result<PurchaseOrderResponse>> CancelAsync(
-        ChangePurchaseOrderStatusCommand command,
-        CancellationToken cancellationToken)
+    public Task<Result<PurchaseOrderResponse>> CancelAsync(ChangePurchaseOrderStatusCommand command, CancellationToken cancellationToken)
     {
         return ChangeStatusAsync(command, PurchaseOrderStatus.Cancelled, purchaseOrderPolicy.CanCancel, cancellationToken);
     }
