@@ -12,25 +12,16 @@
       "value": "purchase-order"
     },
     "environmentName": {
-      "value": "dev"
+      "value": "prod"
     },
     "postgresAdminLogin": {
       "value": "purchaseadmin"
-    },
-    "postgresAdminPassword": {
-      "value": "REPLACE_WITH_A_STRONG_PASSWORD"
     },
     "postgresAllowAzureServices": {
       "value": true
     },
     "postgresFirewallRules": {
-      "value": [
-        {
-          "name": "DeveloperWorkstation",
-          "startIpAddress": "203.0.113.10",
-          "endIpAddress": "203.0.113.10"
-        }
-      ]
+      "value": []
     },
     "tags": {
       "value": {

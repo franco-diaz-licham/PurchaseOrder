@@ -19,7 +19,7 @@ The template is additive infrastructure. It does not redirect Docker, GitHub Act
 Create or choose a resource group:
 
 ```powershell
-az group create --name rg-purchase-order-dev --location eastus2
+az group create --name rg-purchase-order-prod --location eastus2
 ```
 
 Deploy the template:
@@ -30,16 +30,64 @@ $postgresPasswordPlain = ConvertFrom-SecureString $postgresPassword -AsPlainText
 
 az deployment group create `
   --name purchase-order-infra `
-  --resource-group rg-purchase-order-dev `
+  --resource-group rg-purchase-order-prod `
   --template-file infra/main.bicep `
-  --parameters `
-    environmentName=dev `
-    location=eastus2 `
-    staticWebAppLocation=eastus2 `
+  --parameters "@infra/main.parameters.prod.json" `
     postgresAdminPassword=$postgresPasswordPlain
 ```
 
-To add your workstation to PostgreSQL firewall rules, pass `postgresFirewallRules` with your public IP range. The example parameters file shows the shape.
+To add your workstation to PostgreSQL firewall rules, add your public IP range to `postgresFirewallRules` in `main.parameters.prod.json`.
+
+## Parameters And Secrets
+
+Normal environment values live in `main.parameters.prod.json`:
+
+```json
+{
+  "parameters": {
+    "environmentName": {
+      "value": "prod"
+    },
+    "location": {
+      "value": "eastus2"
+    }
+  }
+}
+```
+
+Secret values should not be committed. Pass them after the parameters file:
+
+```powershell
+az deployment group create `
+  --name purchase-order-infra `
+  --resource-group rg-purchase-order-prod `
+  --template-file infra/main.bicep `
+  --parameters "@infra/main.parameters.prod.json" `
+    postgresAdminPassword=$postgresPasswordPlain
+```
+
+In GitHub Actions, the same pattern uses GitHub Secrets:
+
+```powershell
+az deployment group create `
+  --name purchase-order-infra `
+  --resource-group $env:RESOURCE_GROUP `
+  --template-file infra/main.bicep `
+  --parameters "@infra/main.parameters.prod.json" `
+    postgresAdminPassword="$env:POSTGRES_ADMIN_PASSWORD"
+```
+
+If you need to override a normal value temporarily, pass it after the file:
+
+```powershell
+az deployment group create `
+  --name purchase-order-infra `
+  --resource-group rg-purchase-order-prod `
+  --template-file infra/main.bicep `
+  --parameters "@infra/main.parameters.prod.json" `
+    postgresAdminPassword=$postgresPasswordPlain `
+    location=australiaeast
+```
 
 ## GitHub Secrets
 
@@ -47,7 +95,7 @@ After deployment, read the outputs:
 
 ```powershell
 az deployment group show `
-  --resource-group rg-purchase-order-dev `
+  --resource-group rg-purchase-order-prod `
   --name purchase-order-infra `
   --query properties.outputs
 ```
