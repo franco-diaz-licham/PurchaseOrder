@@ -3,7 +3,7 @@ targetScope = 'resourceGroup'
 @description('Azure region for regional resources.')
 param location string = resourceGroup().location
 
-@description('Azure region for Static Web Apps. Static Web Apps is global/static-edge backed, but the managed service still requires a supported creation region.')
+@description('Azure region for Static Web Apps. Static Web Apps Free is used, but this resource type is not currently available in Australia regions.')
 param staticWebAppLocation string = 'eastus2'
 
 @description('Short workload name used in Azure resource names.')
@@ -27,7 +27,7 @@ param apiMinReplicas int = 0
 
 @description('Maximum API Container App replicas.')
 @minValue(1)
-param apiMaxReplicas int = 3
+param apiMaxReplicas int = 1
 
 @description('CPU allocated to each API replica.')
 @allowed([
@@ -40,7 +40,7 @@ param apiMaxReplicas int = 3
   '1.75'
   '2'
 ])
-param apiCpu string = '0.5'
+param apiCpu string = '0.25'
 
 @description('Memory allocated to each API replica.')
 @allowed([
@@ -51,7 +51,7 @@ param apiCpu string = '0.5'
   '3Gi'
   '4Gi'
 ])
-param apiMemory string = '1Gi'
+param apiMemory string = '0.5Gi'
 
 @description('Optional CORS origins for the API. When empty, the provisioned Static Web App origin is used.')
 param apiCorsAllowedOrigins array = []

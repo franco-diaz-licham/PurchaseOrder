@@ -18,7 +18,7 @@ $password = Read-Host "PostgreSQL admin password" -AsSecureString
 [CmdletBinding()]
 param(
     [string]$Subscription,
-    [string]$EnvFile = (Join-Path $PSScriptRoot "../.env"),
+    [string]$EnvFile = (Join-Path $PSScriptRoot "../infra/.env"),
     [securestring]$PostgresAdminPassword,
     [switch]$SkipWhatIf,
     [switch]$WhatIfOnly
@@ -58,7 +58,7 @@ function Get-Config {
 
     $value = [Environment]::GetEnvironmentVariable($Name, "Process")
     if ([string]::IsNullOrWhiteSpace($value)) {
-        throw "$Name is required. Set it in .env."
+        throw "$Name is required. Set it in infra/.env."
     }
 
     return $value

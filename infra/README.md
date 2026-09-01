@@ -10,18 +10,29 @@ This folder provisions the Azure resources used by the current production-shaped
 - Key Vault containing the generated API database connection string.
 - A user-assigned managed identity with `AcrPull` on the registry.
 
+Regional resources are configured for `australiaeast`. Static Web Apps stays on `eastus2` because Azure Static Web Apps Free is not currently available in Australia regions.
+
+Lowest-cost settings are used:
+
+- Container Apps Consumption with `0` minimum replicas, `1` maximum replica, `0.25` CPU, and `0.5Gi` memory.
+- Azure Container Registry `Basic`.
+- Static Web Apps `Free`.
+- PostgreSQL Flexible Server `Burstable` `Standard_B1ms` with `32` GiB storage.
+- Key Vault `standard`.
+- Log Analytics pay-as-you-go with `30` day retention.
+
 The template is additive infrastructure. It does not redirect Docker, GitHub Actions, or runtime paths to `backend/layered`.
 
 `main.bicep` is intentionally thin. It owns parameters, naming, and wiring between modules. Product-specific resources live under `modules/`.
 
 ## Deploy
 
-Review `.env` at the repository root:
+Review `infra/.env`:
 
 ```dotenv
 AZURE_SUBSCRIPTION=<subscription-id-or-name>
 AZURE_RESOURCE_GROUP_NAME=rg-purchase-order-prod
-AZURE_RESOURCE_GROUP_LOCATION=eastus2
+AZURE_RESOURCE_GROUP_LOCATION=australiaeast
 AZURE_DEPLOYMENT_NAME=purchase-order-infra
 AZURE_TEMPLATE_FILE=infra/main.bicep
 AZURE_PARAMETERS_FILE=infra/main.parameters.prod.json
@@ -54,11 +65,11 @@ To skip the preview:
 ./scripts/provision-infra.ps1 -SkipWhatIf
 ```
 
-The script creates the resource group, merges the committed parameters with the PostgreSQL password from `.env`, deploys `main.bicep`, and prints the GitHub secrets needed by the existing workflows.
+The script creates the resource group, merges the committed parameters with the PostgreSQL password from `infra/.env`, deploys `main.bicep`, and prints the GitHub secrets needed by the existing workflows.
 
 To add your workstation to PostgreSQL firewall rules, add your public IP range to `postgresFirewallRules` in `main.parameters.prod.json` before running the script.
 
-Use `.env` for normal value changes. Command-line arguments are now reserved for the common runtime controls:
+Use `infra/.env` for normal value changes. Command-line arguments are now reserved for the common runtime controls:
 
 ```powershell
 ./scripts/provision-infra.ps1 `
@@ -82,7 +93,7 @@ Create or update the resource group:
 ```powershell
 az group create `
   --name rg-purchase-order-prod `
-  --location eastus2
+  --location australiaeast
 ```
 
 Read the PostgreSQL password without committing it:
@@ -134,13 +145,13 @@ Normal environment values live in `main.parameters.prod.json`:
             "value": "prod"
         },
         "location": {
-            "value": "eastus2"
+            "value": "australiaeast"
         }
     }
 }
 ```
 
-Secret values should not be committed. `.env` is ignored by Git, so set `POSTGRES_ADMIN_PASSWORD` locally:
+Secret values should not be committed. `infra/.env` is ignored by Git, so set `POSTGRES_ADMIN_PASSWORD` locally:
 
 ```dotenv
 POSTGRES_ADMIN_PASSWORD=replace-with-a-strong-local-secret
@@ -155,11 +166,11 @@ $env:POSTGRES_ADMIN_PASSWORD = "${{ secrets.POSTGRES_ADMIN_PASSWORD }}"
 ./scripts/provision-infra.ps1 -SkipWhatIf
 ```
 
-If you need to override normal values temporarily, create another `.env` file and pass it to the script:
+If you need to override normal values temporarily, create another env file and pass it to the script:
 
 ```powershell
 ./scripts/provision-infra.ps1 `
-  -EnvFile .env.prod
+  -EnvFile infra/.env.prod
 ```
 
 ## GitHub Secrets
