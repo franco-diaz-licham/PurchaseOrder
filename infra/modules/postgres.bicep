@@ -4,27 +4,12 @@ param location string
 @description('PostgreSQL flexible server name.')
 param serverName string
 
-@description('Application database name.')
-param databaseName string
-
 @description('PostgreSQL administrator login name.')
 param administratorLogin string
 
 @description('PostgreSQL administrator password.')
 @secure()
 param administratorLoginPassword string
-
-@description('PostgreSQL flexible server version.')
-param version string
-
-@description('PostgreSQL SKU name.')
-param skuName string
-
-@description('PostgreSQL SKU tier.')
-param skuTier string
-
-@description('PostgreSQL storage size in GiB.')
-param storageSizeGb int
 
 @description('Allow Azure-hosted services to reach PostgreSQL over its public endpoint.')
 param allowAzureServices bool
@@ -34,6 +19,12 @@ param firewallRules array
 
 @description('Tags applied to PostgreSQL resources.')
 param tags object
+
+var databaseName = 'purchase_order'
+var version = '17'
+var skuName = 'Standard_B1ms'
+var skuTier = 'Burstable'
+var storageSizeGb = 32
 
 resource postgresServer 'Microsoft.DBforPostgreSQL/flexibleServers@2024-08-01' = {
   name: serverName

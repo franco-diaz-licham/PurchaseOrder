@@ -16,30 +16,18 @@ param containerRegistryLoginServer string
 @description('Key Vault secret URI containing the API database connection string.')
 param databaseConnectionSecretUri string
 
-@description('Initial API image.')
-param apiImage string
-
-@description('API container target port.')
-param apiTargetPort int
-
-@description('Minimum API replicas.')
-param minReplicas int
-
-@description('Maximum API replicas.')
-param maxReplicas int
-
-@description('CPU allocated to each API replica.')
-param cpu string
-
-@description('Memory allocated to each API replica.')
-param memory string
-
-@description('API CORS allowed origins.')
-param apiCorsAllowedOrigins array
+@description('API CORS allowed origin.')
+param apiCorsAllowedOrigin string
 
 @description('Tags applied to the API Container App.')
 param tags object
 
+var apiImage = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
+var apiTargetPort = 8080
+var minReplicas = 0
+var maxReplicas = 1
+var cpu = '0.25'
+var memory = '0.5Gi'
 var fixedEnvironmentVariables = [
   {
     name: 'ASPNETCORE_ENVIRONMENT'
@@ -55,9 +43,9 @@ var fixedEnvironmentVariables = [
   }
 ]
 var corsEnvironmentVariables = [
-  for (origin, index) in apiCorsAllowedOrigins: {
-    name: 'Cors__AllowedOrigins__${index}'
-    value: origin
+  {
+    name: 'Cors__AllowedOrigins__0'
+    value: apiCorsAllowedOrigin
   }
 ]
 

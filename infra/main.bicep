@@ -1,102 +1,33 @@
 targetScope = 'resourceGroup'
 
 @description('Azure region for regional resources.')
-param location string = resourceGroup().location
+param location string
 
 @description('Azure region for Static Web Apps. Static Web Apps Free is used, but this resource type is not currently available in Australia regions.')
-param staticWebAppLocation string = 'eastus2'
+param staticWebAppLocation string
 
 @description('Short workload name used in Azure resource names.')
-param workloadName string = 'purchase-order'
+param workloadName string
 
 @description('Environment label used in Azure resource names and tags.')
-param environmentName string = 'dev'
+param environmentName string
 
 @description('Tags applied to all Azure resources.')
-param tags object = {}
-
-@description('Initial API image. The API workflow replaces this with the image built from docker/api.dockerfile.')
-param apiImage string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
-
-@description('Port exposed by the API container.')
-param apiTargetPort int = 8080
-
-@description('Minimum API Container App replicas.')
-@minValue(0)
-param apiMinReplicas int = 0
-
-@description('Maximum API Container App replicas.')
-@minValue(1)
-param apiMaxReplicas int = 1
-
-@description('CPU allocated to each API replica.')
-@allowed([
-  '0.25'
-  '0.5'
-  '0.75'
-  '1'
-  '1.25'
-  '1.5'
-  '1.75'
-  '2'
-])
-param apiCpu string = '0.25'
-
-@description('Memory allocated to each API replica.')
-@allowed([
-  '0.5Gi'
-  '1Gi'
-  '1.5Gi'
-  '2Gi'
-  '3Gi'
-  '4Gi'
-])
-param apiMemory string = '0.5Gi'
-
-@description('Optional CORS origins for the API. When empty, the provisioned Static Web App origin is used.')
-param apiCorsAllowedOrigins array = []
-
-@description('PostgreSQL flexible server version.')
-@allowed([
-  '13'
-  '14'
-  '15'
-  '16'
-  '17'
-])
-param postgresVersion string = '17'
+param tags object
 
 @description('PostgreSQL administrator login name.')
-param postgresAdminLogin string = 'purchaseadmin'
+param postgresAdminLogin string
 
 @description('PostgreSQL administrator password.')
 @secure()
 @minLength(12)
 param postgresAdminPassword string
 
-@description('PostgreSQL SKU name.')
-param postgresSkuName string = 'Standard_B1ms'
-
-@description('PostgreSQL SKU tier.')
-@allowed([
-  'Burstable'
-  'GeneralPurpose'
-  'MemoryOptimized'
-])
-param postgresSkuTier string = 'Burstable'
-
-@description('PostgreSQL storage size in GiB.')
-@minValue(32)
-param postgresStorageSizeGb int = 32
-
-@description('Application database name.')
-param databaseName string = 'purchase_order'
-
 @description('Allow Azure-hosted services to reach PostgreSQL over its public endpoint. For stricter production networking, replace this with private networking.')
-param postgresAllowAzureServices bool = true
+param postgresAllowAzureServices bool
 
 @description('Additional PostgreSQL public firewall rules.')
-param postgresFirewallRules array = []
+param postgresFirewallRules array
 
 var normalizedWorkloadName = toLower(replace(workloadName, '_', '-'))
 var normalizedEnvironmentName = toLower(replace(environmentName, '_', '-'))
@@ -128,10 +59,6 @@ module frontend './modules/static-web-app.bicep' = {
   }
 }
 
-var apiCorsOrigins = empty(apiCorsAllowedOrigins) ? [
-  frontend.outputs.origin
-] : apiCorsAllowedOrigins
-
 module observability './modules/observability.bicep' = {
   name: 'observability'
   params: {
@@ -158,19 +85,14 @@ module postgres './modules/postgres.bicep' = {
     administratorLogin: postgresAdminLogin
     administratorLoginPassword: postgresAdminPassword
     allowAzureServices: postgresAllowAzureServices
-    databaseName: databaseName
     firewallRules: postgresFirewallRules
     location: location
     serverName: names.postgresServer
-    skuName: postgresSkuName
-    skuTier: postgresSkuTier
-    storageSizeGb: postgresStorageSizeGb
     tags: sharedTags
-    version: postgresVersion
   }
 }
 
-var databaseConnectionString = 'Host=${postgres.outputs.hostName};Port=5432;Database=${databaseName};Username=${postgresAdminLogin};Password=${postgresAdminPassword};Ssl Mode=Require;Trust Server Certificate=true;Maximum Pool Size=100;Timeout=60'
+var databaseConnectionString = 'Host=${postgres.outputs.hostName};Port=5432;Database=${postgres.outputs.databaseName};Username=${postgresAdminLogin};Password=${postgresAdminPassword};Ssl Mode=Require;Trust Server Certificate=true;Maximum Pool Size=100;Timeout=60'
 
 module secrets './modules/key-vault.bicep' = {
   name: 'key-vault'
@@ -187,18 +109,12 @@ module api './modules/api-container-app.bicep' = {
   name: 'api-container-app'
   params: {
     apiContainerAppName: names.apiContainerApp
-    apiCorsAllowedOrigins: apiCorsOrigins
-    apiImage: apiImage
-    apiTargetPort: apiTargetPort
+    apiCorsAllowedOrigin: frontend.outputs.origin
     containerAppsEnvironmentId: observability.outputs.containerAppsEnvironmentId
     containerRegistryLoginServer: registry.outputs.containerRegistryLoginServer
     databaseConnectionSecretUri: secrets.outputs.databaseConnectionSecretUri
     location: location
     managedIdentityId: registry.outputs.managedIdentityId
-    maxReplicas: apiMaxReplicas
-    memory: apiMemory
-    minReplicas: apiMinReplicas
-    cpu: apiCpu
     tags: sharedTags
   }
 }
