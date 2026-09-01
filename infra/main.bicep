@@ -1,5 +1,7 @@
 targetScope = 'resourceGroup'
 
+// ------------------------------------- Parameters -------------------------------------
+
 @description('Azure region for regional resources.')
 param location string
 
@@ -29,6 +31,8 @@ param postgresAllowAzureServices bool
 @description('Additional PostgreSQL public firewall rules.')
 param postgresFirewallRules array
 
+// ------------------------------------- Variables -------------------------------------
+
 var normalizedWorkloadName = toLower(replace(workloadName, '_', '-'))
 var normalizedEnvironmentName = toLower(replace(environmentName, '_', '-'))
 var compactWorkloadName = toLower(replace(replace('${normalizedWorkloadName}${normalizedEnvironmentName}', '-', ''), '_', ''))
@@ -49,6 +53,8 @@ var names = {
   postgresServer: take('psql-${resourcePrefix}-${resourceToken}', 63)
   staticWebApp: '${resourcePrefix}-swa'
 }
+
+// ------------------------------------- Modules -------------------------------------
 
 module frontend './modules/static-web-app.bicep' = {
   name: 'static-web-app'
@@ -92,12 +98,10 @@ module postgres './modules/postgres.bicep' = {
   }
 }
 
-var databaseConnectionString = 'Host=${postgres.outputs.hostName};Port=5432;Database=${postgres.outputs.databaseName};Username=${postgresAdminLogin};Password=${postgresAdminPassword};Ssl Mode=Require;Trust Server Certificate=true;Maximum Pool Size=100;Timeout=60'
-
 module secrets './modules/key-vault.bicep' = {
   name: 'key-vault'
   params: {
-    databaseConnectionString: databaseConnectionString
+    databaseConnectionString: 'Host=${postgres.outputs.hostName};Port=5432;Database=${postgres.outputs.databaseName};Username=${postgresAdminLogin};Password=${postgresAdminPassword};Ssl Mode=Require;Trust Server Certificate=true;Maximum Pool Size=100;Timeout=60'
     keyVaultName: names.keyVault
     location: location
     readerPrincipalId: registry.outputs.managedIdentityPrincipalId
@@ -118,6 +122,8 @@ module api './modules/api-container-app.bicep' = {
     tags: sharedTags
   }
 }
+
+// ------------------------------------- Outputs -------------------------------------
 
 output acrName string = registry.outputs.containerRegistryName
 output apiBaseUrl string = api.outputs.apiBaseUrl

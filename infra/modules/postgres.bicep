@@ -1,3 +1,5 @@
+// ------------------------------------- Parameters -------------------------------------
+
 @description('Azure region for PostgreSQL.')
 param location string
 
@@ -20,11 +22,15 @@ param firewallRules array
 @description('Tags applied to PostgreSQL resources.')
 param tags object
 
+// ------------------------------------- Variables -------------------------------------
+
 var databaseName = 'purchase_order'
 var version = '17'
 var skuName = 'Standard_B1ms'
 var skuTier = 'Burstable'
 var storageSizeGb = 32
+
+// ------------------------------------- Resources -------------------------------------
 
 resource postgresServer 'Microsoft.DBforPostgreSQL/flexibleServers@2024-08-01' = {
   name: serverName
@@ -86,6 +92,8 @@ resource additionalFirewallRules 'Microsoft.DBforPostgreSQL/flexibleServers/fire
     }
   }
 ]
+
+// ------------------------------------- Outputs -------------------------------------
 
 output databaseName string = database.name
 output hostName string = '${postgresServer.name}.postgres.database.azure.com'

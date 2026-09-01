@@ -1,3 +1,5 @@
+// ------------------------------------- Parameters -------------------------------------
+
 @description('Azure region for Key Vault.')
 param location string
 
@@ -13,6 +15,8 @@ param databaseConnectionString string
 
 @description('Tags applied to Key Vault resources.')
 param tags object
+
+// ------------------------------------- Resources -------------------------------------
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
   name: keyVaultName
@@ -50,6 +54,8 @@ resource keyVaultSecretsUserRole 'Microsoft.Authorization/roleAssignments@2022-0
     principalType: 'ServicePrincipal'
   }
 }
+
+// ------------------------------------- Outputs -------------------------------------
 
 output databaseConnectionSecretUri string = databaseConnectionSecret.properties.secretUri
 output keyVaultName string = keyVault.name

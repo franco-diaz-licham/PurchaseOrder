@@ -1,3 +1,5 @@
+// ------------------------------------- Parameters -------------------------------------
+
 @description('Azure region for observability resources.')
 param location string
 
@@ -9,6 +11,8 @@ param containerAppsEnvironmentName string
 
 @description('Tags applied to observability resources.')
 param tags object
+
+// ------------------------------------- Resources -------------------------------------
 
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
   name: logAnalyticsWorkspaceName
@@ -36,6 +40,8 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2026-01-01'
     }
   }
 }
+
+// ------------------------------------- Outputs -------------------------------------
 
 output containerAppsEnvironmentId string = containerAppsEnvironment.id
 output containerAppsEnvironmentName string = containerAppsEnvironment.name

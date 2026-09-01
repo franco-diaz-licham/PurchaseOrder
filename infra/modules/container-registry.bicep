@@ -1,3 +1,5 @@
+// ------------------------------------- Parameters -------------------------------------
+
 @description('Azure region for the registry and managed identity.')
 param location string
 
@@ -9,6 +11,8 @@ param managedIdentityName string
 
 @description('Tags applied to resources.')
 param tags object
+
+// ------------------------------------- Resources -------------------------------------
 
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' = {
   name: containerRegistryName
@@ -38,6 +42,8 @@ resource containerRegistryPullRole 'Microsoft.Authorization/roleAssignments@2022
     principalType: 'ServicePrincipal'
   }
 }
+
+// ------------------------------------- Outputs -------------------------------------
 
 output containerRegistryLoginServer string = containerRegistry.properties.loginServer
 output containerRegistryName string = containerRegistry.name

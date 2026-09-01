@@ -1,3 +1,5 @@
+// ------------------------------------- Parameters -------------------------------------
+
 @description('Azure region for the API Container App.')
 param location string
 
@@ -21,6 +23,8 @@ param apiCorsAllowedOrigin string
 
 @description('Tags applied to the API Container App.')
 param tags object
+
+// ------------------------------------- Variables -------------------------------------
 
 var apiImage = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
 var apiTargetPort = 8080
@@ -48,6 +52,8 @@ var corsEnvironmentVariables = [
     value: apiCorsAllowedOrigin
   }
 ]
+
+// ------------------------------------- Resources -------------------------------------
 
 resource apiContainerApp 'Microsoft.App/containerApps@2026-01-01' = {
   name: apiContainerAppName
@@ -108,6 +114,8 @@ resource apiContainerApp 'Microsoft.App/containerApps@2026-01-01' = {
     }
   }
 }
+
+// ------------------------------------- Outputs -------------------------------------
 
 output apiBaseUrl string = 'https://${apiContainerApp.properties.configuration.ingress.fqdn}'
 output apiContainerAppName string = apiContainerApp.name
