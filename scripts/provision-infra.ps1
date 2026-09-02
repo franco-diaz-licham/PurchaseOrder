@@ -28,7 +28,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 # Load reusable helper functions from the local script module.
-Import-Module (Join-Path $PSScriptRoot "ProvisionInfra.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "InfraHelpers.psm1") -Force
 
 # Validate required local tooling before reading configuration or secrets.
 if (-not (Get-Command az -ErrorAction SilentlyContinue)) {
