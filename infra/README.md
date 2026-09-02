@@ -173,6 +173,28 @@ If you need to override normal values temporarily, create another env file and p
   -EnvFile infra/.env.prod
 ```
 
+## Deprovision
+
+To delete the Azure environment, run the deprovisioning script from the repository root:
+
+```powershell
+./scripts/deprovision-infra.ps1
+```
+
+The script reads the subscription and resource group from `infra/.env`, lists the resources that will be deleted, and asks you to type the resource group name before deletion.
+
+To skip the confirmation prompt:
+
+```powershell
+./scripts/deprovision-infra.ps1 -Force
+```
+
+To start deletion and let Azure continue in the background:
+
+```powershell
+./scripts/deprovision-infra.ps1 -Force -NoWait
+```
+
 ## GitHub Secrets
 
 After deployment, read the outputs:
