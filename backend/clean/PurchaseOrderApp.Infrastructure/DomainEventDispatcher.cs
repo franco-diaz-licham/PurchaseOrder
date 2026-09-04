@@ -1,7 +1,7 @@
 using PurchaseOrderApp.Application.Ports;
 using PurchaseOrderApp.Domain.Core;
-using PurchaseOrderApp.Domain.Entities;
 using PurchaseOrderApp.Domain.Events;
+using PurchaseOrderApp.Infrastructure.Background;
 
 namespace PurchaseOrderApp.Infrastructure;
 
@@ -12,10 +12,10 @@ public sealed class DomainEventDispatcher(DatabaseContext db) : IDomainEventDisp
         foreach (var domainEvent in domainEvents) {
             switch (domainEvent) {
                 case StockReservedEvent stockReserved:
-                    await db.AuditLogEntries.AddAsync(AuditLogEntry.RecordReservation(stockReserved), cancellationToken);
+                    await db.OutboxMessages.AddAsync(AuditLogOutboxMapper.ToOutboxMessage(stockReserved), cancellationToken);
                     break;
                 case StockReleasedEvent stockReleased:
-                    await db.AuditLogEntries.AddAsync(AuditLogEntry.RecordRelease(stockReleased), cancellationToken);
+                    await db.OutboxMessages.AddAsync(AuditLogOutboxMapper.ToOutboxMessage(stockReleased), cancellationToken);
                     break;
             }
         }

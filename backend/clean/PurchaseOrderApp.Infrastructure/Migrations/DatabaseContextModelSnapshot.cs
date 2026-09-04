@@ -430,6 +430,138 @@ namespace PurchaseOrderApp.Infrastructure.Migrations
                     b.ToTable("warehouse_stock", (string)null);
                 });
 
+            modelBuilder.Entity("PurchaseOrderApp.Infrastructure.Background.OutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("ActorUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("actor_user_id");
+
+                    b.Property<int>("AttemptCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("attempt_count");
+
+                    b.Property<string>("CorrelationId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("correlation_id");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_utc")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Guid>("EntityId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("entity_id");
+
+                    b.Property<string>("EntityType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("entity_type");
+
+                    b.Property<string>("IdempotencyKey")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("idempotency_key");
+
+                    b.Property<string>("LastError")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("last_error");
+
+                    b.Property<string>("LockedBy")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("locked_by");
+
+                    b.Property<DateTimeOffset?>("LockedUntilUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("locked_until_utc");
+
+                    b.Property<string>("MessageType")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("message_type");
+
+                    b.Property<DateTimeOffset>("NextAttemptUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("next_attempt_utc")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<DateTimeOffset>("OccurredUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("occurred_utc");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("payload")
+                        .HasDefaultValueSql("'{}'::jsonb");
+
+                    b.Property<DateTimeOffset?>("ProcessedUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("processed_utc");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)")
+                        .HasDefaultValue("pending")
+                        .HasColumnName("status");
+
+                    b.Property<DateTimeOffset>("UpdatedUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_utc")
+                        .HasDefaultValueSql("now()");
+
+                    b.HasKey("Id")
+                        .HasName("pk_outbox_message");
+
+                    b.HasIndex("CorrelationId")
+                        .HasDatabaseName("ix_outbox_message_correlation_id");
+
+                    b.HasIndex("IdempotencyKey")
+                        .IsUnique()
+                        .HasDatabaseName("ix_outbox_message_idempotency_key")
+                        .HasFilter("idempotency_key IS NOT NULL");
+
+                    b.HasIndex("LockedUntilUtc")
+                        .HasDatabaseName("ix_outbox_message_locked_until_utc");
+
+                    b.HasIndex("EntityType", "EntityId")
+                        .HasDatabaseName("ix_outbox_message_entity_type_entity_id");
+
+                    b.HasIndex("Status", "NextAttemptUtc")
+                        .HasDatabaseName("ix_outbox_message_status_next_attempt_utc");
+
+                    b.ToTable("outbox_message", "background", t =>
+                        {
+                            t.HasCheckConstraint("ck_outbox_message_attempt_count", "attempt_count >= 0");
+
+                            t.HasCheckConstraint("ck_outbox_message_correlation_id", "length(trim(correlation_id)) > 0");
+
+                            t.HasCheckConstraint("ck_outbox_message_entity_type", "length(trim(entity_type)) > 0");
+
+                            t.HasCheckConstraint("ck_outbox_message_message_type", "length(trim(message_type)) > 0");
+
+                            t.HasCheckConstraint("ck_outbox_message_status", "status IN ('pending', 'processing', 'processed', 'failed', 'dead_lettered')");
+                        });
+                });
+
             modelBuilder.Entity("PurchaseOrderApp.Domain.Entities.PurchaseOrder", b =>
                 {
                     b.HasOne("PurchaseOrderApp.Domain.Entities.Warehouse", "Warehouse")
