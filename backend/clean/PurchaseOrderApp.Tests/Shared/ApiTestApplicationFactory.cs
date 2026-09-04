@@ -21,6 +21,7 @@ public sealed class ApiTestApplicationFactory(string connectionString) : WebAppl
         builder.ConfigureAppConfiguration(configuration => {
             configuration.AddInMemoryCollection(new Dictionary<string, string?> {
                 ["Database:PurchaseOrderDb"] = connectionString,
+                ["BackgroundProcessing:Enabled"] = "false",
                 ["Cors:AllowedOrigins:0"] = "http://localhost"
             });
         });

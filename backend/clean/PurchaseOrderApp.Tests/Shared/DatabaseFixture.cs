@@ -51,7 +51,7 @@ public abstract class DatabaseFixture
         await connection.OpenAsync();
         _respawner = await Respawner.CreateAsync(connection, new RespawnerOptions {
             DbAdapter = DbAdapter.Postgres,
-            SchemasToInclude = ["public"],
+            SchemasToInclude = ["public", "background"],
             TablesToIgnore = [new Table("public", "__EFMigrationsHistory")]
         });
     }
