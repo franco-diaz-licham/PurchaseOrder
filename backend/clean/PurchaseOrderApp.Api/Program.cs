@@ -17,6 +17,8 @@ try {
     app.UseHttpsRedirection();
     app.UseCors(CorsOptions.PolicyName);
     app.MapControllers();
+    app.UseBackgroundProcessingDashboard();
+    app.ScheduleBackgroundProcessing();
 
     await app.RunAsync();
 } catch {
