@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using PurchaseOrderApp.Domain.Entities;
+using PurchaseOrderApp.Infrastructure.Background;
 
 namespace PurchaseOrderApp.Infrastructure;
 
@@ -8,6 +9,7 @@ public sealed class DatabaseContext(DbContextOptions<DatabaseContext> options) :
 {
     public DbSet<AuditLogEntry> AuditLogEntries => Set<AuditLogEntry>();
     public DbSet<InventoryItem> InventoryItems => Set<InventoryItem>();
+    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
     public DbSet<PurchaseOrder> PurchaseOrders => Set<PurchaseOrder>();
     public DbSet<PurchaseOrderLine> PurchaseOrderLines => Set<PurchaseOrderLine>();
     public DbSet<StockReservation> StockReservations => Set<StockReservation>();
