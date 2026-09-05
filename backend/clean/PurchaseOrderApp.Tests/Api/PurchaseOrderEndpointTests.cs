@@ -1,10 +1,10 @@
+using PurchaseOrderApp.Infrastructure.Background;
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using PurchaseOrderApp.Api.Models;
 using PurchaseOrderApp.Application.Models;
 using PurchaseOrderApp.Domain.Enums;
-using PurchaseOrderApp.Infrastructure.Background;
 using PurchaseOrderApp.Tests.Shared;
 using Shouldly;
 
@@ -104,10 +104,11 @@ public sealed class PurchaseOrderEndpointTests : ApiEndpointTestFixture
         auditLogBeforeDispatch.ShouldBeEmpty();
 
         Db.ChangeTracker.Clear();
-        var queuedAuditMessages = await Db.OutboxMessages.CountAsync(message => message.Status == OutboxMessageStatus.Pending);
-        queuedAuditMessages.ShouldBe(2);
+        var queuedAuditJobs = await Db.OutboxMessages.CountAsync(message => message.PublishedUtc == null);
+        Storage.GetMonitoringApi().EnqueuedCount("audit").ShouldBe(0);
+        queuedAuditJobs.ShouldBe(2);
 
-        await ProcessBackgroundOutboxAsync();
+        await ProcessBackgroundJobsAsync();
 
         var auditResponse = await Client.GetAsync("/api/audit-log");
         auditResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -116,8 +117,8 @@ public sealed class PurchaseOrderEndpointTests : ApiEndpointTestFixture
         auditLog.Select(entry => entry.Quantity).ShouldContain(4.250m);
 
         Db.ChangeTracker.Clear();
-        var processedAuditMessages = await Db.OutboxMessages.CountAsync(message => message.Status == OutboxMessageStatus.Processed);
-        processedAuditMessages.ShouldBe(2);
+        var succeededAuditJobs = Storage.GetMonitoringApi().SucceededListCount();
+        succeededAuditJobs.ShouldBe(2);
     }
 
     [Test]

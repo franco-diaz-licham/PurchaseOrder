@@ -1,8 +1,10 @@
+using PurchaseOrderApp.Application.Ports;
+using Hangfire.AspNetCore;
+using Hangfire;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using PurchaseOrderApp.Api.Models;
-using PurchaseOrderApp.Application.Ports;
 using Shouldly;
 
 namespace PurchaseOrderApp.Tests.Shared;
@@ -58,15 +60,19 @@ public abstract class ApiEndpointTestFixture : DatabaseFixture, IDisposable
     }
 
     /// <summary>
-    /// Runs background outbox processing once for tests that assert deferred side effects.
+    /// Executes real Hangfire jobs for tests that assert deferred side effects.
     /// </summary>
-    protected async Task ProcessBackgroundOutboxAsync(CancellationToken cancellationToken = default)
+    protected async Task ProcessBackgroundJobsAsync(CancellationToken cancellationToken = default)
     {
         if (_factory is null) throw new InvalidOperationException("The API factory has not been created.");
-
-        using var scope = _factory.Services.CreateScope();
-        var processor = scope.ServiceProvider.GetRequiredService<IOutboxProcessor>();
-        await processor.ProcessPendingAsync(cancellationToken);
+        using var relayScope = _factory.Services.CreateScope();
+        await relayScope.ServiceProvider.GetRequiredService<IOutboxProcessor>().ProcessPendingAsync(cancellationToken);
+        using var server = new BackgroundJobServer(new BackgroundJobServerOptions {
+            Queues = ["audit"],
+            WorkerCount = 1,
+            Activator = new AspNetCoreJobActivator(_factory.Services.GetRequiredService<IServiceScopeFactory>())
+        }, Storage);
+        await HangfireTestWorker.WaitForSuccessAsync(Storage, 2, cancellationToken);
     }
 
     /// <summary>

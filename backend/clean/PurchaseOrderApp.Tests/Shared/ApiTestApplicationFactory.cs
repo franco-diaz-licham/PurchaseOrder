@@ -27,6 +27,11 @@ public sealed class ApiTestApplicationFactory(string connectionString) : WebAppl
         });
 
         builder.ConfigureTestServices(services => {
+            // The test explicitly starts a worker only after checking pre-execution state.
+            services.RemoveAll<Microsoft.Extensions.Hosting.IHostedService>();
+            // Hangfire caches some loggers statically across hosts. Use a non-disposable factory.
+            services.AddSingleton<Microsoft.Extensions.Logging.ILoggerFactory>(
+                Microsoft.Extensions.Logging.Abstractions.NullLoggerFactory.Instance);
             services.RemoveAll<DbContextOptions<DatabaseContext>>();
             services.AddDbContext<DatabaseContext>(options => {
                 options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention();

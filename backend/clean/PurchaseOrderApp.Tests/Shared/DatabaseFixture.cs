@@ -1,3 +1,5 @@
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
@@ -20,6 +22,8 @@ public abstract class DatabaseFixture
         .WithPassword("purchase_order")
         .Build();
 
+    protected JobStorage Storage { get; private set; } = default!;
+
     private Respawner _respawner = default!;
     private ServiceProvider _serviceProvider = default!;
     private IServiceScope _scope = default!;
@@ -40,19 +44,25 @@ public abstract class DatabaseFixture
     [OneTimeSetUp]
     public async Task StartDatabaseAsync()
     {
+        Hangfire.Logging.LogProvider.SetCurrentLogProvider(new TestHangfireLogProvider());
         await _postgres.StartAsync();
         _serviceProvider = CreateServiceProvider();
 
         using var setupScope = _serviceProvider.CreateScope();
         var setupContext = setupScope.ServiceProvider.GetRequiredService<DatabaseContext>();
         await setupContext.Database.MigrateAsync();
+#pragma warning disable CS0618
+        Storage = new PostgreSqlStorage(ConnectionString, new PostgreSqlStorageOptions {
+            QueuePollInterval = TimeSpan.FromMilliseconds(100)
+        });
+#pragma warning restore CS0618
 
         await using var connection = new NpgsqlConnection(ConnectionString);
         await connection.OpenAsync();
         _respawner = await Respawner.CreateAsync(connection, new RespawnerOptions {
             DbAdapter = DbAdapter.Postgres,
-            SchemasToInclude = ["public", "background"],
-            TablesToIgnore = [new Table("public", "__EFMigrationsHistory")]
+            SchemasToInclude = ["public", "background", "hangfire"],
+            TablesToIgnore = [new Table("public", "__EFMigrationsHistory"), new Table("hangfire", "schema")]
         });
     }
 
@@ -62,6 +72,7 @@ public abstract class DatabaseFixture
     [SetUp]
     public async Task ResetDatabaseAsync()
     {
+        Hangfire.Logging.LogProvider.SetCurrentLogProvider(new TestHangfireLogProvider());
         await using var connection = new NpgsqlConnection(ConnectionString);
         await connection.OpenAsync();
         await _respawner.ResetAsync(connection);
