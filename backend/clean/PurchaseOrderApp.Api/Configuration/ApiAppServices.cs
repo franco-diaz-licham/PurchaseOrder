@@ -75,7 +75,9 @@ public static class ApiAppServices
         });
 
         services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
+        services.AddScoped<IAuditJobQueue, HangfireAuditJobQueue>();
         services.AddScoped<IOutboxProcessor, OutboxProcessor>();
+        services.AddScoped<StockAuditJob>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IAuditLogRepository, AuditLogRepository>();
         services.AddScoped<IFinanceQueryRepository, FinanceRepository>();
@@ -100,12 +102,10 @@ public static class ApiAppServices
             .GetSection(BackgroundProcessingOptions.SectionName)
             .Get<BackgroundProcessingOptions>() ?? new BackgroundProcessingOptions();
 
-        if (!backgroundOptions.Enabled) return services;
-
         services.AddHangfire((sp, hangfire) => {
             var databaseOptions = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
             var storageOptions = new PostgreSqlStorageOptions {
-                SchemaName = "hangfire"
+                SchemaName = "hangfire",
             };
 
             hangfire
@@ -117,9 +117,9 @@ public static class ApiAppServices
                     storageOptions);
         });
 
-        services.AddHangfireServer(options => {
+        if (backgroundOptions.Enabled) services.AddHangfireServer(options => {
             options.WorkerCount = backgroundOptions.WorkerCount;
-            options.Queues = ["default"];
+            options.Queues = ["default", "audit"];
         });
 
         return services;

@@ -6,6 +6,7 @@ public sealed class BackgroundProcessingOptions
 {
     public const string SectionName = "BackgroundProcessing";
 
+    /// <summary>Controls the worker, recurring relay, and development dashboard.</summary>
     public bool Enabled { get; set; } = true;
 
     [Required]
