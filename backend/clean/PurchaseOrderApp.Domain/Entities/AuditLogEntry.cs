@@ -74,10 +74,10 @@ public sealed class AuditLogEntry : Entity<AuditLogEntryId>
     /// <summary>
     /// Creates an audit entry from a stock reserved domain event.
     /// </summary>
-    public static AuditLogEntry RecordReservation(StockReservedEvent domainEvent)
+    public static AuditLogEntry RecordReservation(StockReservedEvent domainEvent, AuditLogEntryId? auditId = null)
     {
         return new AuditLogEntry(
-            new AuditLogEntryId(Guid.NewGuid()),
+            auditId ?? new AuditLogEntryId(Guid.NewGuid()),
             AuditAction.Reserve,
             domainEvent.InventoryItemId,
             domainEvent.WarehouseId,
@@ -92,10 +92,10 @@ public sealed class AuditLogEntry : Entity<AuditLogEntryId>
     /// <summary>
     /// Creates an audit entry from a stock released domain event.
     /// </summary>
-    public static AuditLogEntry RecordRelease(StockReleasedEvent domainEvent)
+    public static AuditLogEntry RecordRelease(StockReleasedEvent domainEvent, AuditLogEntryId? auditId = null)
     {
         return new AuditLogEntry(
-            new AuditLogEntryId(Guid.NewGuid()),
+            auditId ?? new AuditLogEntryId(Guid.NewGuid()),
             AuditAction.Release,
             domainEvent.InventoryItemId,
             domainEvent.WarehouseId,

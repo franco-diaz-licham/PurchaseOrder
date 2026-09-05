@@ -1,12 +1,12 @@
 namespace PurchaseOrderApp.Application.Ports;
 
 /// <summary>
-/// Processes committed outbox messages into their eventual side effects.
+/// Relays committed outbox messages to the background queue.
 /// </summary>
 public interface IOutboxProcessor
 {
     /// <summary>
-    /// Claims and processes pending outbox messages.
+    /// Publishes unpublished messages as individual background jobs.
     /// </summary>
     Task ProcessPendingAsync(CancellationToken cancellationToken);
 }
